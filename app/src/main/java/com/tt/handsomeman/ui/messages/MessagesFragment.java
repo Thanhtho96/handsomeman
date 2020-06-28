@@ -42,11 +42,11 @@ public class MessagesFragment extends BaseFragment<MessageViewModel, FragmentMes
     SharedPreferencesUtils sharedPreferencesUtils;
     MutableLiveData<List<ConversationResponse>> conversationList = new MutableLiveData<>();
     MutableLiveData<List<Contact>> contactList = new MutableLiveData<>();
+    String authorizationCode;
     private Fragment childMessagesFragment = new MessagesChildMessagesFragment();
     private Fragment childContactsFragment = new MessagesChildContactsFragment();
     private Fragment active = childMessagesFragment;
     private EditText edtSearchByWord;
-    String authorizationCode;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
@@ -112,7 +112,7 @@ public class MessagesFragment extends BaseFragment<MessageViewModel, FragmentMes
     }
 
     private void setEditTextHintTextAndIcon() {
-        ImageSpan imageHint = new ImageSpan(getContext(), R.drawable.ic_search_18dp);
+        ImageSpan imageHint = new ImageSpan(getContext(), R.drawable.ic_search_19dp);
         SpannableString spannableString = new SpannableString("    " + getResources().getString(R.string.search_by_word));
         spannableString.setSpan(imageHint, 0, 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         edtSearchByWord.setHint(spannableString);

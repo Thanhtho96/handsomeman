@@ -17,7 +17,7 @@ import com.tt.handsomeman.adapter.PaymentMilestoneAdapter;
 import com.tt.handsomeman.databinding.ActivityViewJobTransactionBinding;
 import com.tt.handsomeman.response.PaymentPaid;
 import com.tt.handsomeman.response.TransactionDetailResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.DecimalFormat;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class ViewJobTransaction extends BaseAppCompatActivity<HandymanViewModel> {
+public class ViewJobTransaction extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

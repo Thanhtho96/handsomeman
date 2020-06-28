@@ -15,7 +15,7 @@ import com.tt.handsomeman.databinding.ActivityCustomerTransferHistoryBinding;
 import com.tt.handsomeman.response.CustomerTransferHistoryResponse;
 import com.tt.handsomeman.response.DataBracketResponse;
 import com.tt.handsomeman.response.ListCustomerTransfer;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.viewmodel.CustomerViewModel;
@@ -25,7 +25,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class CustomerTransferHistory extends BaseAppCompatActivity<CustomerViewModel> {
+public class CustomerTransferHistory extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

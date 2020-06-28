@@ -1,16 +1,18 @@
 package com.tt.handsomeman.ui;
 
+import android.os.Bundle;
+import android.view.View;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tt.handsomeman.BuildConfig;
-import com.tt.handsomeman.viewmodel.BaseViewModel;
-
-public abstract class BaseAppCompatActivity<T extends BaseViewModel> extends AppCompatActivity {
-    protected T baseViewModel;
-
+public abstract class BaseAppCompatActivity extends AppCompatActivity {
     @Override
-    protected void onDestroy() {
-        baseViewModel.clearSubscriptions(this.getClass().getName().replace(BuildConfig.APPLICATION_ID, ""));
-        super.onDestroy();
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        View view = getWindow().getDecorView();
+        view.setSystemUiVisibility
+                (View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
     }
 }

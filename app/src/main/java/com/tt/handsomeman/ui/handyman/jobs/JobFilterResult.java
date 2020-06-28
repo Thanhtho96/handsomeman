@@ -17,7 +17,7 @@ import com.tt.handsomeman.adapter.JobFilterAdapter;
 import com.tt.handsomeman.databinding.ActivityFilterResultBinding;
 import com.tt.handsomeman.model.Job;
 import com.tt.handsomeman.request.JobFilterRequest;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.Constants;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class JobFilterResult extends BaseAppCompatActivity<HandymanViewModel> {
+public class JobFilterResult extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

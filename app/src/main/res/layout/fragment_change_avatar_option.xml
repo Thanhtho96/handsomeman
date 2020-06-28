@@ -7,7 +7,6 @@
     android:background="@color/white"
     tools:context=".ui.ChangeAvatarOptionFragment">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +19,7 @@
             android:gravity="center_horizontal"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            android:text="Change Avatar Option"
+            android:text="@string/change_avatar_option"
             android:textColor="@color/text_bg_bid_job"
             android:textSize="14sp" />
 
@@ -37,7 +36,7 @@
             android:gravity="center_horizontal"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:text="Take a photo"
+            android:text="@string/take_a_photo"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -55,7 +54,7 @@
             android:gravity="center_horizontal"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:text="Choose from Album"
+            android:text="@string/choose_from_album"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -73,7 +72,7 @@
             android:gravity="center_horizontal"
             android:paddingTop="15dp"
             android:paddingBottom="15dp"
-            android:text="Back"
+            android:text="@string/back"
             android:textColor="@color/orange_red"
             android:textSize="18sp"
             android:textStyle="bold" />

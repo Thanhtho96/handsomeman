@@ -163,6 +163,11 @@ public class HandyManMainScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        View view = getWindow().getDecorView();
+        view.setSystemUiVisibility
+                (view.getSystemUiVisibility() |
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         binding = ActivityHandyManMainScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         HandymanApp.getComponent().inject(this);
@@ -174,9 +179,9 @@ public class HandyManMainScreen extends AppCompatActivity {
 //        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 //        NavigationUI.setupWithNavController(navView, navController);
 
-        getLastKnownLocation();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         startLocationService();
+        getLastKnownLocation();
 
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         FragmentManipulate();
@@ -184,6 +189,10 @@ public class HandyManMainScreen extends AppCompatActivity {
 
     private void getLastKnownLocation() {
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -213,7 +222,7 @@ public class HandyManMainScreen extends AppCompatActivity {
         if (requestCode == PERMISSION_REQUEST_LOCATION) {
             // Request for camera permission.
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission has been granted. Start camera preview Activity.
+                // Permission has been granted. Start location service.
                 startLocationService();
             } else {
                 // Permission request was denied.

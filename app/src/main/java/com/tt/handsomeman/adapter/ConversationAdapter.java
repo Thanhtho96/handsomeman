@@ -21,7 +21,6 @@ import com.daimajia.swipe.adapters.RecyclerSwipeAdapter;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ItemConversationBinding;
 import com.tt.handsomeman.response.ConversationResponse;
-import com.tt.handsomeman.ui.handyman.more.MyProfileEdit;
 import com.tt.handsomeman.util.TimeParseUtil;
 
 import java.text.ParseException;

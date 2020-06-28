@@ -4,127 +4,132 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/white"
     android:fitsSystemWindows="true"
     tools:context=".ui.Register">
 
-    <ImageButton
-        android:id="@+id/registerBackButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:background="@drawable/custom_ripple_transparent_color_radius_bg"
-        android:padding="15dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/back_back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/imageRegister"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:layout_marginTop="75dp"
-        android:src="@drawable/logo"
-        app:layout_constraintTop_toBottomOf="@+id/registerBackButton" />
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark">
 
-    <TextView
-        android:id="@+id/textViewRole"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:textColor="@color/white"
-        android:textSize="@dimen/design_8sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageRegister"
-        tools:text="@string/customer_role" />
-
-    <LinearLayout
-        android:id="@+id/loginFBLinear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="75dp"
-        android:layout_marginEnd="75dp"
-        android:background="@drawable/custom_ripple_white_radius_bg"
-        app:layout_constraintBottom_toTopOf="@+id/reDes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageRegister">
+        <ImageButton
+            android:id="@+id/registerBackButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/custom_ripple_transparent_color_radius_bg"
+            android:padding="15dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/back_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="10dp"
-            android:src="@drawable/ic_fb" />
+            android:id="@+id/imageRegister"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="75dp"
+            android:src="@drawable/logo"
+            app:layout_constraintTop_toBottomOf="@+id/registerBackButton" />
 
         <TextView
+            android:id="@+id/textViewRole"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="10dp"
-            android:text="@string/facebook_login"
-            android:textColor="@color/facebook_text_bg"
-            android:textSize="@dimen/design_6sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:layout_marginTop="7dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/design_8sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageRegister"
+            tools:text="@string/customer_role" />
 
-    <TextView
-        android:id="@+id/reDes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="65dp"
-        android:gravity="center"
-        android:text="@string/register_description"
-        android:textColor="@color/white"
-        android:textSize="@dimen/design_4_3sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/white"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <Button
-            android:id="@+id/buttonRegisterLogin"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/loginFBLinear"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/custom_ripple_transparent_color_bg"
+            android:layout_marginStart="75dp"
+            android:layout_marginEnd="75dp"
+            android:background="@drawable/custom_ripple_white_radius_bg"
+            app:layout_constraintBottom_toTopOf="@+id/reDes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageRegister">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="10dp"
+                android:src="@drawable/ic_fb" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="10dp"
+                android:text="@string/facebook_login"
+                android:textColor="@color/facebook_text_bg"
+                android:textSize="@dimen/design_6sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/reDes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="65dp"
             android:gravity="center"
-            android:text="@string/log_in"
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/design_6sp"
-            android:textStyle="bold" />
+            android:text="@string/register_description"
+            android:textColor="@color/white"
+            android:textSize="@dimen/design_4_3sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@color/colorPrimary" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
-            android:id="@+id/buttonRegisterSignUp"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/custom_ripple_transparent_color_bg"
-            android:text="@string/sign_up"
-            android:textAllCaps="false"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/design_6sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            <Button
+                android:id="@+id/buttonRegisterLogin"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/custom_ripple_transparent_color_bg"
+                android:gravity="center"
+                android:text="@string/log_in"
+                android:textAllCaps="false"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/design_6sp"
+                android:textStyle="bold" />
 
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/colorPrimary" />
+
+            <Button
+                android:id="@+id/buttonRegisterSignUp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/custom_ripple_transparent_color_bg"
+                android:text="@string/sign_up"
+                android:textAllCaps="false"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/design_6sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

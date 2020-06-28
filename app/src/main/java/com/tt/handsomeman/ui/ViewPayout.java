@@ -16,7 +16,7 @@ import com.tt.handsomeman.viewmodel.UserViewModel;
 
 import javax.inject.Inject;
 
-public class ViewPayout extends BaseAppCompatActivity<UserViewModel> {
+public class ViewPayout extends BaseAppCompatActivityWithViewModel<UserViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

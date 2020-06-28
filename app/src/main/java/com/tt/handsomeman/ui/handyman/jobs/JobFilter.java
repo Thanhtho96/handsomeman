@@ -8,19 +8,18 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.SpinnerString;
 import com.tt.handsomeman.databinding.ActivityJobFilterBinding;
+import com.tt.handsomeman.ui.BaseAppCompatActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class JobFilter extends AppCompatActivity {
+public class JobFilter extends BaseAppCompatActivity {
 
     Integer radius, priceMin, priceMax;
     String dateCreated = null;

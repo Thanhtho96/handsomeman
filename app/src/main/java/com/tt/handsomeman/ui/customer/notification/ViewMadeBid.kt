@@ -21,7 +21,7 @@ import com.tt.handsomeman.adapter.FileNameAdapter
 import com.tt.handsomeman.databinding.ActivityViewMadeBidBinding
 import com.tt.handsomeman.request.AcceptBidRequest
 import com.tt.handsomeman.response.BidFileResponse
-import com.tt.handsomeman.ui.BaseAppCompatActivity
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel
 import com.tt.handsomeman.util.CustomDividerItemDecoration
 import com.tt.handsomeman.util.DecimalFormat
 import com.tt.handsomeman.util.SharedPreferencesUtils
@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class ViewMadeBid : BaseAppCompatActivity<NotificationViewModel?>() {
+class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 

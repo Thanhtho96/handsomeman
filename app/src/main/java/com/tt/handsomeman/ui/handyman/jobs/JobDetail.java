@@ -13,6 +13,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -35,10 +36,9 @@ import com.tt.handsomeman.model.HandymanJobDetail;
 import com.tt.handsomeman.model.Job;
 import com.tt.handsomeman.model.PaymentMilestone;
 import com.tt.handsomeman.response.StandardResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.handyman.ViewJobTransaction;
 import com.tt.handsomeman.ui.handyman.jobs.bid_job_detail.BidJobDetail;
-import com.tt.handsomeman.ui.handyman.more.MyProfileEdit;
 import com.tt.handsomeman.ui.messages.Conversation;
 import com.tt.handsomeman.util.DimensionConverter;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -49,7 +49,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class JobDetail extends BaseAppCompatActivity<HandymanViewModel> {
+public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
     private static final Integer REVIEW_REQUEST = 777;
 
@@ -58,6 +58,7 @@ public class JobDetail extends BaseAppCompatActivity<HandymanViewModel> {
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
+    private ConstraintLayout container;
     private ImageView imClientAvatar, imIsWish;
     private RatingBar rtReview;
     private TextView tvJobTitle, tvJobId, tvJobCreateTime, tvJobDetail,
@@ -76,6 +77,8 @@ public class JobDetail extends BaseAppCompatActivity<HandymanViewModel> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        View view = getWindow().getDecorView();
+        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         binding = ActivityJobDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         HandymanApp.getComponent().inject(this);
@@ -94,6 +97,7 @@ public class JobDetail extends BaseAppCompatActivity<HandymanViewModel> {
     }
 
     private void bindView() {
+        container = binding.container;
         rtReview = binding.ratingBarJobDetail;
         tvJobTitle = binding.jobTitleJobDetail;
         tvJobId = binding.jobIdJobDetail;
@@ -251,6 +255,7 @@ public class JobDetail extends BaseAppCompatActivity<HandymanViewModel> {
             }
 
             if (jobDetail.isAccepted()) {
+                container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 tvHired.setText(getString(R.string.yes));
                 btnViewTransaction.setVisibility(View.VISIBLE);
                 btnViewTransaction.setOnClickListener(v -> {
@@ -263,6 +268,7 @@ public class JobDetail extends BaseAppCompatActivity<HandymanViewModel> {
             } else if (jobDetail.isBid()) {
                 tvHired.setText(getString(R.string.no));
             } else {
+                container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 btnPlaceABid.setVisibility(View.VISIBLE);
                 btnPlaceABid.setOnClickListener(v -> bidJob());
                 tvHired.setText(getString(R.string.no));

@@ -14,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -26,6 +25,7 @@ import com.tt.handsomeman.model.SignUpAddPayoutFormState;
 import com.tt.handsomeman.request.UserActivatingAccount;
 import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.service.UserService;
+import com.tt.handsomeman.ui.BaseAppCompatActivity;
 import com.tt.handsomeman.util.Constants;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusCodeConstant;
@@ -42,7 +42,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SignUpAddPayout extends AppCompatActivity {
+public class SignUpAddPayout extends BaseAppCompatActivity {
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     @Inject

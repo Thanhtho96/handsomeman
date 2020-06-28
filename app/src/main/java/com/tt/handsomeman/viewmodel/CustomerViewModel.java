@@ -119,7 +119,9 @@ public class CustomerViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((startScreenResponseResponse) -> {
-                                    startScreenCustomerMutableLiveData.setValue(startScreenResponseResponse.body().getData());
+                                    if (startScreenResponseResponse.body() != null) {
+                                        startScreenCustomerMutableLiveData.setValue(startScreenResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -132,7 +134,9 @@ public class CustomerViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
-                                    nearbyHandymanResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    if (nearbyHandymanResponseResponse.body() != null) {
+                                        nearbyHandymanResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -144,7 +148,9 @@ public class CustomerViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
-                                    nearbyHandymanResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    if (nearbyHandymanResponseResponse.body() != null) {
+                                        nearbyHandymanResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -155,7 +161,9 @@ public class CustomerViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
-                                    customerReviewProfileMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    if (nearbyHandymanResponseResponse.body() != null) {
+                                        customerReviewProfileMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -167,7 +175,9 @@ public class CustomerViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
-                                    handymanDetailResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    if (nearbyHandymanResponseResponse.body() != null) {
+                                        handymanDetailResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -178,7 +188,9 @@ public class CustomerViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
-                                    customerProfileResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    if (nearbyHandymanResponseResponse.body() != null) {
+                                        customerProfileResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -189,7 +201,9 @@ public class CustomerViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
-                                    customerProfileResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    if (nearbyHandymanResponseResponse.body() != null) {
+                                        customerProfileResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -212,7 +226,9 @@ public class CustomerViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((jobResponse) -> {
-                            customerJobDetailMutableLiveData.setValue(jobResponse.body().getData());
+                            if (jobResponse.body() != null) {
+                                customerJobDetailMutableLiveData.setValue(jobResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -222,7 +238,9 @@ public class CustomerViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((myProjectListResponse) -> {
-                            myProjectListMutableLiveData.setValue(myProjectListResponse.body().getData());
+                            if (myProjectListResponse.body() != null) {
+                                myProjectListMutableLiveData.setValue(myProjectListResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -243,7 +261,9 @@ public class CustomerViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
-                            listCategoryMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            if (dataBracketResponseResponse.body() != null) {
+                                listCategoryMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -276,7 +296,8 @@ public class CustomerViewModel extends BaseViewModel {
                 }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void loadReviewWithHandyman(String authorization, int handymanId){
+    public void loadReviewWithHandyman(String authorization,
+                                       int handymanId) {
         compositeDisposable.add(customerService.loadReviewWithHandyman(authorization, handymanId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -285,7 +306,8 @@ public class CustomerViewModel extends BaseViewModel {
                 }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void reviewHandyman(String authorization, ReviewRequest reviewRequest){
+    public void reviewHandyman(String authorization,
+                               ReviewRequest reviewRequest) {
         compositeDisposable.add(customerService.reviewHandyman(locale, authorization, reviewRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

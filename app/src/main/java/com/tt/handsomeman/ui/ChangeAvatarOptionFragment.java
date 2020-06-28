@@ -175,7 +175,6 @@ public class ChangeAvatarOptionFragment extends BottomSheetDialogFragment {
         }
     }
 
-    // Todo: load image, update avatar in about fragment just pass url and all done
     private void setImageView() {
         try {
             MyProfileAboutFragment aboutFragment = (MyProfileAboutFragment) getParentFragment().getParentFragment();

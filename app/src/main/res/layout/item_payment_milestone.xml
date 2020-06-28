@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="10dp"
-    android:paddingBottom="10dp"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:paddingBottom="10dp">
 
     <TextView
         android:id="@+id/paymentMileStoneOrder"
@@ -13,7 +13,7 @@
         android:layout_weight="1"
         android:textColor="@color/text_white_bg"
         android:textSize="@dimen/design_4_3sp"
-        tools:text="1st payment milestone"/>
+        tools:text="1st payment milestone" />
 
     <TextView
         android:id="@+id/paymentMileStonePercentage"
@@ -21,6 +21,6 @@
         android:layout_height="wrap_content"
         android:textColor="@color/text_white_bg"
         android:textSize="@dimen/design_4_3sp"
-        tools:text="$50"/>
+        tools:text="$50" />
 
 </LinearLayout>

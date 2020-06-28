@@ -23,7 +23,7 @@ import com.tt.handsomeman.viewmodel.UserViewModel;
 
 import javax.inject.Inject;
 
-public class ChangePassword extends BaseAppCompatActivity<UserViewModel> {
+public class ChangePassword extends BaseAppCompatActivityWithViewModel<UserViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

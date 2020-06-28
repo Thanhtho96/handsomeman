@@ -14,8 +14,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityLoginBinding;
@@ -38,7 +36,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Login extends AppCompatActivity {
+public class Login extends BaseAppCompatActivity {
     @Inject
     UserService userService;
     @Inject

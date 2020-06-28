@@ -7,7 +7,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -25,7 +24,7 @@ import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import javax.inject.Inject;
 
-public class MyProfile extends AppCompatActivity {
+public class MyProfile extends BaseAppCompatActivity {
     private static final Integer REQUEST_MY_PROFILE_RESULT_CODE = 77;
 
     @Inject

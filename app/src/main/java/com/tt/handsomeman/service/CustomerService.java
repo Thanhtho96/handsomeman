@@ -20,7 +20,6 @@ import com.tt.handsomeman.response.StartScreenCustomer;
 import com.tt.handsomeman.response.ViewMadeTransactionResponse;
 import com.tt.handsomeman.util.Constants;
 
-import io.reactivex.Completable;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Handsome Man</string>
+    <string name="share_pref" translatable="false">_preferences</string>
     <string name="boarding_des_1">Easily to look for thousands of handymen to help your problems</string>
     <string name="boarding_des_2">Cheaper and faster than hiring  normal craftman</string>
     <string name="boarding_des_3">Be one of the handyman and start to work and earn money</string>
@@ -522,4 +523,12 @@
     <string name="comment">Comment</string>
     <string name="describe_your_experience_optional">Describe your experience (optional)</string>
     <string name="select_image">Please select an image</string>
+    <string name="choose_one_option_below">Please choose 1 option below</string>
+    <string name="view_avatar">View Avatar</string>
+    <string name="change_avatar">Change Avatar</string>
+    <string name="cancel">Cancel</string>
+    <string name="change_avatar_option">Change Avatar Option</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="choose_from_album">Choose from Album</string>
+    <string name="back">Back</string>
 </resources>

@@ -13,7 +13,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -34,7 +33,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SignUp extends AppCompatActivity {
+public class SignUp extends BaseAppCompatActivity {
 
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;

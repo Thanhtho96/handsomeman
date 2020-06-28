@@ -17,7 +17,7 @@ import com.tt.handsomeman.adapter.FindHandymanFilterAdapter;
 import com.tt.handsomeman.databinding.ActivityHandymanNearYourLocationBinding;
 import com.tt.handsomeman.request.NearbyHandymanRequest;
 import com.tt.handsomeman.response.HandymanResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.Constants;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -31,7 +31,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class HandymanNearYourLocation extends BaseAppCompatActivity<CustomerViewModel> {
+public class HandymanNearYourLocation extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

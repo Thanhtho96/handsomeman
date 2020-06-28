@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityRegisterBinding;
@@ -21,7 +19,7 @@ import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import javax.inject.Inject;
 
-public class Register extends AppCompatActivity {
+public class Register extends BaseAppCompatActivity {
 
     @SuppressLint("StaticFieldLeak")
     public static Activity register;

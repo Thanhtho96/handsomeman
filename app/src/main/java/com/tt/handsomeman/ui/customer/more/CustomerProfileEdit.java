@@ -18,21 +18,20 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.signature.MediaStoreSignature;
-import com.bumptech.glide.signature.ObjectKey;
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityCustomerProfileEditBinding;
 import com.tt.handsomeman.model.Customer;
 import com.tt.handsomeman.response.CustomerProfileResponse;
 import com.tt.handsomeman.response.StandardResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
 import com.tt.handsomeman.viewmodel.CustomerViewModel;
 
 import javax.inject.Inject;
 
-public class CustomerProfileEdit extends BaseAppCompatActivity<CustomerViewModel> {
+public class CustomerProfileEdit extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

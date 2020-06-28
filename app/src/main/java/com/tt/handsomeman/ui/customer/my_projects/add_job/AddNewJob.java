@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -15,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 
 import com.tt.handsomeman.HandymanApp;
+import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityAddNewJobBinding;
 import com.tt.handsomeman.request.AddJobRequest;
 import com.tt.handsomeman.response.StandardResponse;
@@ -40,6 +42,7 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
     SharedPreferencesUtils sharedPreferencesUtils;
     ViewPager2 viewPager;
     AddJobRequest addJobRequest;
+    private LinearLayout container;
     private Button btnSubmit;
     private FragmentStateAdapter pagerAdapter;
     private OnPageChangeCallback pageChangeCallback;
@@ -51,6 +54,7 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
         setContentView(viewBinding.getRoot());
         addJobRequest = new AddJobRequest();
         btnSubmit = viewBinding.buttonSubmit;
+        container = viewBinding.container;
 
         HandymanApp.getComponent().inject(this);
         baseViewModel = new ViewModelProvider(this, viewModelFactory).get(CustomerViewModel.class);
@@ -62,7 +66,7 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
     }
 
     private void addNewJob() {
-        viewBinding.buttonSubmit.setOnClickListener(v -> {
+        btnSubmit.setOnClickListener(v -> {
             Calendar now = Calendar.getInstance();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault());
             String token = sharedPreferencesUtils.get("token", String.class);
@@ -92,16 +96,19 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
+                        container.setBackgroundColor(getResources().getColor(R.color.white));
                         viewBinding.imageButtonCheckFirst.setVisibility(View.VISIBLE);
                         viewBinding.imageButtonCheckSecond.setVisibility(View.INVISIBLE);
                         btnSubmit.setVisibility(View.GONE);
                         break;
                     case 1:
+                        container.setBackgroundColor(getResources().getColor(R.color.white));
                         viewBinding.imageButtonCheckFirst.setVisibility(View.INVISIBLE);
                         viewBinding.imageButtonCheckSecond.setVisibility(View.VISIBLE);
                         btnSubmit.setVisibility(View.GONE);
                         break;
                     case 2:
+                        container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                         viewBinding.imageButtonCheckFirst.setVisibility(View.INVISIBLE);
                         viewBinding.imageButtonCheckSecond.setVisibility(View.INVISIBLE);
                         btnSubmit.setVisibility(View.VISIBLE);

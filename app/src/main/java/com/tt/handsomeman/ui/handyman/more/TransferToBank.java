@@ -18,7 +18,7 @@ import com.tt.handsomeman.adapter.SpinnerBankAccount;
 import com.tt.handsomeman.databinding.ActivityTransferToBankBinding;
 import com.tt.handsomeman.request.HandymanTransferRequest;
 import com.tt.handsomeman.response.PayoutResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.DecimalFormat;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
@@ -32,7 +32,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class TransferToBank extends BaseAppCompatActivity<HandymanViewModel> {
+public class TransferToBank extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

@@ -20,7 +20,7 @@ import com.tt.handsomeman.databinding.ActivityAddNewSkillBinding;
 import com.tt.handsomeman.model.Category;
 import com.tt.handsomeman.model.Skill;
 import com.tt.handsomeman.response.ListCategory;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.viewmodel.HandymanViewModel;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class AddNewSkill extends BaseAppCompatActivity<HandymanViewModel> {
+public class AddNewSkill extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

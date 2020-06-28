@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
@@ -17,7 +16,7 @@ import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import javax.inject.Inject;
 
-public class Start extends AppCompatActivity implements View.OnClickListener {
+public class Start extends BaseAppCompatActivity implements View.OnClickListener {
 
     @SuppressLint("StaticFieldLeak")
     public static Activity start;

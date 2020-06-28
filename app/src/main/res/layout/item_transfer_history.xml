@@ -9,31 +9,27 @@
     android:focusable="true"
     android:padding="15dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/lastNumberPayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:text="@string/account_ends_with"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/design_4_7sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/dateTransfer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_white_bg"
+        android:textSize="@dimen/design_3_3sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/lastNumberPayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/account_ends_with"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="@dimen/design_4_7sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/dateTransfer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_white_bg"
-            android:textSize="@dimen/design_3_3sp"
-            tools:text="@string/yesterday" />
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/lastNumberPayout"
+        tools:text="@string/yesterday" />
 
     <TextView
         android:id="@+id/transferBalance"

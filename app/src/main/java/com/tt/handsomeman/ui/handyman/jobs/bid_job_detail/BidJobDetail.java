@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -68,6 +69,7 @@ public class BidJobDetail extends BaseFragmentActivity<HandymanViewModel, Activi
      * The pager adapter, which provides the pages to the view pager widget.
      */
     private PagerAdapter pagerAdapter;
+    private ConstraintLayout container;
     private TextView tvViewPagerName;
     private Button btnSubmit;
     private ImageButton ibCheckButtonBudget, ibCheckButtonLetter;
@@ -167,6 +169,7 @@ public class BidJobDetail extends BaseFragmentActivity<HandymanViewModel, Activi
     }
 
     private void bindView() {
+        container = viewBinding.container;
         tvViewPagerName = viewBinding.bidJobDetailViewPagerName;
         ibCheckButtonBudget = viewBinding.imageButtonCheckBudgetBidJobDetail;
         ibCheckButtonLetter = viewBinding.imageButtonCheckLetterBidJobDetail;
@@ -188,18 +191,21 @@ public class BidJobDetail extends BaseFragmentActivity<HandymanViewModel, Activi
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
+                        container.setBackgroundColor(getResources().getColor(R.color.white));
                         ibCheckButtonBudget.setVisibility(View.VISIBLE);
                         ibCheckButtonLetter.setVisibility(View.GONE);
                         btnSubmit.setVisibility(View.GONE);
                         tvViewPagerName.setText(getResources().getText(R.string.budget));
                         break;
                     case 1:
+                        container.setBackgroundColor(getResources().getColor(R.color.white));
                         ibCheckButtonBudget.setVisibility(View.GONE);
                         ibCheckButtonLetter.setVisibility(View.VISIBLE);
                         btnSubmit.setVisibility(View.GONE);
                         tvViewPagerName.setText(getResources().getText(R.string.letter));
                         break;
                     case 2:
+                        container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                         ibCheckButtonBudget.setVisibility(View.GONE);
                         ibCheckButtonLetter.setVisibility(View.GONE);
                         btnSubmit.setVisibility(View.VISIBLE);

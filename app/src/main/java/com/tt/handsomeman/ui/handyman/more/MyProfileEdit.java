@@ -22,7 +22,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.signature.MediaStoreSignature;
-import com.bumptech.glide.signature.ObjectKey;
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.SkillEditAdapter;
@@ -33,7 +32,7 @@ import com.tt.handsomeman.request.HandymanEditRequest;
 import com.tt.handsomeman.request.SkillEditRequest;
 import com.tt.handsomeman.response.HandymanProfileResponse;
 import com.tt.handsomeman.response.StandardResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
@@ -45,7 +44,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class MyProfileEdit extends BaseAppCompatActivity<HandymanViewModel> {
+public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
     private static final Integer REQUEST_MY_PROFILE_EDIT_RESULT_CODE = 777;
 
     @Inject

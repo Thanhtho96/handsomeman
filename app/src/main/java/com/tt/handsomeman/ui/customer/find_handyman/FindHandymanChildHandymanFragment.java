@@ -51,6 +51,7 @@ public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerView
     private List<HandymanResponse> handymanResponseList = new ArrayList<>();
     private List<Category> categoryArrayList = new ArrayList<>();
     private String authorizationCode;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,

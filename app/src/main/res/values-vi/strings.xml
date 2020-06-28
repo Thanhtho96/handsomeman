@@ -253,4 +253,13 @@
     <string name="review">Đánh giá</string>
     <string name="comment">Bình luận</string>
     <string name="describe_your_experience_optional">Mô tả trải nghiệm của bạn (không bắt buộc)</string>
+    <string name="select_image">Làm ơn hãy chọn 1 tấm hình</string>
+    <string name="choose_one_option_below">Làm ơn hãy chọn 1 tùy chọn ở dưới</string>
+    <string name="view_avatar">Xem ảnh đại diện</string>
+    <string name="change_avatar">Thay đổi ảnh đại diện</string>
+    <string name="cancel">Hủy</string>
+    <string name="change_avatar_option">Tùy chọn thay đổi ảnh đại diện</string>
+    <string name="take_a_photo">Chụp 1 tấm hình</string>
+    <string name="choose_from_album">Chọn từ Bộ sưu tập</string>
+    <string name="back">Quay lại</string>
 </resources>

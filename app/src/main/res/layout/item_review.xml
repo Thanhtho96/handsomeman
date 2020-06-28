@@ -14,38 +14,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/reviewNameItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:orientation="vertical"
+        android:textColor="@color/black"
+        android:textSize="@dimen/design_3_7sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/reviewAvatar"
+        app:layout_constraintTop_toTopOf="@+id/reviewAvatar"
+        tools:text="Katherin Manson" />
+
+    <RatingBar
+        android:id="@+id/ratingBarReviewItem"
+        style="@style/CustomHeartsRatingBar_13dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:stepSize="1"
         app:layout_constraintBottom_toBottomOf="@+id/reviewAvatar"
         app:layout_constraintStart_toEndOf="@+id/reviewAvatar"
-        app:layout_constraintTop_toTopOf="@+id/reviewAvatar">
-
-        <TextView
-            android:id="@+id/reviewNameItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="@dimen/design_3_7sp"
-            android:textStyle="bold"
-            tools:text="Katherin Manson" />
-
-        <View
-            android:id="@+id/viewBlank"
-            android:layout_width="match_parent"
-            android:layout_height="1dp" />
-
-        <RatingBar
-            android:id="@+id/ratingBarReviewItem"
-            style="@style/CustomHeartsRatingBar_13dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:isIndicator="true"
-            android:numStars="5"
-            android:stepSize="1" />
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/reviewNameItem" />
 
     <TextView
         android:id="@+id/reviewCommentItem"

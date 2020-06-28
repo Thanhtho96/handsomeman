@@ -107,7 +107,7 @@ public class MyProjectsFragment extends BaseFragment<HandymanViewModel, Fragment
     }
 
     private void setEditTextHintTextAndIcon() {
-        ImageSpan imageHint = new ImageSpan(getContext(), R.drawable.ic_search_18dp);
+        ImageSpan imageHint = new ImageSpan(getContext(), R.drawable.ic_search_19dp);
         SpannableString spannableString = new SpannableString("    " + getResources().getString(R.string.search_by_word));
         spannableString.setSpan(imageHint, 0, 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         edtSearchByWord.setHint(spannableString);

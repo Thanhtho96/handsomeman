@@ -7,12 +7,12 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:textSize="@dimen/design_8sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/not_done_yet" />
+        android:text="@string/not_done_yet"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="@dimen/design_8sp"
+        android:textStyle="bold" />
 
 </FrameLayout>

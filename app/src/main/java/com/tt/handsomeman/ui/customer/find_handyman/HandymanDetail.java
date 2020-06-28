@@ -8,6 +8,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -28,9 +29,8 @@ import com.tt.handsomeman.model.Skill;
 import com.tt.handsomeman.request.HandymanDetailRequest;
 import com.tt.handsomeman.response.HandymanDetailResponse;
 import com.tt.handsomeman.response.HandymanReviewResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.customer.CustomerReview;
-import com.tt.handsomeman.ui.handyman.more.MyProfileEdit;
 import com.tt.handsomeman.util.Constants;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.DecimalFormat;
@@ -42,7 +42,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class HandymanDetail extends BaseAppCompatActivity<CustomerViewModel> {
+public class HandymanDetail extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
     private static final Integer REVIEW_REQUEST = 777;
     private static boolean reviewed;
@@ -51,6 +51,7 @@ public class HandymanDetail extends BaseAppCompatActivity<CustomerViewModel> {
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
+    private ConstraintLayout container;
     private TextView tvDistance, accountName, education, about, allProjects, successedProject, countReviews;
     private RatingBar rtCountPoint;
     private Button btnInviteToProject, btnReview;
@@ -81,8 +82,10 @@ public class HandymanDetail extends BaseAppCompatActivity<CustomerViewModel> {
         int jobId = intent.getIntExtra("jobId", 0);
 
         if (succeed) {
+            container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             btnReview.setVisibility(View.VISIBLE);
         } else if (!accepted) {
+            container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             btnInviteToProject.setVisibility(View.VISIBLE);
         }
 
@@ -113,6 +116,7 @@ public class HandymanDetail extends BaseAppCompatActivity<CustomerViewModel> {
     }
 
     private void bindView() {
+        container = binding.container;
         tvDistance = binding.textViewHandymanDistance;
         accountName = binding.accountName;
         education = binding.education;

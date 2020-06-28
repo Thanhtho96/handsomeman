@@ -32,9 +32,8 @@ import com.tt.handsomeman.model.Job;
 import com.tt.handsomeman.model.PaymentMilestone;
 import com.tt.handsomeman.response.CustomerJobDetail;
 import com.tt.handsomeman.response.HandymanResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.customer.find_handyman.HandymanDetail;
-import com.tt.handsomeman.ui.handyman.more.MyProfileEdit;
 import com.tt.handsomeman.ui.messages.Conversation;
 import com.tt.handsomeman.util.DimensionConverter;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -44,7 +43,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class MyJobDetail extends BaseAppCompatActivity<CustomerViewModel> {
+public class MyJobDetail extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
     private static final Integer REVIEW_REQUEST = 777;
 
@@ -193,7 +192,8 @@ public class MyJobDetail extends BaseAppCompatActivity<CustomerViewModel> {
         });
     }
 
-    private void loadHandyman(CustomerJobDetail customerJobDetail, String authorizationCode) {
+    private void loadHandyman(CustomerJobDetail customerJobDetail,
+                              String authorizationCode) {
         HandymanResponse handymanResponse = customerJobDetail.getHandyman();
         tvHandymanName.setText(handymanResponse.getName());
         rtReview.setRating(handymanResponse.getAverageReviewPoint());

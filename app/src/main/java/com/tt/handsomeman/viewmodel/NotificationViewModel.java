@@ -64,7 +64,9 @@ public class NotificationViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
-                            listNotificationMutableLiveData.setValue(response.body().getData());
+                            if (response.body() != null) {
+                                listNotificationMutableLiveData.setValue(response.body().getData());
+                            }
                         }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }

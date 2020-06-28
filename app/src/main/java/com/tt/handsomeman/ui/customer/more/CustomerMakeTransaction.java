@@ -30,7 +30,7 @@ import com.tt.handsomeman.response.JobTransactionResponse;
 import com.tt.handsomeman.response.PayoutResponse;
 import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.response.ViewMadeTransactionResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.DecimalFormat;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
@@ -44,7 +44,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class CustomerMakeTransaction extends BaseAppCompatActivity<CustomerViewModel> {
+public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

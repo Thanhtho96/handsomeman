@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.tt.handsomeman.model.Handyman;
 import com.tt.handsomeman.model.HandymanJobDetail;
 import com.tt.handsomeman.model.Job;
 import com.tt.handsomeman.request.HandymanEditRequest;
@@ -42,7 +41,6 @@ import okhttp3.RequestBody;
 public class HandymanViewModel extends BaseViewModel {
 
     private final HandymanService handymanService;
-    private MutableLiveData<Handyman> handymanMutableLiveData = new MutableLiveData<>();
     private MutableLiveData<HandymanReviewProfile> handymanReviewProfileMutableLiveData = new MutableLiveData<>();
     private MutableLiveData<HandymanProfileResponse> handymanProfileResponseMutableLiveData = new MutableLiveData<>();
     private MutableLiveData<ListCategory> listCategoryMutableLiveData = new MutableLiveData<>();
@@ -54,7 +52,6 @@ public class HandymanViewModel extends BaseViewModel {
     private MutableLiveData<List<Job>> jobMutableLiveData = new MutableLiveData<>();
     private MutableLiveData<HandymanJobDetail> jobDetailMutableLiveData = new MutableLiveData<>();
     private MutableLiveData<JobDetailProfile> jobDetailProfileMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<String> messageResponse = new MutableLiveData<>();
     private MutableLiveData<StandardResponse> standardResponseMarkReadMutableLiveData = new MutableLiveData<>();
     private MutableLiveData<DataBracketResponse<TransactionDetailResponse>> jobTransactionLiveData = new MutableLiveData<>();
     private MutableLiveData<DataBracketResponse<ReviewResponse>> reviewResponseLiveData = new MutableLiveData<>();
@@ -65,10 +62,6 @@ public class HandymanViewModel extends BaseViewModel {
                       HandymanService handymanService) {
         super(application);
         this.handymanService = handymanService;
-    }
-
-    public MutableLiveData<Handyman> getHandymanMutableLiveData() {
-        return handymanMutableLiveData;
     }
 
     public MutableLiveData<HandymanReviewProfile> getHandymanReviewProfileLiveData() {
@@ -127,16 +120,14 @@ public class HandymanViewModel extends BaseViewModel {
         return reviewResponseLiveData;
     }
 
-    public MutableLiveData<String> getMessageResponse() {
-        return messageResponse;
-    }
-
     public void fetchHandymanInfo(String authorization) {
         compositeDisposable.add(handymanService.getHandymanInfo(locale, authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
-                            handymanProfileResponseMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            if (dataBracketResponseResponse.body() != null) {
+                                handymanProfileResponseMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -146,7 +137,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((response) -> {
-                    handymanReviewProfileMutableLiveData.setValue(response.body().getData());
+                    if (response.body() != null) {
+                        handymanReviewProfileMutableLiveData.setValue(response.body().getData());
+                    }
                 }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
@@ -155,7 +148,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
-                            handymanProfileResponseMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            if (dataBracketResponseResponse.body() != null) {
+                                handymanProfileResponseMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -175,7 +170,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
-                            listCategoryMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            if (dataBracketResponseResponse.body() != null) {
+                                listCategoryMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -185,7 +182,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
-                            listTransferHistoryMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            if (dataBracketResponseResponse.body() != null) {
+                                listTransferHistoryMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -195,7 +194,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
-                            listPayoutResponseMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            if (dataBracketResponseResponse.body() != null) {
+                                listPayoutResponseMutableLiveData.setValue(dataBracketResponseResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
@@ -215,7 +216,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((myProjectListResponse) -> {
-                            myProjectListMutableLiveData.setValue(myProjectListResponse.body().getData());
+                            if (myProjectListResponse.body() != null) {
+                                myProjectListMutableLiveData.setValue(myProjectListResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -227,7 +230,9 @@ public class HandymanViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((startScreenResponseResponse) -> {
-                                    screenDataMutableLiveData.setValue(startScreenResponseResponse.body().getData());
+                                    if (startScreenResponseResponse.body() != null) {
+                                        screenDataMutableLiveData.setValue(startScreenResponseResponse.body().getData());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -238,7 +243,9 @@ public class HandymanViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobWishList) -> {
-                                    jobMutableLiveData.setValue(jobWishList.body().getData().getJobs());
+                                    if (jobWishList.body() != null) {
+                                        jobMutableLiveData.setValue(jobWishList.body().getData().getJobs());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -251,7 +258,9 @@ public class HandymanViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobResponse) -> {
-                                    jobMutableLiveData.setValue(jobResponse.body().getData().getJobs());
+                                    if (jobResponse.body() != null) {
+                                        jobMutableLiveData.setValue(jobResponse.body().getData().getJobs());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -264,7 +273,9 @@ public class HandymanViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobResponse) -> {
-                                    jobMutableLiveData.setValue(jobResponse.body().getData().getJobs());
+                                    if (jobResponse.body() != null) {
+                                        jobMutableLiveData.setValue(jobResponse.body().getData().getJobs());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -276,7 +287,9 @@ public class HandymanViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobResponse) -> {
-                                    jobMutableLiveData.setValue(jobResponse.body().getData().getJobs());
+                                    if (jobResponse.body() != null) {
+                                        jobMutableLiveData.setValue(jobResponse.body().getData().getJobs());
+                                    }
                                 },
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -287,7 +300,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((jobResponse) -> {
-                            jobDetailMutableLiveData.setValue(jobResponse.body().getData());
+                            if (jobResponse.body() != null) {
+                                jobDetailMutableLiveData.setValue(jobResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
@@ -298,7 +313,9 @@ public class HandymanViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((profileResponse) -> {
-                            jobDetailProfileMutableLiveData.setValue(profileResponse.body().getData());
+                            if (profileResponse.body() != null) {
+                                jobDetailProfileMutableLiveData.setValue(profileResponse.body().getData());
+                            }
                         },
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }

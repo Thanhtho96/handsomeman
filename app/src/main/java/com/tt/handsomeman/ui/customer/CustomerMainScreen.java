@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -29,6 +28,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityCustomerMainScreenBinding;
+import com.tt.handsomeman.ui.BaseAppCompatActivity;
 import com.tt.handsomeman.ui.NotificationsFragment;
 import com.tt.handsomeman.ui.customer.find_handyman.FindHandymanFragment;
 import com.tt.handsomeman.ui.customer.more.CustomerMoreFragment;
@@ -43,7 +43,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
-public class CustomerMainScreen extends AppCompatActivity {
+public class CustomerMainScreen extends BaseAppCompatActivity {
 
     private static final int PERMISSION_REQUEST_LOCATION = 0;
     private static final long MIN_TIME_TO_REQUEST_LOCATION = 30000; //30s
@@ -174,9 +174,9 @@ public class CustomerMainScreen extends AppCompatActivity {
 //        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 //        NavigationUI.setupWithNavController(navView, navController);
 
-        getLastKnownLocation();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         startLocationService();
+        getLastKnownLocation();
 
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         FragmentManipulate();
@@ -184,6 +184,10 @@ public class CustomerMainScreen extends AppCompatActivity {
 
     private void getLastKnownLocation() {
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -213,7 +217,7 @@ public class CustomerMainScreen extends AppCompatActivity {
         if (requestCode == PERMISSION_REQUEST_LOCATION) {
             // Request for camera permission.
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission has been granted. Start camera preview Activity.
+                // Permission has been granted. Start location service.
                 startLocationService();
             } else {
                 // Permission request was denied.

@@ -15,7 +15,7 @@ import com.tt.handsomeman.databinding.ActivityViewTransactionBinding;
 import com.tt.handsomeman.response.DataBracketResponse;
 import com.tt.handsomeman.response.PaidPaymentNotificationResponse;
 import com.tt.handsomeman.response.StandardResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.DecimalFormat;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
@@ -23,7 +23,7 @@ import com.tt.handsomeman.viewmodel.NotificationViewModel;
 
 import javax.inject.Inject;
 
-public class ViewTransaction extends BaseAppCompatActivity<NotificationViewModel> {
+public class ViewTransaction extends BaseAppCompatActivityWithViewModel<NotificationViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

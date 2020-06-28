@@ -17,14 +17,14 @@ import com.tt.handsomeman.request.ReviewRequest;
 import com.tt.handsomeman.response.DataBracketResponse;
 import com.tt.handsomeman.response.ReviewResponse;
 import com.tt.handsomeman.response.StandardResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
 import com.tt.handsomeman.viewmodel.HandymanViewModel;
 
 import javax.inject.Inject;
 
-public class HandymanReview extends BaseAppCompatActivity<HandymanViewModel> {
+public class HandymanReview extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

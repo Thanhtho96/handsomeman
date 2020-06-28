@@ -28,7 +28,7 @@ import com.tt.handsomeman.response.DataBracketResponse;
 import com.tt.handsomeman.response.ListMessage;
 import com.tt.handsomeman.response.MessageResponse;
 import com.tt.handsomeman.response.StandardResponse;
-import com.tt.handsomeman.ui.BaseAppCompatActivity;
+import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.FCMService;
 import com.tt.handsomeman.util.Constants;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -50,7 +50,7 @@ import javax.inject.Inject;
 
 import jp.wasabeef.recyclerview.animators.FadeInUpAnimator;
 
-public class Conversation extends BaseAppCompatActivity<MessageViewModel> {
+public class Conversation extends BaseAppCompatActivityWithViewModel<MessageViewModel> {
 
     public static Integer receiveDefaultId;
     @Inject
@@ -104,6 +104,10 @@ public class Conversation extends BaseAppCompatActivity<MessageViewModel> {
         addRecyclerViewListener();
         sendMessage(authorizationCode, receiveId);
         listenToFireBaseService(receiveId);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
+                new IntentFilter(FCMService.REQUEST_MESSAGE)
+        );
     }
 
     private void listenToFireBaseService(int receiveId) {
@@ -300,14 +304,6 @@ public class Conversation extends BaseAppCompatActivity<MessageViewModel> {
         rcvMessage.setItemAnimator(new FadeInUpAnimator());
 
         rcvMessage.setAdapter(messageAdapter);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
-                new IntentFilter(FCMService.REQUEST_MESSAGE)
-        );
     }
 
     @Override

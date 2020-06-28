@@ -81,10 +81,12 @@ public class MessageViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
-                            if (response.body().getStatus().equals(StatusConstant.OK)) {
-                                messageResponse.setValue(response.body().getMessage());
-                            } else {
-                                messageResponse.setValue(response.body().getMessage());
+                            if (response.body() != null) {
+                                if (response.body().getStatus().equals(StatusConstant.OK)) {
+                                    messageResponse.setValue(response.body().getMessage());
+                                } else {
+                                    messageResponse.setValue(response.body().getMessage());
+                                }
                             }
                         }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
