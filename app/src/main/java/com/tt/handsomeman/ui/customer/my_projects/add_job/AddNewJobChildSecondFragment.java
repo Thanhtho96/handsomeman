@@ -21,7 +21,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -84,7 +83,7 @@ public class AddNewJobChildSecondFragment extends Fragment {
     private FragmentAddNewJobChildSecondBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -121,21 +120,18 @@ public class AddNewJobChildSecondFragment extends Fragment {
 
     private void initJobLocation(String currentAddress) {
         edtLocation.setText(currentAddress);
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                mMap = googleMap;
+        mapFragment.getMapAsync(googleMap -> {
+            mMap = googleMap;
 
-                LatLng jobLocation = new LatLng(lat, lng);
-                mMap.addMarker(new MarkerOptions().position(jobLocation).title(currentAddress));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
-                mMap.getUiSettings().setScrollGesturesEnabled(false);
+            LatLng jobLocation = new LatLng(lat, lng);
+            mMap.addMarker(new MarkerOptions().position(jobLocation).title(currentAddress));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
+            mMap.getUiSettings().setScrollGesturesEnabled(false);
 
-                addJobRequest.setLat(lat);
-                addJobRequest.setLng(lng);
-                addJobRequest.setLocation(currentAddress);
-                ibCheckSecond.setEnabled(true);
-            }
+            addJobRequest.setLat(lat);
+            addJobRequest.setLng(lng);
+            addJobRequest.setLocation(currentAddress);
+            ibCheckSecond.setEnabled(true);
         });
     }
 
@@ -152,12 +148,13 @@ public class AddNewJobChildSecondFragment extends Fragment {
         RxTextView.textChanges(edtLocation)
                 .skip(1)
                 .debounce(500, TimeUnit.MILLISECONDS)
-                .filter(charSequence -> charSequence.length() >= 3 && !charSequence.toString().equals(chosenPlaceName))
+                .map(CharSequence::toString)
+                .filter(charSequence -> charSequence.length() >= 3 && !charSequence.equals(chosenPlaceName))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::autoCompletePlaceBuilder);
     }
 
-    private void autoCompletePlaceBuilder(CharSequence charSequence) {
+    private void autoCompletePlaceBuilder(String charSequence) {
         Log.d("RxTextView ", "is working");
         // Use the builder to create a FindAutocompletePredictionsRequest.
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
@@ -168,7 +165,7 @@ public class AddNewJobChildSecondFragment extends Fragment {
                 .setCountry(countryCode)
                 .setTypeFilter(TypeFilter.ADDRESS)
                 .setSessionToken(token)
-                .setQuery(charSequence.toString())
+                .setQuery(charSequence)
                 .build();
 
         placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
@@ -196,17 +193,14 @@ public class AddNewJobChildSecondFragment extends Fragment {
 
     private void createRecyclerView() {
         placeAdapter = new PlaceAdapter(getContext(), placeResponseList);
-        placeAdapter.setOnItemClickListener(new PlaceAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                PlaceResponse placeResponse = placeResponseList.get(position);
-                chosenPlaceName = placeResponse.getPrimaryPlaceName();
+        placeAdapter.setOnItemClickListener(position -> {
+            PlaceResponse placeResponse = placeResponseList.get(position);
+            chosenPlaceName = placeResponse.getPrimaryPlaceName();
 
-                placeResponseList.clear();
-                placeAdapter.notifyDataSetChanged();
-                searchPlaceBaseOnPlaceId(placeResponse.getPlaceId(), placeResponse.getPrimaryPlaceName());
-                edtLocation.setText(placeResponse.getPrimaryPlaceName());
-            }
+            placeResponseList.clear();
+            placeAdapter.notifyDataSetChanged();
+            searchPlaceBaseOnPlaceId(placeResponse.getPlaceId(), placeResponse.getPrimaryPlaceName());
+            edtLocation.setText(placeResponse.getPrimaryPlaceName());
         });
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(getContext());
         rcvPlace.setLayoutManager(layoutManagerPayout);
@@ -224,9 +218,11 @@ public class AddNewJobChildSecondFragment extends Fragment {
 
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
-            jobLatEdit = place.getLatLng().latitude;
-            jobLngEdit = place.getLatLng().longitude;
-            Log.i("Search place", "Place found: " + place.getName() + ", " + jobLatEdit + "|" + jobLngEdit);
+            if (place.getLatLng() != null) {
+                jobLatEdit = place.getLatLng().latitude;
+                jobLngEdit = place.getLatLng().longitude;
+                Log.i("Search place", "Place found: " + place.getName() + ", " + jobLatEdit + "|" + jobLngEdit);
+            }
 
             moveMapToJobLocation(placeName);
         }).addOnFailureListener((exception) -> {
@@ -246,22 +242,19 @@ public class AddNewJobChildSecondFragment extends Fragment {
     }
 
     private void moveMapToJobLocation(String placeName) {
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                mMap = googleMap;
-                mMap.clear();
+        mapFragment.getMapAsync(googleMap -> {
+            mMap = googleMap;
+            mMap.clear();
 
-                LatLng jobLocation = new LatLng(jobLatEdit, jobLngEdit);
-                mMap.addMarker(new MarkerOptions().position(jobLocation).title(placeName));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
-                mMap.getUiSettings().setScrollGesturesEnabled(false);
+            LatLng jobLocation = new LatLng(jobLatEdit, jobLngEdit);
+            mMap.addMarker(new MarkerOptions().position(jobLocation).title(placeName));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
+            mMap.getUiSettings().setScrollGesturesEnabled(false);
 
-                addJobRequest.setLat(jobLatEdit);
-                addJobRequest.setLng(jobLngEdit);
-                addJobRequest.setLocation(placeName);
-                ibCheckSecond.setEnabled(true);
-            }
+            addJobRequest.setLat(jobLatEdit);
+            addJobRequest.setLng(jobLngEdit);
+            addJobRequest.setLocation(placeName);
+            ibCheckSecond.setEnabled(true);
         });
     }
 
@@ -320,7 +313,7 @@ public class AddNewJobChildSecondFragment extends Fragment {
 
         deadlineOption = getResources().getStringArray(R.array.dead_line);
 
-        AddNewJob addNewJob = (AddNewJob) getActivity();
+        AddNewJob addNewJob = (AddNewJob) requireActivity();
         addJobRequest = addNewJob.addJobRequest;
         viewPager = addNewJob.viewBinding.viewPager;
         ibCheckSecond = addNewJob.viewBinding.imageButtonCheckSecond;

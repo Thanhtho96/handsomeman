@@ -7,9 +7,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
@@ -19,7 +19,6 @@ import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityAddNewJobBinding;
 import com.tt.handsomeman.request.AddJobRequest;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.BaseFragmentActivity;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
@@ -73,15 +72,12 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
             addJobRequest.setCreateTime(simpleDateFormat.format(now.getTime()));
 
             baseViewModel.addNewJob(token, addJobRequest);
-            baseViewModel.getStandardResponseMutableLiveData().observe(this, new Observer<StandardResponse>() {
-                @Override
-                public void onChanged(StandardResponse standardResponse) {
-                    Toast.makeText(AddNewJob.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                        Intent intent = new Intent();
-                        setResult(RESULT_OK, intent);
-                        finish();
-                    }
+            baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
+                Toast.makeText(AddNewJob.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    Intent intent = new Intent();
+                    setResult(RESULT_OK, intent);
+                    finish();
                 }
             });
         });
@@ -155,6 +151,7 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
             super(fa);
         }
 
+        @NonNull
         @Override
         public Fragment createFragment(int position) {
             switch (position) {
@@ -162,10 +159,8 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
                     return new AddNewJobChildFirstFragment();
                 case 1:
                     return new AddNewJobChildSecondFragment();
-                case 2:
-                    return new AddNewJobChildThirdFragment();
                 default:
-                    return null;
+                    return new AddNewJobChildThirdFragment();
             }
         }
 

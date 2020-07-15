@@ -14,7 +14,6 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,10 +26,8 @@ import com.tt.handsomeman.adapter.CategorySelectionAdapter;
 import com.tt.handsomeman.adapter.SpinnerPercentage;
 import com.tt.handsomeman.adapter.SpinnerString;
 import com.tt.handsomeman.databinding.FragmentAddNewJobChildFirstBinding;
-import com.tt.handsomeman.model.AddJobFirstFormState;
 import com.tt.handsomeman.model.Category;
 import com.tt.handsomeman.request.AddJobRequest;
-import com.tt.handsomeman.response.ListCategory;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -61,7 +58,7 @@ public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel,
     private List<Category> categoryList = new ArrayList<>();
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -201,7 +198,7 @@ public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel,
         spSecondPaymentMilestone = viewBinding.spinnerSecondPaymentMilestones;
         layoutSecondPaymentMilestone = viewBinding.layoutSecondPaymentMilestone;
 
-        AddNewJob addNewJob = (AddNewJob) getActivity();
+        AddNewJob addNewJob = (AddNewJob) requireActivity();
         ibCheckFirst = addNewJob.viewBinding.imageButtonCheckFirst;
         viewPager = addNewJob.viewBinding.viewPager;
         addJobRequest = addNewJob.addJobRequest;
@@ -214,25 +211,22 @@ public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel,
                                   EditText edtTitle,
                                   EditText edtDetail,
                                   ImageButton ibCheckFirst) {
-        formViewModel.getFormStateMutableLiveData().observe(getViewLifecycleOwner(), new Observer<AddJobFirstFormState>() {
-            @Override
-            public void onChanged(AddJobFirstFormState addJobFirstFormState) {
-                if (addJobFirstFormState == null) {
-                    return;
-                }
-                ibCheckFirst.setEnabled(addJobFirstFormState.isDataValid());
-                if (addJobFirstFormState.getBudgetMinError() != null) {
-                    edtBudgetMin.setError(getString(addJobFirstFormState.getBudgetMinError()));
-                }
-                if (addJobFirstFormState.getBudgetMaxError() != null) {
-                    edtBudgetMax.setError(getString(addJobFirstFormState.getBudgetMaxError()));
-                }
-                if (addJobFirstFormState.getTitleError() != null) {
-                    edtTitle.setError(getString(addJobFirstFormState.getTitleError()));
-                }
-                if (addJobFirstFormState.getDetailError() != null) {
-                    edtDetail.setError(getString(addJobFirstFormState.getDetailError()));
-                }
+        formViewModel.getFormStateMutableLiveData().observe(getViewLifecycleOwner(), addJobFirstFormState -> {
+            if (addJobFirstFormState == null) {
+                return;
+            }
+            ibCheckFirst.setEnabled(addJobFirstFormState.isDataValid());
+            if (addJobFirstFormState.getBudgetMinError() != null) {
+                edtBudgetMin.setError(getString(addJobFirstFormState.getBudgetMinError()));
+            }
+            if (addJobFirstFormState.getBudgetMaxError() != null) {
+                edtBudgetMax.setError(getString(addJobFirstFormState.getBudgetMaxError()));
+            }
+            if (addJobFirstFormState.getTitleError() != null) {
+                edtTitle.setError(getString(addJobFirstFormState.getTitleError()));
+            }
+            if (addJobFirstFormState.getDetailError() != null) {
+                edtDetail.setError(getString(addJobFirstFormState.getDetailError()));
             }
         });
     }
@@ -286,13 +280,10 @@ public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel,
     private void getListCategory() {
         String authorizationCode = sharedPreferencesUtils.get("token", String.class);
         baseViewModel.fetchListCategory(authorizationCode);
-        baseViewModel.getListCategoryMutableLiveData().observe(getViewLifecycleOwner(), new Observer<ListCategory>() {
-            @Override
-            public void onChanged(ListCategory listCategory) {
-                categoryList.clear();
-                categoryList.addAll(listCategory.getCategoryList());
-                categorySelectionAdapter.notifyDataSetChanged();
-            }
+        baseViewModel.getListCategoryMutableLiveData().observe(getViewLifecycleOwner(), listCategory -> {
+            categoryList.clear();
+            categoryList.addAll(listCategory.getCategoryList());
+            categorySelectionAdapter.notifyDataSetChanged();
         });
     }
 }

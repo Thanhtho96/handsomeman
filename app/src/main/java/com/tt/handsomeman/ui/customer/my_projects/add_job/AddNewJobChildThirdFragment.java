@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -43,7 +42,7 @@ public class AddNewJobChildThirdFragment extends Fragment {
     private FragmentAddNewJobChildThirdBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentAddNewJobChildThirdBinding.inflate(inflater, container, false);
@@ -67,7 +66,7 @@ public class AddNewJobChildThirdFragment extends Fragment {
         tvLocation = binding.location;
         tvPaymentMilestoneCount = binding.paymentMileStoneCount;
         tbPaymentMilestone = binding.paymentMileStoneTableLayout;
-        AddNewJob addNewJob = (AddNewJob) getActivity();
+        AddNewJob addNewJob = (AddNewJob) requireActivity();
         addJobRequest = addNewJob.addJobRequest;
         mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.mapReview);
@@ -97,7 +96,7 @@ public class AddNewJobChildThirdFragment extends Fragment {
             TextView b = new TextView(getContext());
             b.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
             b.setTextColor(getResources().getColor(R.color.text_white_bg));
-            b.setTextSize(DimensionConverter.spToPx(getResources().getDimension(R.dimen.design_3_3sp), getContext()));
+            b.setTextSize(DimensionConverter.spToPx(getResources().getDimension(R.dimen.design_3_3sp), requireContext()));
             b.setGravity(Gravity.START);
             switch ((i + 1) % 10) {
                 case 1:
@@ -117,7 +116,7 @@ public class AddNewJobChildThirdFragment extends Fragment {
             TextView b2 = new TextView(getContext());
             b2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1));
             b2.setTextColor(getResources().getColor(R.color.text_white_bg));
-            b2.setTextSize(DimensionConverter.spToPx(getResources().getDimension(R.dimen.design_3_3sp), getContext()));
+            b2.setTextSize(DimensionConverter.spToPx(getResources().getDimension(R.dimen.design_3_3sp), requireContext()));
             b2.setGravity(Gravity.END);
             b2.setText(getString(R.string.percentage, addJobRequest.getPercentages().get(i)));
             tr.addView(b);
@@ -128,17 +127,14 @@ public class AddNewJobChildThirdFragment extends Fragment {
     }
 
     private void moveMapToJobLocation(String placeName) {
-        mapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                mMap = googleMap;
-                mMap.clear();
+        mapFragment.getMapAsync(googleMap -> {
+            mMap = googleMap;
+            mMap.clear();
 
-                LatLng jobLocation = new LatLng(addJobRequest.getLat(), addJobRequest.getLng());
-                mMap.addMarker(new MarkerOptions().position(jobLocation).title(placeName));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
-                mMap.getUiSettings().setScrollGesturesEnabled(false);
-            }
+            LatLng jobLocation = new LatLng(addJobRequest.getLat(), addJobRequest.getLng());
+            mMap.addMarker(new MarkerOptions().position(jobLocation).title(placeName));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
+            mMap.getUiSettings().setScrollGesturesEnabled(false);
         });
     }
 
