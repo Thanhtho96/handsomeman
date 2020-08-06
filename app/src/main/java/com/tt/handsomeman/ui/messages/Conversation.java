@@ -309,7 +309,7 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
     @Override
     protected void onStop() {
         super.onStop();
-        receiveDefaultId = 0;
+        receiveDefaultId = null;
     }
 
     @Override
@@ -321,7 +321,7 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
     @Override
     public void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        receiveDefaultId = 0;
+        receiveDefaultId = null;
         super.onDestroy();
     }
 }
