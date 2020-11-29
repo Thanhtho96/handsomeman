@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,20 +17,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
+import com.here.sdk.core.GeoCoordinates;
+import com.here.sdk.core.LanguageCode;
+import com.here.sdk.core.errors.InstantiationErrorException;
+import com.here.sdk.search.Place;
+import com.here.sdk.search.SearchEngine;
+import com.here.sdk.search.SearchOptions;
+import com.here.sdk.search.Suggestion;
+import com.here.sdk.search.TextQuery;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
@@ -46,7 +44,6 @@ import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -73,12 +70,9 @@ public class AddNewJobChildSecondFragment extends Fragment {
     private SimpleDateFormat sdf;
     private AddJobRequest addJobRequest;
     private Double lat, lng;
-    private String countryCode;
-    private PlacesClient placesClient;
-    private AutocompleteSessionToken token;
-    private RectangularBounds bounds;
+    private SearchEngine searchEngine;
+    private SearchOptions searchOptions;
     private SupportMapFragment mapFragment;
-    private Double jobLatEdit, jobLngEdit;
     private String chosenPlaceName = null;
     private FragmentAddNewJobChildSecondBinding binding;
 
@@ -87,6 +81,12 @@ public class AddNewJobChildSecondFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
+        try {
+            searchEngine = new SearchEngine();
+        } catch (InstantiationErrorException e) {
+            throw new RuntimeException("Initialization of SearchEngine failed: " + e.error.name());
+        }
+
         binding = FragmentAddNewJobChildSecondBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -101,20 +101,23 @@ public class AddNewJobChildSecondFragment extends Fragment {
         lng = Constants.Longitude.getValue();
 
         String currentAddress = sharedPreferencesUtils.get("address", String.class);
-        countryCode = sharedPreferencesUtils.get("countryCode", String.class);
+        String countryCode = sharedPreferencesUtils.get("countryCode", String.class);
 
-        placesClient = Constants.placesClientMutableLiveData.getValue();
-        token = Constants.autocompleteSessionTokenMutableLiveData.getValue();
-        // Create a RectangularBounds object.
-        bounds = RectangularBounds.newInstance(
-                new LatLng(lat - 0.01, lng - 0.01),
-                new LatLng(lat + 0.01, lng + 0.01));
+        int maxItems = 5;
+        if (countryCode.equalsIgnoreCase("vn"))
+            searchOptions = new SearchOptions(LanguageCode.VI_VN, maxItems);
+        else
+            searchOptions = new SearchOptions(LanguageCode.EN_US, maxItems);
 
         bindView();
         generateSpinnerDeadline(spDeadline);
         createRecyclerView();
-        initJobLocation(currentAddress);
-        editTextEmitValueListener();
+
+        if (searchEngine != null) {
+            initJobLocation(currentAddress);
+            editTextEmitValueListener();
+        }
+
         sendData();
     }
 
@@ -147,7 +150,7 @@ public class AddNewJobChildSecondFragment extends Fragment {
     private void editTextEmitValueListener() {
         RxTextView.textChanges(edtLocation)
                 .skip(1)
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(277, TimeUnit.MILLISECONDS)
                 .map(CharSequence::toString)
                 .filter(charSequence -> charSequence.length() >= 3 && !charSequence.equals(chosenPlaceName))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -155,52 +158,65 @@ public class AddNewJobChildSecondFragment extends Fragment {
     }
 
     private void autoCompletePlaceBuilder(String charSequence) {
-        Log.d("RxTextView ", "is working");
-        // Use the builder to create a FindAutocompletePredictionsRequest.
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                // Call either setLocationBias() OR setLocationRestriction().
-                .setLocationBias(bounds)
-                //.setLocationRestriction(bounds)
-                .setOrigin(new LatLng(lat, lng))
-                .setCountry(countryCode)
-                .setTypeFilter(TypeFilter.ADDRESS)
-                .setSessionToken(token)
-                .setQuery(charSequence)
-                .build();
+        Double lat, lng;
 
-        placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
-            placeResponseList.clear();
-            for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                placeResponseList.add(new PlaceResponse(prediction.getPlaceId(), prediction.getPrimaryText(null).toString(), prediction.getSecondaryText(null).toString()));
-            }
-            placeAdapter.notifyDataSetChanged();
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                ApiException apiException = (ApiException) exception;
-                int errorCode = apiException.getStatusCode();
-                Log.e("Autocomplete builder", "Place not found: " + errorCode);
-                if (errorCode == 9010) {
-                    Toast.makeText(getContext(), getResources().getString(R.string.error_9010_auto_complete), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), getResources().getString(R.string.places_not_found_auto_complete), Toast.LENGTH_SHORT).show();
-                }
-                placeResponseList.clear();
-                placeAdapter.notifyDataSetChanged();
-                ibCheckSecond.setEnabled(false);
-            }
-        });
+        if (Constants.Latitude.getValue() == null)
+            lat = 90d;
+        else
+            lat = Constants.Latitude.getValue();
+
+        if (Constants.Longitude.getValue() == null)
+            lng = 180d;
+        else
+            lng = Constants.Longitude.getValue();
+
+        GeoCoordinates centerGeoCoordinates = new GeoCoordinates(lat, lng);
+
+        searchEngine.suggest(
+                new TextQuery(charSequence, centerGeoCoordinates),
+                searchOptions,
+                (searchError, list) -> {
+                    if (searchError != null) {
+                        Log.d("HereMapInfo", "AutoSuggest Error: " + searchError.name());
+                        placeResponseList.clear();
+                        placeAdapter.notifyDataSetChanged();
+                        ibCheckSecond.setEnabled(false);
+                        return;
+                    }
+                    if (list != null) {
+                        Log.d("HereMapInfo", "AutoSuggest results: " + list.size());
+                        placeResponseList.clear();
+
+                        for (Suggestion autoSuggestResult : list) {
+                            Place place = autoSuggestResult.getPlace();
+                            if (place != null && place.getGeoCoordinates() != null) {
+                                placeResponseList.add(new PlaceResponse(
+                                        autoSuggestResult.getTitle(),
+                                        place.getAddress().addressText,
+                                        place.getGeoCoordinates().latitude,
+                                        place.getGeoCoordinates().longitude)
+                                );
+                            }
+                        }
+                        placeAdapter.notifyDataSetChanged();
+                    } else {
+                        placeResponseList.clear();
+                        placeAdapter.notifyDataSetChanged();
+                        ibCheckSecond.setEnabled(false);
+                    }
+                });
     }
 
     private void createRecyclerView() {
         placeAdapter = new PlaceAdapter(getContext(), placeResponseList);
         placeAdapter.setOnItemClickListener(position -> {
             PlaceResponse placeResponse = placeResponseList.get(position);
-            chosenPlaceName = placeResponse.getPrimaryPlaceName();
+            chosenPlaceName = placeResponse.getSecondaryPlaceName();
 
             placeResponseList.clear();
             placeAdapter.notifyDataSetChanged();
-            searchPlaceBaseOnPlaceId(placeResponse.getPlaceId(), placeResponse.getPrimaryPlaceName());
-            edtLocation.setText(placeResponse.getPrimaryPlaceName());
+            edtLocation.setText(placeResponse.getSecondaryPlaceName());
+            moveMapToJobLocation(placeResponse);
         });
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(getContext());
         rcvPlace.setLayoutManager(layoutManagerPayout);
@@ -209,51 +225,19 @@ public class AddNewJobChildSecondFragment extends Fragment {
         rcvPlace.setAdapter(placeAdapter);
     }
 
-    private void searchPlaceBaseOnPlaceId(String placeId,
-                                          String placeName) {
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
-
-        // Construct a request object, passing the place ID and fields array.
-        FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
-
-        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-            Place place = response.getPlace();
-            if (place.getLatLng() != null) {
-                jobLatEdit = place.getLatLng().latitude;
-                jobLngEdit = place.getLatLng().longitude;
-                Log.i("Search place", "Place found: " + place.getName() + ", " + jobLatEdit + "|" + jobLngEdit);
-            }
-
-            moveMapToJobLocation(placeName);
-        }).addOnFailureListener((exception) -> {
-            if (exception instanceof ApiException) {
-                ApiException apiException = (ApiException) exception;
-                int statusCode = apiException.getStatusCode();
-                // Handle error with given status code.
-                Log.e("Search place", "Place not found: " + apiException.getStatusCode());
-                if (statusCode == 9010) {
-                    Toast.makeText(getContext(), getResources().getString(R.string.error9010_search_place), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), getResources().getString(R.string.places_not_found_search_place), Toast.LENGTH_SHORT).show();
-                }
-                ibCheckSecond.setEnabled(false);
-            }
-        });
-    }
-
-    private void moveMapToJobLocation(String placeName) {
+    private void moveMapToJobLocation(PlaceResponse placeResponse) {
         mapFragment.getMapAsync(googleMap -> {
             mMap = googleMap;
             mMap.clear();
 
-            LatLng jobLocation = new LatLng(jobLatEdit, jobLngEdit);
-            mMap.addMarker(new MarkerOptions().position(jobLocation).title(placeName));
+            LatLng jobLocation = new LatLng(placeResponse.getLatitude(), placeResponse.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(jobLocation).title(placeResponse.getSecondaryPlaceName()));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
             mMap.getUiSettings().setScrollGesturesEnabled(false);
 
-            addJobRequest.setLat(jobLatEdit);
-            addJobRequest.setLng(jobLngEdit);
-            addJobRequest.setLocation(placeName);
+            addJobRequest.setLat(placeResponse.getLatitude());
+            addJobRequest.setLng(placeResponse.getLongitude());
+            addJobRequest.setLocation(placeResponse.getSecondaryPlaceName());
             ibCheckSecond.setEnabled(true);
         });
     }

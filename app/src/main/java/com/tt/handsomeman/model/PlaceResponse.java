@@ -1,24 +1,32 @@
 package com.tt.handsomeman.model;
 
 public class PlaceResponse {
-    private String placeId;
     private String primaryPlaceName;
     private String secondaryPlaceName;
+    private Double latitude;
+    private Double longitude;
 
-    public PlaceResponse(String placeId,
-                         String primaryPlaceName,
-                         String secondaryPlaceName) {
-        this.placeId = placeId;
+    public PlaceResponse(String primaryPlaceName, String secondaryPlaceName, Double latitude, Double longitude) {
         this.primaryPlaceName = primaryPlaceName;
         this.secondaryPlaceName = secondaryPlaceName;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public String getPlaceId() {
-        return placeId;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public String getPrimaryPlaceName() {

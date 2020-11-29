@@ -28,10 +28,11 @@ import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.FileAddAdapter;
 import com.tt.handsomeman.databinding.FragmentBidJobDetailLetterWritingBinding;
 import com.tt.handsomeman.model.FileRequest;
+import com.tt.handsomeman.util.Constants;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.CustomViewPager;
+import com.tt.handsomeman.util.FileUtils;
 import com.tt.handsomeman.util.MD5;
-import com.tt.handsomeman.util.RealPathUtil;
 
 import java.io.File;
 
@@ -132,35 +133,29 @@ public class BidJobLetterFragment extends Fragment {
                 int count = data.getClipData().getItemCount(); //evaluate the count before the for loop --- otherwise, the count is evaluated every loop.
                 for (int i = 0; i < count; i++) {
                     Uri fileURI = data.getClipData().getItemAt(i).getUri();
-                    File file = new File(fileURI.getPath());
-                    int file_size = Integer.parseInt(String.valueOf(file.length() / 1024 / 1024));
-                    if (file_size <= 5) {
-                        String filePath = RealPathUtil.getRealPath(getContext(), fileURI);
-                        FileRequest fileRequest = new FileRequest(file.getName(), filePath, MD5.calculateMD5(new File(filePath)));
+                    String filePath = FileUtils.onSelectFromGalleryResult(requireActivity(), fileURI, Constants.FILE_TYPE.PDF);
+                    if (filePath != null) {
+                        File file = new File(filePath);
+                        FileRequest fileRequest = new FileRequest(file.getName(), filePath, MD5.calculateMD5(file));
                         if (!jobBidRequest.getFileRequestList().contains(fileRequest)) {
                             jobBidRequest.getFileRequestList().add(fileRequest);
                             fileAddAdapter.notifyItemInserted(jobBidRequest.getFileRequestList().size() - 1);
                         } else {
                             Toast.makeText(getContext(), getString(R.string.duplicate_file), Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(getContext(), file.getName() + getString(R.string.file_too_large), Toast.LENGTH_SHORT).show();
                     }
                 }
             } else {
-                File file = new File(data.getData().getPath());
-                int file_size = Integer.parseInt(String.valueOf(file.length() / 1024 / 1024));
-                if (file_size <= 5) {
-                    String filePath = RealPathUtil.getRealPath(getContext(), data.getData());
-                    FileRequest fileRequest = new FileRequest(file.getName(), filePath, MD5.calculateMD5(new File(filePath)));
+                String filePath = FileUtils.onSelectFromGalleryResult(requireActivity(), data.getData(), Constants.FILE_TYPE.PDF);
+                if (filePath != null) {
+                    File file = new File(filePath);
+                    FileRequest fileRequest = new FileRequest(file.getName(), filePath, MD5.calculateMD5(file));
                     if (!jobBidRequest.getFileRequestList().contains(fileRequest)) {
                         jobBidRequest.getFileRequestList().add(fileRequest);
                         fileAddAdapter.notifyItemInserted(jobBidRequest.getFileRequestList().size() - 1);
                     } else {
                         Toast.makeText(getContext(), getString(R.string.duplicate_file), Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getContext(), file.getName() + getString(R.string.file_too_large), Toast.LENGTH_SHORT).show();
                 }
             }
         }

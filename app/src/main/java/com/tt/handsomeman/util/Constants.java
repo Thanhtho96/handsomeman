@@ -2,9 +2,6 @@ package com.tt.handsomeman.util;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.net.PlacesClient;
-
 public class Constants {
     public static final String BASE_URL = "https://handsomeman.herokuapp.com/";
     //    public static final String BASE_URL = "http://7.7.7.17:8080/";
@@ -82,7 +79,22 @@ public class Constants {
     public static final MutableLiveData<Double> Latitude = new MutableLiveData<>();
     public static final MutableLiveData<Double> Longitude = new MutableLiveData<>();
     public static final MutableLiveData<String> language = new MutableLiveData<>();
-    public static MutableLiveData<PlacesClient> placesClientMutableLiveData = new MutableLiveData<>();
-    public static MutableLiveData<AutocompleteSessionToken> autocompleteSessionTokenMutableLiveData = new MutableLiveData<>();
+    public static final String dateTimeSecondFileNamePattern = "yyyyMMdd_HHmmss";
+    public static final int MAX_UPLOAD_FILE_SIZE = 5;
+    public static final String fileProviderExtension = ".fileprovider";
 
+    public enum FILE_TYPE {
+        IMAGE("IMG_"),
+        PDF("PDF_");
+
+        private final String fileSuffix;
+
+        FILE_TYPE(String fileSuffix) {
+            this.fileSuffix = fileSuffix;
+        }
+
+        public String getFileSuffix() {
+            return fileSuffix;
+        }
+    }
 }
