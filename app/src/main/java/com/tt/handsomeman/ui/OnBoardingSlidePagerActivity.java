@@ -11,9 +11,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityOnBoardingSlidePagerBinding;
@@ -111,16 +108,6 @@ public class OnBoardingSlidePagerActivity extends FragmentActivity {
                     break;
             }
         }
-
-        Places.initialize(this, "AIzaSyBzEI6AAHYuzXQOj9fdD2fEpH2gTcaam48");
-        PlacesClient placesClient = Places.createClient(this);
-
-        // Initialize the AutocompleteSupportFragment.
-        // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
-        // and once again when the user makes a selection (for example when calling fetchPlace()).
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-        Constants.placesClientMutableLiveData.setValue(placesClient);
-        Constants.autocompleteSessionTokenMutableLiveData.setValue(token);
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = binding.boardingPager;
