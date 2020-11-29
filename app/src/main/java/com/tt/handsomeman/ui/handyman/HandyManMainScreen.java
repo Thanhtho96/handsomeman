@@ -11,7 +11,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -96,7 +95,6 @@ public class HandyManMainScreen extends AppCompatActivity {
             if (lat != null && lng != null) {
                 Constants.Latitude.setValue(location.getLatitude());
                 Constants.Longitude.setValue(location.getLongitude());
-                Toast.makeText(HandyManMainScreen.this, "Location changed", Toast.LENGTH_SHORT).show();
 
                 try {
                     List<Address> address = geoCoder.getFromLocation(lat, lng, 1);

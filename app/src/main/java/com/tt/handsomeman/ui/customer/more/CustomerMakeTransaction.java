@@ -1,5 +1,7 @@
 package com.tt.handsomeman.ui.customer.more;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -52,7 +54,7 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
     SharedPreferencesUtils sharedPreferencesUtils;
     private ImageButton btnCheck;
     private EditText edtBalanceTransfer;
-    private TextView tvBonus, tvPaymentMilestoneOrder, paymentMilestonePercentage, handymanName;
+    private TextView tvBonus, tvPaymentMilestoneOrder, tvPaymentMilestonePercentage, handymanName;
     private Spinner spBankAccount, spProject;
     private ImageView imgHandymanAvatar;
     private SpinnerBankAccount spinnerBankAccount;
@@ -66,6 +68,7 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
     private double minPay;
     private double bonus;
     private int paymentMilestoneOrder;
+    private int paymentMilestonePercentage;
     private String authorization;
 
     @Override
@@ -107,7 +110,12 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
             baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
                 Toast.makeText(CustomerMakeTransaction.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
                 if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                    onBackPressed();
+                    if (!(paymentMilestoneOrder == 1 && paymentMilestonePercentage < 100)) {
+                        Intent intent = new Intent();
+                        intent.putExtra("removedPendingJob", jobId);
+                        setResult(Activity.RESULT_OK, intent);
+                    }
+                    finish();
                 }
             });
         });
@@ -184,7 +192,8 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
                         tvPaymentMilestoneOrder.setText(getString(R.string.default_milestone, paymentMilestoneOrder));
                         break;
                 }
-                paymentMilestonePercentage.setText(getString(R.string.percentage, jobTransactionResponse.getPaymentMileStonePercentage()));
+                paymentMilestonePercentage = jobTransactionResponse.getPaymentMileStonePercentage();
+                tvPaymentMilestonePercentage.setText(getString(R.string.percentage, paymentMilestonePercentage));
                 handymanName.setText(jobTransactionResponse.getHandymanName());
 
                 GlideUrl glideUrl1 = new GlideUrl((jobTransactionResponse.getHandymanAvatar()),
@@ -259,7 +268,7 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
         edtBalanceTransfer = binding.editTextTransferAmount;
         tvBonus = binding.bonus;
         tvPaymentMilestoneOrder = binding.paymentMileStoneOrder;
-        paymentMilestonePercentage = binding.paymentMileStonePercentage;
+        tvPaymentMilestonePercentage = binding.paymentMileStonePercentage;
         handymanName = binding.handymanName;
         spBankAccount = binding.spinnerBankAccount;
         spProject = binding.spinnerProject;

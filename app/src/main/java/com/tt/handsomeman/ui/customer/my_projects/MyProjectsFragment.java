@@ -23,6 +23,7 @@ import com.tt.handsomeman.databinding.FragmentMyProjectsBinding;
 import com.tt.handsomeman.model.Job;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
+import com.tt.handsomeman.viewmodel.CustomerMainScreenViewModel;
 import com.tt.handsomeman.viewmodel.CustomerViewModel;
 
 import java.util.List;
@@ -41,11 +42,13 @@ public class MyProjectsFragment extends BaseFragment<CustomerViewModel, Fragment
     SharedPreferencesUtils sharedPreferencesUtils;
     private Fragment active = childInProgressFragment;
     private EditText edtSearchByWord;
+    private CustomerMainScreenViewModel customerMainScreenViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
+        customerMainScreenViewModel = new ViewModelProvider(requireActivity()).get(CustomerMainScreenViewModel.class);
         baseViewModel = new ViewModelProvider(this, viewModelFactory).get(CustomerViewModel.class);
         viewBinding = FragmentMyProjectsBinding.inflate(inflater, container, false);
         return viewBinding.getRoot();
@@ -80,10 +83,23 @@ public class MyProjectsFragment extends BaseFragment<CustomerViewModel, Fragment
         });
 
         fetchData();
+        customerMainScreenViewModel.getSuccessfulJob().observe(getViewLifecycleOwner(), jobId -> {
+            if (jobId == 0) return;
+            List<Job> listProgressJob = inProgressList.getValue();
+            for (Job job : listProgressJob) {
+                if (job.getId().equals(jobId)) {
+                    listProgressJob.remove(job);
+                    inProgressList.setValue(listProgressJob);
+                    List<Job> listPastJob = inPastList.getValue();
+                    listPastJob.add(0, job);
+                    inPastList.setValue(listPastJob);
+                    return;
+                }
+            }
+        });
     }
 
     void fetchData() {
-
         baseViewModel.fetchJobsOfCustomer();
         baseViewModel.getMyProjectListMutableLiveData().observe(getViewLifecycleOwner(), myProjectList -> {
             inProgressList.setValue(myProjectList.getInProgressList());

@@ -37,6 +37,7 @@ import com.tt.handsomeman.ui.ChangePassword;
 import com.tt.handsomeman.ui.MyProfile;
 import com.tt.handsomeman.ui.Start;
 import com.tt.handsomeman.ui.ViewPayout;
+import com.tt.handsomeman.ui.customer.CustomerMainScreen;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.YesOrNoDialog;
@@ -95,7 +96,7 @@ public class CustomerMoreFragment extends BaseFragment<CustomerViewModel, Fragme
             if (payoutList.size() == 0) {
                 Toast.makeText(getContext(), getString(R.string.need_payout_to_make_transaction), Toast.LENGTH_SHORT).show();
             } else {
-                startActivity(new Intent(getContext(), CustomerMakeTransaction.class));
+                getActivity().startActivityForResult(new Intent(getContext(), CustomerMakeTransaction.class), CustomerMainScreen.MADE_TRANSACTION_CODE);
             }
         });
 

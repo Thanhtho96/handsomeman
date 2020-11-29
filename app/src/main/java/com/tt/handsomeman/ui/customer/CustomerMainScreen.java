@@ -1,7 +1,9 @@
 package com.tt.handsomeman.ui.customer;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -10,12 +12,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -33,6 +36,7 @@ import com.tt.handsomeman.ui.customer.my_projects.MyProjectsFragment;
 import com.tt.handsomeman.ui.messages.MessagesFragment;
 import com.tt.handsomeman.util.Constants;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
+import com.tt.handsomeman.viewmodel.CustomerMainScreenViewModel;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,12 +49,14 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
     private static final int PERMISSION_REQUEST_LOCATION = 0;
     private static final long MIN_TIME_TO_REQUEST_LOCATION = 30000; //30s
     private static final float MIN_DISTANCE_TO_REQUEST_LOCATION = 5; //5 meters
+    public static final int MADE_TRANSACTION_CODE = 777;
     final Fragment fragment1 = new FindHandymanFragment();
     final Fragment fragment2 = new MessagesFragment();
     final Fragment fragment3 = new MyProjectsFragment();
     final Fragment fragment4 = new NotificationsFragment();
     final Fragment fragment5 = new CustomerMoreFragment();
     final FragmentManager fm = getSupportFragmentManager();
+    private CustomerMainScreenViewModel customerMainScreenViewModel;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private ActivityCustomerMainScreenBinding binding;
@@ -95,7 +101,6 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
             if (lat != null && lng != null) {
                 Constants.Latitude.setValue(location.getLatitude());
                 Constants.Longitude.setValue(location.getLongitude());
-                Toast.makeText(CustomerMainScreen.this, "Location changed", Toast.LENGTH_SHORT).show();
 
                 try {
                     List<Address> address = geoCoder.getFromLocation(lat, lng, 1);
@@ -159,7 +164,7 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
         HandymanApp.getComponent().inject(this);
 
         geoCoder = new Geocoder(CustomerMainScreen.this, Locale.getDefault());
-
+        customerMainScreenViewModel = new ViewModelProvider(this).get(CustomerMainScreenViewModel.class);
         BottomNavigationView navView = binding.navView;
 
 //        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -260,6 +265,14 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
         super.onStart();
         String userId = sharedPreferencesUtils.get("userId", String.class);
         FirebaseMessaging.getInstance().subscribeToTopic("notification-" + userId);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == MADE_TRANSACTION_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            customerMainScreenViewModel.getSuccessfulJob().setValue(data.getIntExtra("removedPendingJob", 0));
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
