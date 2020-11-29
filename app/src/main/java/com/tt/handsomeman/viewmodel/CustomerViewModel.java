@@ -27,6 +27,7 @@ import com.tt.handsomeman.response.StartScreenCustomer;
 import com.tt.handsomeman.response.ViewMadeTransactionResponse;
 import com.tt.handsomeman.service.CustomerService;
 import com.tt.handsomeman.util.Constants;
+import com.tt.handsomeman.util.LiveEvent;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import javax.inject.Inject;
@@ -47,7 +48,7 @@ public class CustomerViewModel extends BaseViewModel {
     private final MutableLiveData<ListCategory> listCategoryMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<MyProjectList> myProjectListMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<CustomerProfileResponse> customerProfileResponseMutableLiveData = new MutableLiveData<>();
-    private final MutableLiveData<StandardResponse> standardResponseMutableLiveData = new MutableLiveData<>();
+    private final LiveEvent<StandardResponse> standardResponseMutableLiveData = new LiveEvent<>();
     private final MutableLiveData<CustomerJobDetail> customerJobDetailMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<DataBracketResponse<ViewMadeTransactionResponse>> viewTransactionLiveData = new MutableLiveData<>();
     private final MutableLiveData<DataBracketResponse<ListCustomerTransfer>> listTransferHistoryLiveData = new MutableLiveData<>();
@@ -100,7 +101,7 @@ public class CustomerViewModel extends BaseViewModel {
         return listTransferHistoryLiveData;
     }
 
-    public MutableLiveData<StandardResponse> getStandardResponseMutableLiveData() {
+    public LiveEvent<StandardResponse> getStandardResponseMutableLiveData() {
         return standardResponseMutableLiveData;
     }
 
