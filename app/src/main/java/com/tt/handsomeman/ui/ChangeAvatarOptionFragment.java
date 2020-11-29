@@ -113,9 +113,9 @@ public class ChangeAvatarOptionFragment extends BottomSheetDialogFragment {
                 == PackageManager.PERMISSION_GRANTED) {
             // Permission is already available, start camera preview
             Intent intent = new Intent();
-            intent.setType("image/jpeg");
+            intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            intent.setAction(Intent.ACTION_GET_CONTENT);
             Toast.makeText(getContext(), getString(R.string.select_image), Toast.LENGTH_SHORT).show();
             startActivityForResult(Intent.createChooser(intent, getString(R.string.select_image)), REQUEST_FILE);
         } else {
