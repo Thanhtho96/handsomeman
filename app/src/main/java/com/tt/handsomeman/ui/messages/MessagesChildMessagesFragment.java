@@ -115,7 +115,7 @@ public class MessagesChildMessagesFragment extends BaseFragment<MessageViewModel
         RecyclerView.LayoutManager layoutManagerMessage = new LinearLayoutManager(getContext());
         rcvMessage.setLayoutManager(layoutManagerMessage);
         rcvMessage.setItemAnimator(new FadeInLeftAnimator());
-        rcvMessage.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvMessage.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvMessage.setAdapter(conversationAdapter);
         rcvMessage.addOnScrollListener(onScrollListener);
     }

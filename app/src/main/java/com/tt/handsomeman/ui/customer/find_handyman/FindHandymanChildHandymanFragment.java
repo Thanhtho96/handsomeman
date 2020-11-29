@@ -92,7 +92,7 @@ public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerView
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvFindHandyman.setLayoutManager(layoutManagerJob);
         rcvFindHandyman.setItemAnimator(new DefaultItemAnimator());
-        rcvFindHandyman.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvFindHandyman.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvFindHandyman.setAdapter(findHandymanAdapter);
     }
 
@@ -110,7 +110,7 @@ public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerView
         RecyclerView.LayoutManager layoutManagerCategory = new LinearLayoutManager(getContext());
         rcvCategory.setLayoutManager(layoutManagerCategory);
         rcvCategory.setItemAnimator(new DefaultItemAnimator());
-        rcvCategory.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvCategory.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvCategory.setAdapter(categoryAdapter);
     }
 

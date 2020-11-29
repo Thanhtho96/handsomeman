@@ -133,7 +133,7 @@ public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanVi
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvSkillEdit.setLayoutManager(layoutManagerJob);
         rcvSkillEdit.setItemAnimator(new DefaultItemAnimator());
-        rcvSkillEdit.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvSkillEdit.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvSkillEdit.setAdapter(skillEditAdapter);
     }
 

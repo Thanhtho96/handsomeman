@@ -8,7 +8,9 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,14 +38,15 @@ public class CustomDividerItemDecoration extends RecyclerView.ItemDecoration {
         mShowLastDivider = showLastDivider;
     }
 
-    public CustomDividerItemDecoration(Drawable divider) {
-        mDivider = divider;
+    public CustomDividerItemDecoration(Context context, @DrawableRes Integer drawableRes) {
+        mDivider = ContextCompat.getDrawable(context, drawableRes);
     }
 
-    public CustomDividerItemDecoration(Drawable divider,
+    public CustomDividerItemDecoration(Context context,
+                                       @DrawableRes Integer drawableRes,
                                        boolean showFirstDivider,
                                        boolean showLastDivider) {
-        this(divider);
+        this.mDivider = ContextCompat.getDrawable(context, drawableRes);
         mShowFirstDivider = showFirstDivider;
         mShowLastDivider = showLastDivider;
     }

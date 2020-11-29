@@ -118,7 +118,7 @@ public class BidJobLetterFragment extends Fragment {
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvNotification.setLayoutManager(layoutManagerJob);
         rcvNotification.setItemAnimator(new DefaultItemAnimator());
-        rcvNotification.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvNotification.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvNotification.setAdapter(fileAddAdapter);
     }
 

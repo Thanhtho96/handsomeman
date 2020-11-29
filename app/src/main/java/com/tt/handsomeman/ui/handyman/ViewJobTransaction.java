@@ -84,7 +84,7 @@ public class ViewJobTransaction extends BaseAppCompatActivityWithViewModel<Handy
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         rcvPaymentMilestone.setLayoutManager(layoutManager);
         rcvPaymentMilestone.setItemAnimator(new DefaultItemAnimator());
-        rcvPaymentMilestone.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvPaymentMilestone.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvPaymentMilestone.setAdapter(paymentMilestoneAdapter);
     }
 

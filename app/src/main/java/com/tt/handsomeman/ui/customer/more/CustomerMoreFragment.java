@@ -150,7 +150,7 @@ public class CustomerMoreFragment extends BaseFragment<CustomerViewModel, Fragme
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(getContext());
         rcvPayout.setLayoutManager(layoutManagerPayout);
         rcvPayout.setItemAnimator(new DefaultItemAnimator());
-        rcvPayout.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvPayout.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvPayout.setAdapter(payoutAdapter);
     }
 

@@ -205,7 +205,7 @@ public class AddNewJobChildSecondFragment extends Fragment {
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(getContext());
         rcvPlace.setLayoutManager(layoutManagerPayout);
         rcvPlace.setItemAnimator(new DefaultItemAnimator());
-        rcvPlace.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider_white)));
+        rcvPlace.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider_white));
         rcvPlace.setAdapter(placeAdapter);
     }
 

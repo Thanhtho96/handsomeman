@@ -177,7 +177,7 @@ public class HandymanDetail extends BaseAppCompatActivityWithViewModel<CustomerV
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         rcvReview.setLayoutManager(layoutManager);
         rcvReview.setItemAnimator(new DefaultItemAnimator());
-        rcvReview.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvReview.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvReview.setAdapter(handymanReviewAdapter);
     }
 
@@ -186,7 +186,7 @@ public class HandymanDetail extends BaseAppCompatActivityWithViewModel<CustomerV
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(this);
         rcvSkill.setLayoutManager(layoutManagerPayout);
         rcvSkill.setItemAnimator(new DefaultItemAnimator());
-        rcvSkill.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvSkill.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvSkill.setAdapter(skillAdapter);
     }
 

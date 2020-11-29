@@ -102,7 +102,7 @@ public class MyProfileAboutFragment extends BaseFragment<HandymanViewModel, Frag
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(getContext());
         rcvSkill.setLayoutManager(layoutManagerPayout);
         rcvSkill.setItemAnimator(new DefaultItemAnimator());
-        rcvSkill.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvSkill.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvSkill.setAdapter(skillAdapter);
     }
 

@@ -66,7 +66,7 @@ public class CustomerMyProjectsChildInProgressFragment extends Fragment {
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvJob.setLayoutManager(layoutManagerJob);
         rcvJob.setItemAnimator(new DefaultItemAnimator());
-        rcvJob.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvJob.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvJob.setAdapter(jobAdapter);
     }
 

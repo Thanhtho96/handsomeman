@@ -93,7 +93,7 @@ public class FindHandymanCategory extends BaseAppCompatActivityWithViewModel<Cus
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvHandyman.setLayoutManager(layoutManagerJob);
         rcvHandyman.setItemAnimator(new DefaultItemAnimator());
-        rcvHandyman.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvHandyman.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvHandyman.setAdapter(findHandymanFilterAdapter);
     }
 

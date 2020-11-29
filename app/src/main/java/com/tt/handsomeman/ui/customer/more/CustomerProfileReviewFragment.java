@@ -81,7 +81,7 @@ public class CustomerProfileReviewFragment extends BaseFragment<CustomerViewMode
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         rcvReview.setLayoutManager(layoutManager);
         rcvReview.setItemAnimator(new DefaultItemAnimator());
-        rcvReview.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvReview.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvReview.setAdapter(customerReviewAdapter);
     }
 }

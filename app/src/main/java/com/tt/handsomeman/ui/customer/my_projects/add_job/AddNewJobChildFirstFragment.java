@@ -273,7 +273,7 @@ public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel,
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(getContext());
         rcvCategories.setLayoutManager(layoutManagerPayout);
         rcvCategories.setItemAnimator(new DefaultItemAnimator());
-        rcvCategories.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvCategories.addItemDecoration(new CustomDividerItemDecoration(getContext(), R.drawable.recycler_view_divider));
         rcvCategories.setAdapter(categorySelectionAdapter);
     }
 

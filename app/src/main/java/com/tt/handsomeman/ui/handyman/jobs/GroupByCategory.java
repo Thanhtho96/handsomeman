@@ -90,7 +90,7 @@ public class GroupByCategory extends BaseAppCompatActivityWithViewModel<Handyman
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvJob.setLayoutManager(layoutManagerJob);
         rcvJob.setItemAnimator(new DefaultItemAnimator());
-        rcvJob.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvJob.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvJob.setAdapter(jobAdapter);
     }
 

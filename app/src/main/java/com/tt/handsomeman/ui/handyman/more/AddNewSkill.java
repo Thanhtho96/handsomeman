@@ -82,7 +82,7 @@ public class AddNewSkill extends BaseAppCompatActivityWithViewModel<HandymanView
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(this);
         rcvSkillCategoriesName.setLayoutManager(layoutManagerPayout);
         rcvSkillCategoriesName.setItemAnimator(new DefaultItemAnimator());
-        rcvSkillCategoriesName.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvSkillCategoriesName.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvSkillCategoriesName.setAdapter(addNewSkillAdapter);
     }
 

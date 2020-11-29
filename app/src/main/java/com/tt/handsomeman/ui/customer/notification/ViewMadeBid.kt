@@ -10,7 +10,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.Observer
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,16 +79,14 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
 
         this.jobTitle.text = jobTitle
         whoBid.text = getString(R.string.who_just_made_bid, personBid)
-        val token = sharedPreferencesUtils.get("token", String::class.java)
-        getNotificationData(notificationId, jobBidId, token)
-        acceptBid(handymanId, token)
+        getNotificationData(notificationId, jobBidId)
+        acceptBid(handymanId)
     }
 
-    private fun markAsRead(notificationId: Int,
-                           token: String) {
+    private fun markAsRead(notificationId: Int) {
         if (!isRead) {
             baseViewModel!!.markNotificationAsRead(notificationId)
-            baseViewModel!!.standardResponseMarkReadMutableLiveData.observe(this, Observer { standardResponse ->
+            baseViewModel!!.standardResponseMarkReadMutableLiveData.observe(this, { standardResponse ->
                 if (standardResponse.status == StatusConstant.OK) {
                     isRead = true
                     isReadForFirstTime = true
@@ -97,14 +95,13 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
         }
     }
 
-    private fun acceptBid(handymanId: Int,
-                          token: String) {
+    private fun acceptBid(handymanId: Int) {
         btnAcceptBid.setOnClickListener {
             val now = Calendar.getInstance()
             val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault())
             val sendTime = formatter.format(now.time)
             baseViewModel!!.acceptBid(AcceptBidRequest(jobId, handymanId, sendTime))
-            baseViewModel!!.standardResponseAcceptBidMutableLiveData.observe(this, Observer { standardResponse ->
+            baseViewModel!!.standardResponseAcceptBidMutableLiveData.observe(this, { standardResponse ->
                 Toast.makeText(this@ViewMadeBid, standardResponse.message, Toast.LENGTH_SHORT).show()
                 if ((standardResponse.status == StatusConstant.OK)) {
                     val intent = Intent()
@@ -118,10 +115,9 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
     }
 
     private fun getNotificationData(notificationId: Int,
-                                    jobBidId: Int,
-                                    token: String) {
+                                    jobBidId: Int) {
         baseViewModel!!.fetchMadeBidNotification(jobBidId)
-        baseViewModel!!.madeABidNotificationResponseMutableLiveData.observe(this, Observer { madeABidNotificationResponseDataBracketResponse ->
+        baseViewModel!!.madeABidNotificationResponseMutableLiveData.observe(this, { madeABidNotificationResponseDataBracketResponse ->
             if (madeABidNotificationResponseDataBracketResponse.status == StatusConstant.OK) {
                 val madeABidNotificationResponse = madeABidNotificationResponseDataBracketResponse.data
                 bid.text = getString(R.string.money_currency_string, DecimalFormat.format(madeABidNotificationResponse.bid))
@@ -135,7 +131,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
                     fileNameAdapter.notifyDataSetChanged()
                 }
                 if (!isRead) {
-                    markAsRead(notificationId, token)
+                    markAsRead(notificationId)
                 }
             } else {
                 Toast.makeText(this@ViewMadeBid, madeABidNotificationResponseDataBracketResponse.message, Toast.LENGTH_SHORT).show()
@@ -154,7 +150,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
         val layoutManagerJob: RecyclerView.LayoutManager = LinearLayoutManager(this)
         rcvFileName.layoutManager = layoutManagerJob
         rcvFileName.itemAnimator = DefaultItemAnimator()
-        rcvFileName.addItemDecoration(CustomDividerItemDecoration(resources.getDrawable(R.drawable.recycler_view_divider, null)))
+        rcvFileName.addItemDecoration(CustomDividerItemDecoration(this, R.drawable.recycler_view_divider))
         rcvFileName.adapter = fileNameAdapter
     }
 
@@ -178,7 +174,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
                 map[getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/${bidFileResponse.fileName}"] = response?.body?.contentLength()!!
                 // if don't find file available contentLength will return -1
                 if (response?.body?.contentLength()!! > 0) {
-                    val file_size: Long? = response?.body?.contentLength()
+                    val fileSize: Long? = response?.body?.contentLength()
                     inputStream =
                             BufferedInputStream(response?.body?.byteStream())
                     outputStream = FileOutputStream(
@@ -196,7 +192,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
                             ensureActive()
                             total += readBytes
                             outputStream.write(data, 0, readBytes)
-                            updateDownloadProgressBar(position, (total / file_size!! * 100).toInt())
+                            updateDownloadProgressBar(position, (total / fileSize!! * 100).toInt())
                         }
                     }
                     updateDownloadProgressBar(position, 0)

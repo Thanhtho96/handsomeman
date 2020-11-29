@@ -60,7 +60,7 @@ public class CustomerTransferHistory extends BaseAppCompatActivityWithViewModel<
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         rcvTransferHistory.setLayoutManager(layoutManager);
         rcvTransferHistory.setItemAnimator(new DefaultItemAnimator());
-        rcvTransferHistory.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvTransferHistory.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvTransferHistory.setAdapter(customerTransferHistoryAdapter);
     }
 

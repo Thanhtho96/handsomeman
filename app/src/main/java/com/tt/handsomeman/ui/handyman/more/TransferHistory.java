@@ -62,7 +62,7 @@ public class TransferHistory extends BaseAppCompatActivityWithViewModel<Handyman
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(this);
         rcvTransferHistory.setLayoutManager(layoutManagerPayout);
         rcvTransferHistory.setItemAnimator(new DefaultItemAnimator());
-        rcvTransferHistory.addItemDecoration(new CustomDividerItemDecoration(getResources().getDrawable(R.drawable.recycler_view_divider)));
+        rcvTransferHistory.addItemDecoration(new CustomDividerItemDecoration(this, R.drawable.recycler_view_divider));
         rcvTransferHistory.setAdapter(transferHistoryAdapter);
     }
 }
