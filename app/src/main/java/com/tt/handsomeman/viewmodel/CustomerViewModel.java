@@ -27,6 +27,7 @@ import com.tt.handsomeman.response.StartScreenCustomer;
 import com.tt.handsomeman.response.ViewMadeTransactionResponse;
 import com.tt.handsomeman.service.CustomerService;
 import com.tt.handsomeman.util.Constants;
+import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import javax.inject.Inject;
 
@@ -38,26 +39,29 @@ import okhttp3.RequestBody;
 public class CustomerViewModel extends BaseViewModel {
 
     private final CustomerService customerService;
-    private MutableLiveData<StartScreenCustomer> startScreenCustomerMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<NearbyHandymanResponse> nearbyHandymanResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<CustomerReviewProfile> customerReviewProfileMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<HandymanDetailResponse> handymanDetailResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<Customer> customerMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<ListCategory> listCategoryMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<MyProjectList> myProjectListMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<CustomerProfileResponse> customerProfileResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<StandardResponse> standardResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<CustomerJobDetail> customerJobDetailMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<ViewMadeTransactionResponse>> viewTransactionLiveData = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<ListCustomerTransfer>> listTransferHistoryLiveData = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<ReviewResponse>> reviewResponseLiveData = new MutableLiveData<>();
-    private String locale = Constants.language.getValue();
+    private final MutableLiveData<StartScreenCustomer> startScreenCustomerMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<NearbyHandymanResponse> nearbyHandymanResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<CustomerReviewProfile> customerReviewProfileMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<HandymanDetailResponse> handymanDetailResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Customer> customerMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<ListCategory> listCategoryMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<MyProjectList> myProjectListMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<CustomerProfileResponse> customerProfileResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<StandardResponse> standardResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<CustomerJobDetail> customerJobDetailMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<ViewMadeTransactionResponse>> viewTransactionLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<ListCustomerTransfer>> listTransferHistoryLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<ReviewResponse>> reviewResponseLiveData = new MutableLiveData<>();
+    private final String locale = Constants.language.getValue();
+    private final String authorization;
 
     @Inject
     CustomerViewModel(@NonNull Application application,
-                      CustomerService customerService) {
+                      CustomerService customerService,
+                      SharedPreferencesUtils sharedPreferencesUtils) {
         super(application);
         this.customerService = customerService;
+        this.authorization = sharedPreferencesUtils.get("token", String.class);
     }
 
     public MutableLiveData<StartScreenCustomer> getStartScreenCustomerMutableLiveData() {
@@ -112,10 +116,9 @@ public class CustomerViewModel extends BaseViewModel {
         return reviewResponseLiveData;
     }
 
-    public void fetchDataStartScreen(String authorization,
-                                     NearbyHandymanRequest nearbyHandymanRequest) {
+    public void fetchDataStartScreen(NearbyHandymanRequest nearbyHandymanRequest) {
         compositeDisposable
-                .add(customerService.getStartScreen(locale, authorization, nearbyHandymanRequest)
+                .add(customerService.getStartScreen(locale, this.authorization, nearbyHandymanRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((startScreenResponseResponse) -> {
@@ -126,11 +129,10 @@ public class CustomerViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetHandymanByCategory(String authorization,
-                                      Integer categoryId,
+    public void fetHandymanByCategory(Integer categoryId,
                                       NearbyHandymanRequest nearbyHandymanRequest) {
         compositeDisposable
-                .add(customerService.getHandymanByCateGory(locale, authorization, categoryId, nearbyHandymanRequest)
+                .add(customerService.getHandymanByCateGory(locale, this.authorization, categoryId, nearbyHandymanRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
@@ -141,10 +143,9 @@ public class CustomerViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetHandymanNearby(String authorization,
-                                  NearbyHandymanRequest nearbyHandymanRequest) {
+    public void fetHandymanNearby(NearbyHandymanRequest nearbyHandymanRequest) {
         compositeDisposable
-                .add(customerService.getHandymanNearby(locale, authorization, nearbyHandymanRequest)
+                .add(customerService.getHandymanNearby(locale, this.authorization, nearbyHandymanRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
@@ -155,9 +156,9 @@ public class CustomerViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchCustomerReview(String authorization) {
+    public void fetchCustomerReview() {
         compositeDisposable
-                .add(customerService.getCustomerReview(locale, authorization)
+                .add(customerService.getCustomerReview(locale, this.authorization)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
@@ -182,9 +183,9 @@ public class CustomerViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchCustomerInfo(String authorization) {
+    public void fetchCustomerInfo() {
         compositeDisposable
-                .add(customerService.getCustomerInfo(locale, authorization)
+                .add(customerService.getCustomerInfo(locale, this.authorization)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
@@ -195,9 +196,9 @@ public class CustomerViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchCustomerProfile(String authorization) {
+    public void fetchCustomerProfile() {
         compositeDisposable
-                .add(customerService.getCustomerProfile(locale, authorization)
+                .add(customerService.getCustomerProfile(locale, this.authorization)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((nearbyHandymanResponseResponse) -> {
@@ -208,21 +209,17 @@ public class CustomerViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void editCustomerProfile(String authorization,
-                                    String customerEditName) {
+    public void editCustomerProfile(String customerEditName) {
         compositeDisposable
-                .add(customerService.editCustomerProfile(locale, authorization, customerEditName)
+                .add(customerService.editCustomerProfile(locale, this.authorization, customerEditName)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe((nearbyHandymanResponseResponse) -> {
-                                    standardResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body());
-                                },
+                        .subscribe((nearbyHandymanResponseResponse) -> standardResponseMutableLiveData.setValue(nearbyHandymanResponseResponse.body()),
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchCustomerJobDetail(String authorization,
-                                       Integer jobId) {
-        compositeDisposable.add(customerService.getCustomerJobDetail(locale, authorization, jobId)
+    public void fetchCustomerJobDetail(Integer jobId) {
+        compositeDisposable.add(customerService.getCustomerJobDetail(locale, this.authorization, jobId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((jobResponse) -> {
@@ -233,8 +230,8 @@ public class CustomerViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchJobsOfCustomer(String authorization) {
-        compositeDisposable.add(customerService.getJobsOfCustomer(locale, authorization)
+    public void fetchJobsOfCustomer() {
+        compositeDisposable.add(customerService.getJobsOfCustomer(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((myProjectListResponse) -> {
@@ -245,19 +242,16 @@ public class CustomerViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void addNewJob(String authorization,
-                          AddJobRequest addJobRequest) {
-        compositeDisposable.add(customerService.addNewJob(locale, authorization, addJobRequest)
+    public void addNewJob(AddJobRequest addJobRequest) {
+        compositeDisposable.add(customerService.addNewJob(locale, this.authorization, addJobRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(standardResponseResponse -> {
-                            standardResponseMutableLiveData.setValue(standardResponseResponse.body());
-                        },
+                .subscribe(standardResponseResponse -> standardResponseMutableLiveData.setValue(standardResponseResponse.body()),
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchListCategory(String authorization) {
-        compositeDisposable.add(customerService.getListCategory(locale, authorization)
+    public void fetchListCategory() {
+        compositeDisposable.add(customerService.getListCategory(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
@@ -268,62 +262,46 @@ public class CustomerViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void viewMakeTransaction(String authorization) {
-        compositeDisposable.add(customerService.viewMakeTransaction(locale, authorization)
+    public void viewMakeTransaction() {
+        compositeDisposable.add(customerService.viewMakeTransaction(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataBracketResponseResponse -> {
-                    viewTransactionLiveData.setValue(dataBracketResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(dataBracketResponseResponse -> viewTransactionLiveData.setValue(dataBracketResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void makeTheTransaction(String authorization,
-                                   MadeTheTransactionRequest madeTheTransactionRequest) {
-        compositeDisposable.add(customerService.makeTheTransaction(locale, authorization, madeTheTransactionRequest)
+    public void makeTheTransaction(MadeTheTransactionRequest madeTheTransactionRequest) {
+        compositeDisposable.add(customerService.makeTheTransaction(locale, this.authorization, madeTheTransactionRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(standardResponseResponse -> {
-                    standardResponseMutableLiveData.setValue(standardResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(standardResponseResponse -> standardResponseMutableLiveData.setValue(standardResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void fetchTransferHistory(String authorization) {
-        compositeDisposable.add(customerService.viewTransferHistory(authorization)
+    public void fetchTransferHistory() {
+        compositeDisposable.add(customerService.viewTransferHistory(this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataBracketResponseResponse -> {
-                    listTransferHistoryLiveData.setValue(dataBracketResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(dataBracketResponseResponse -> listTransferHistoryLiveData.setValue(dataBracketResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void loadReviewWithHandyman(String authorization,
-                                       int handymanId) {
-        compositeDisposable.add(customerService.loadReviewWithHandyman(authorization, handymanId)
+    public void loadReviewWithHandyman(int handymanId) {
+        compositeDisposable.add(customerService.loadReviewWithHandyman(this.authorization, handymanId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataBracketResponseResponse -> {
-                    reviewResponseLiveData.setValue(dataBracketResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(dataBracketResponseResponse -> reviewResponseLiveData.setValue(dataBracketResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void reviewHandyman(String authorization,
-                               ReviewRequest reviewRequest) {
-        compositeDisposable.add(customerService.reviewHandyman(locale, authorization, reviewRequest)
+    public void reviewHandyman(ReviewRequest reviewRequest) {
+        compositeDisposable.add(customerService.reviewHandyman(locale, this.authorization, reviewRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(standardResponseResponse -> {
-                    standardResponseMutableLiveData.setValue(standardResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(standardResponseResponse -> standardResponseMutableLiveData.setValue(standardResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void updateAvatar(String authorizationCode,
-                             MultipartBody.Part body,
+    public void updateAvatar(MultipartBody.Part body,
                              RequestBody updateDate) {
-        compositeDisposable.add(customerService.updateAvatar(locale, authorizationCode, body, updateDate)
+        compositeDisposable.add(customerService.updateAvatar(locale, authorization, body, updateDate)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(standardResponseResponse -> {
-                    standardResponseMutableLiveData.setValue(standardResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(standardResponseResponse -> standardResponseMutableLiveData.setValue(standardResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 }

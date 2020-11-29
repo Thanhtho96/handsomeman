@@ -4,23 +4,23 @@ import androidx.annotation.Nullable;
 
 public class SignUpAddPayoutFormState {
     @Nullable
-    private Integer firstNameError;
+    private final Integer firstNameError;
     @Nullable
-    private Integer lastNameError;
+    private final Integer lastNameError;
     @Nullable
-    private Integer addressError;
+    private final Integer addressError;
     @Nullable
-    private Integer portalCodeError;
+    private final Integer portalCodeError;
     @Nullable
-    private Integer emailError;
+    private final Integer emailError;
     @Nullable
-    private Integer accountNumberError;
+    private final Integer accountNumberError;
     @Nullable
-    private Integer accountRoutingError;
+    private final Integer accountRoutingError;
     @Nullable
-    private Integer birthdayError;
+    private final Integer birthdayError;
 
-    private boolean isDataValid;
+    private final boolean isDataValid;
 
     public SignUpAddPayoutFormState(@Nullable Integer firstNameError,
                                     @Nullable Integer lastNameError,

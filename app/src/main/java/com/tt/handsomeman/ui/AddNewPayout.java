@@ -7,21 +7,19 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.lifecycle.Observer;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.SpinnerString;
 import com.tt.handsomeman.databinding.ActivityAddNewPayoutBinding;
-import com.tt.handsomeman.model.SignUpAddPayoutFormState;
 import com.tt.handsomeman.request.AddNewPayoutRequest;
 import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.service.UserService;
@@ -43,6 +41,7 @@ import retrofit2.Response;
 
 public class AddNewPayout extends BaseAppCompatActivity {
 
+    private final Calendar myCalendar = Calendar.getInstance();
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     @Inject
@@ -50,7 +49,6 @@ public class AddNewPayout extends BaseAppCompatActivity {
     private String[] type, country;
     private EditText edtBirthday;
     private ImageButton ibBirthDay, ibCheck;
-    private Calendar myCalendar = Calendar.getInstance();
     private SignUpAddPayoutViewModel signUpAddPayoutViewModel;
     private ActivityAddNewPayoutBinding binding;
 
@@ -82,30 +80,17 @@ public class AddNewPayout extends BaseAppCompatActivity {
         HandymanApp.getComponent().inject(this);
         signUpAddPayoutViewModel = new ViewModelProvider(this).get(SignUpAddPayoutViewModel.class);
 
-        binding.addNewPayoutBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.addNewPayoutBackButton.setOnClickListener(view -> onBackPressed());
 
         observeSignUpAddPayoutState(edtFirstName, edtLastName, edtAddress, edtPortalCode, edtEmail, edtAccountNumber, edtAccountRouting);
 
         edtChangedListener(edtFirstName, edtLastName, edtAddress, edtPortalCode, edtEmail, edtAccountNumber, edtAccountRouting);
 
-        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-
-            @Override
-            public void onDateSet(DatePicker view,
-                                  int year,
-                                  int monthOfYear,
-                                  int dayOfMonth) {
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, monthOfYear);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                updateLabel();
-            }
-
+        final DatePickerDialog.OnDateSetListener date = (view, year, monthOfYear, dayOfMonth) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel();
         };
         showBirthdayPickerDialog(date);
 
@@ -125,86 +110,67 @@ public class AddNewPayout extends BaseAppCompatActivity {
                              EditText edtAccountRouting,
                              Spinner spinnerType,
                              Spinner spinnerCountry) {
-        ibCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlphaAnimation inAnimation;
+        ibCheck.setOnClickListener(view -> {
+            AlphaAnimation inAnimation;
 
-                progressBarHolder.bringToFront();
-                inAnimation = new AlphaAnimation(0f, 1f);
-                inAnimation.setDuration(300);
-                progressBarHolder.setAnimation(inAnimation);
-                progressBarHolder.setVisibility(View.VISIBLE);
+            progressBarHolder.bringToFront();
+            inAnimation = new AlphaAnimation(0f, 1f);
+            inAnimation.setDuration(300);
+            progressBarHolder.setAnimation(inAnimation);
+            progressBarHolder.setVisibility(View.VISIBLE);
 
-                ibCheck.setEnabled(false);
+            ibCheck.setEnabled(false);
 
-                String token = sharedPreferencesUtils.get("token", String.class);
-                String locale = Constants.language.getValue();
+            String token = sharedPreferencesUtils.get("token", String.class);
+            String locale = Constants.language.getValue();
 
-                String myFormat = "yyyy-MM-dd"; //In which you need put here
-                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
+            String myFormat = "yyyy-MM-dd"; //In which you need put here
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.getDefault());
 
-                String firstName = edtFirstName.getText().toString();
-                String lastName = edtLastName.getText().toString();
-                String address = edtAddress.getText().toString();
-                int portalCode = Integer.parseInt(edtPortalCode.getText().toString());
-                String birthday = sdf.format(myCalendar.getTime());
+            String firstName = edtFirstName.getText().toString();
+            String lastName = edtLastName.getText().toString();
+            String address = edtAddress.getText().toString();
+            int portalCode = Integer.parseInt(edtPortalCode.getText().toString());
+            String birthday = sdf.format(myCalendar.getTime());
 
-                String selectedType;
-                switch (spinnerType.getSelectedItemPosition()) {
-                    case 0:
-                        selectedType = "Individual";
-                        break;
-                    case 1:
-                        selectedType = "Business";
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value: " + spinnerType.getSelectedItemPosition());
-                }
+            String selectedType;
+            switch (spinnerType.getSelectedItemPosition()) {
+                case 0:
+                    selectedType = "Individual";
+                    break;
+                case 1:
+                    selectedType = "Business";
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + spinnerType.getSelectedItemPosition());
+            }
 
-                String email = edtEmail.getText().toString();
-                String accountNumber = edtAccountNumber.getText().toString();
-                String accountRouting = edtAccountRouting.getText().toString();
-                String selectedCountry = country[spinnerCountry.getSelectedItemPosition()];
+            String email = edtEmail.getText().toString();
+            String accountNumber = edtAccountNumber.getText().toString();
+            String accountRouting = edtAccountRouting.getText().toString();
+            String selectedCountry = country[spinnerCountry.getSelectedItemPosition()];
 
-                AddNewPayoutRequest addNewPayoutRequest = new AddNewPayoutRequest(firstName, lastName, address, portalCode, birthday, selectedType, email, accountNumber, accountRouting, selectedCountry);
+            AddNewPayoutRequest addNewPayoutRequest = new AddNewPayoutRequest(firstName, lastName, address, portalCode, birthday, selectedType, email, accountNumber, accountRouting, selectedCountry);
 
-                userService.addPayout(locale, token, addNewPayoutRequest).enqueue(new Callback<StandardResponse>() {
-                    @Override
-                    public void onResponse(Call<StandardResponse> call,
-                                           Response<StandardResponse> response) {
-                        if (response.body().getStatus().equals(StatusConstant.OK)) {
-                            AlphaAnimation outAnimation;
+            userService.addPayout(locale, token, addNewPayoutRequest).enqueue(new Callback<StandardResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<StandardResponse> call,
+                                       @NonNull Response<StandardResponse> response) {
+                    if (response.body().getStatus().equals(StatusConstant.OK)) {
+                        AlphaAnimation outAnimation;
 
-                            outAnimation = new AlphaAnimation(1f, 0f);
-                            outAnimation.setDuration(200);
-                            progressBarHolder.setAnimation(outAnimation);
-                            progressBarHolder.setVisibility(View.GONE);
+                        outAnimation = new AlphaAnimation(1f, 0f);
+                        outAnimation.setDuration(200);
+                        progressBarHolder.setAnimation(outAnimation);
+                        progressBarHolder.setVisibility(View.GONE);
 
-                            new NotificationDialog(AddNewPayout.this, R.style.PauseDialog, getString(R.string.add_new_payout_successful, response.body().getMessage()), new NotificationDialog.OnItemClickListener() {
-                                @Override
-                                public void onItemClickOk() {
-                                    Intent intent = new Intent();
-                                    intent.putExtra("isMoreFragmentEdit", true);
-                                    setResult(RESULT_OK, intent);
-                                    finish();
-                                }
-                            }).show();
-                        } else {
-                            AlphaAnimation outAnimation;
-
-                            outAnimation = new AlphaAnimation(1f, 0f);
-                            outAnimation.setDuration(200);
-                            progressBarHolder.setAnimation(outAnimation);
-                            progressBarHolder.setVisibility(View.GONE);
-                            ibCheck.setEnabled(true);
-                            Toast.makeText(AddNewPayout.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<StandardResponse> call,
-                                          Throwable t) {
+                        new NotificationDialog(AddNewPayout.this, R.style.PauseDialog, getString(R.string.add_new_payout_successful, response.body().getMessage()), () -> {
+                            Intent intent = new Intent();
+                            intent.putExtra("isMoreFragmentEdit", true);
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }).show();
+                    } else {
                         AlphaAnimation outAnimation;
 
                         outAnimation = new AlphaAnimation(1f, 0f);
@@ -212,28 +178,30 @@ public class AddNewPayout extends BaseAppCompatActivity {
                         progressBarHolder.setAnimation(outAnimation);
                         progressBarHolder.setVisibility(View.GONE);
                         ibCheck.setEnabled(true);
-                        Toast.makeText(AddNewPayout.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(AddNewPayout.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     }
-                });
-            }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<StandardResponse> call,
+                                      @NonNull Throwable t) {
+                    AlphaAnimation outAnimation;
+
+                    outAnimation = new AlphaAnimation(1f, 0f);
+                    outAnimation.setDuration(200);
+                    progressBarHolder.setAnimation(outAnimation);
+                    progressBarHolder.setVisibility(View.GONE);
+                    ibCheck.setEnabled(true);
+                    Toast.makeText(AddNewPayout.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
 
     private void showBirthdayPickerDialog(DatePickerDialog.OnDateSetListener date) {
-        ibBirthDay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDatePickerDialog(date);
-            }
-        });
+        ibBirthDay.setOnClickListener(view -> showDatePickerDialog(date));
 
-        edtBirthday.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog(date);
-            }
-        });
+        edtBirthday.setOnClickListener(v -> showDatePickerDialog(date));
     }
 
     private void edtChangedListener(EditText edtFirstName,
@@ -284,45 +252,42 @@ public class AddNewPayout extends BaseAppCompatActivity {
                                              EditText edtEmail,
                                              EditText edtAccountNumber,
                                              EditText edtAccountRouting) {
-        signUpAddPayoutViewModel.getUpAddPayoutFormState().observe(this, new Observer<SignUpAddPayoutFormState>() {
-            @Override
-            public void onChanged(SignUpAddPayoutFormState signUpAddPayoutFormState) {
-                if (signUpAddPayoutFormState == null) {
-                    return;
-                }
+        signUpAddPayoutViewModel.getUpAddPayoutFormState().observe(this, signUpAddPayoutFormState -> {
+            if (signUpAddPayoutFormState == null) {
+                return;
+            }
+            ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+            if (signUpAddPayoutFormState.getFirstNameError() != null) {
                 ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                if (signUpAddPayoutFormState.getFirstNameError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtFirstName.setError(getString(signUpAddPayoutFormState.getFirstNameError()));
-                }
-                if (signUpAddPayoutFormState.getLastNameError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtLastName.setError(getString(signUpAddPayoutFormState.getLastNameError()));
-                }
-                if (signUpAddPayoutFormState.getAddressError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtAddress.setError(getString(signUpAddPayoutFormState.getAddressError()));
-                }
-                if (signUpAddPayoutFormState.getPortalCodeError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtPortalCode.setError(getString(signUpAddPayoutFormState.getPortalCodeError()));
-                }
-                if (signUpAddPayoutFormState.getEmailError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtEmail.setError(getString(signUpAddPayoutFormState.getEmailError()));
-                }
-                if (signUpAddPayoutFormState.getAccountNumberError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtAccountNumber.setError(getString(signUpAddPayoutFormState.getAccountNumberError()));
-                }
-                if (signUpAddPayoutFormState.getAccountRoutingError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtAccountRouting.setError(getString(signUpAddPayoutFormState.getAccountRoutingError()));
-                }
-                if (signUpAddPayoutFormState.getBirthdayError() != null) {
-                    ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
-                    edtBirthday.setError(getString(signUpAddPayoutFormState.getBirthdayError()));
-                }
+                edtFirstName.setError(getString(signUpAddPayoutFormState.getFirstNameError()));
+            }
+            if (signUpAddPayoutFormState.getLastNameError() != null) {
+                ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+                edtLastName.setError(getString(signUpAddPayoutFormState.getLastNameError()));
+            }
+            if (signUpAddPayoutFormState.getAddressError() != null) {
+                ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+                edtAddress.setError(getString(signUpAddPayoutFormState.getAddressError()));
+            }
+            if (signUpAddPayoutFormState.getPortalCodeError() != null) {
+                ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+                edtPortalCode.setError(getString(signUpAddPayoutFormState.getPortalCodeError()));
+            }
+            if (signUpAddPayoutFormState.getEmailError() != null) {
+                ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+                edtEmail.setError(getString(signUpAddPayoutFormState.getEmailError()));
+            }
+            if (signUpAddPayoutFormState.getAccountNumberError() != null) {
+                ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+                edtAccountNumber.setError(getString(signUpAddPayoutFormState.getAccountNumberError()));
+            }
+            if (signUpAddPayoutFormState.getAccountRoutingError() != null) {
+                ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+                edtAccountRouting.setError(getString(signUpAddPayoutFormState.getAccountRoutingError()));
+            }
+            if (signUpAddPayoutFormState.getBirthdayError() != null) {
+                ibCheck.setEnabled(signUpAddPayoutFormState.isDataValid());
+                edtBirthday.setError(getString(signUpAddPayoutFormState.getBirthdayError()));
             }
         });
     }

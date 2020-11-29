@@ -4,13 +4,13 @@ import androidx.annotation.Nullable;
 
 public class ChangePasswordFormState {
     @Nullable
-    private Integer currentPasswordError;
+    private final Integer currentPasswordError;
     @Nullable
-    private Integer newPasswordError;
+    private final Integer newPasswordError;
     @Nullable
-    private Integer rePasswordError;
+    private final Integer rePasswordError;
 
-    private boolean isDataValid;
+    private final boolean isDataValid;
 
     public ChangePasswordFormState(@Nullable Integer currentPasswordError,
                                    @Nullable Integer newPasswordError,

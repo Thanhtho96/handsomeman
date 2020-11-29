@@ -14,7 +14,7 @@ import com.tt.handsomeman.response.ListMessage;
 import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.service.MessageService;
 import com.tt.handsomeman.util.Constants;
-import com.tt.handsomeman.util.StatusConstant;
+import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import javax.inject.Inject;
 
@@ -23,17 +23,20 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MessageViewModel extends BaseViewModel {
     private final MessageService messageService;
-    private MutableLiveData<DataBracketResponse<ListConversation>> listConversation = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<ListMessage>> listMessageResponse = new MutableLiveData<>();
-    private MutableLiveData<StandardResponse> standardResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<String> messageResponse = new MutableLiveData<>();
-    private String locale = Constants.language.getValue();
+    private final MutableLiveData<DataBracketResponse<ListConversation>> listConversation = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<ListMessage>> listMessageResponse = new MutableLiveData<>();
+    private final MutableLiveData<StandardResponse> standardResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> messageResponse = new MutableLiveData<>();
+    private final String locale = Constants.language.getValue();
+    private final String authorization;
 
     @Inject
     MessageViewModel(@NonNull Application application,
-                     MessageService messageService) {
+                     MessageService messageService,
+                     SharedPreferencesUtils sharedPreferencesUtils) {
         super(application);
         this.messageService = messageService;
+        authorization = sharedPreferencesUtils.get("token", String.class);
     }
 
     public MutableLiveData<DataBracketResponse<ListMessage>> getListMessageResponse() {
@@ -52,54 +55,40 @@ public class MessageViewModel extends BaseViewModel {
         return messageResponse;
     }
 
-    public void fetchAllConversationByAccountId(String authorization,
-                                                String type) {
-        compositeDisposable.add(messageService.getAllConversationByAccountId(locale, authorization, type)
+    public void fetchAllConversationByAccountId(String type) {
+        compositeDisposable.add(messageService.getAllConversationByAccountId(locale, this.authorization, type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            listConversation.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> listConversation.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 
-    public void fetchMessagesWithAccount(String authorization,
-                                         Integer accountId,
+    public void fetchMessagesWithAccount(Integer accountId,
                                          PageableRequest pageableRequest) {
-        compositeDisposable.add(messageService.getAllMessagesWithAccount(locale, authorization, accountId, pageableRequest)
+        compositeDisposable.add(messageService.getAllMessagesWithAccount(locale, this.authorization, accountId, pageableRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            listMessageResponse.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> listMessageResponse.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 
-    public void deleteConversationById(String authorization,
-                                       Integer conversationId) {
-        compositeDisposable.add(messageService.deleteConversationById(locale, authorization, conversationId)
+    public void deleteConversationById(Integer conversationId) {
+        compositeDisposable.add(messageService.deleteConversationById(locale, this.authorization, conversationId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                             if (response.body() != null) {
-                                if (response.body().getStatus().equals(StatusConstant.OK)) {
-                                    messageResponse.setValue(response.body().getMessage());
-                                } else {
-                                    messageResponse.setValue(response.body().getMessage());
-                                }
+                                messageResponse.setValue(response.body().getMessage());
                             }
                         }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 
-    public void sendMessageToConversation(String authorization,
-                                          SendMessageRequest sendMessageRequest) {
-        compositeDisposable.add(messageService.sendMessageToConversation(locale, authorization, sendMessageRequest)
+    public void sendMessageToConversation(SendMessageRequest sendMessageRequest) {
+        compositeDisposable.add(messageService.sendMessageToConversation(locale, this.authorization, sendMessageRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            standardResponseMutableLiveData.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> standardResponseMutableLiveData.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 }

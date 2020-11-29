@@ -24,14 +24,13 @@ import javax.inject.Inject;
 
 public class TransferHistory extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
+    private final List<TransferHistoryResponse> transferHistoryList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-
     private RecyclerView rcvTransferHistory;
     private TransferHistoryAdapter transferHistoryAdapter;
-    private List<TransferHistoryResponse> transferHistoryList = new ArrayList<>();
     private ActivityTransferHistoryBinding binding;
 
     @Override
@@ -43,16 +42,14 @@ public class TransferHistory extends BaseAppCompatActivityWithViewModel<Handyman
         baseViewModel = new ViewModelProvider(this, viewModelFactory).get(HandymanViewModel.class);
 
         rcvTransferHistory = binding.recyclerViewTransferHistory;
-        binding.viewTransferHistoryBackButton.setOnClickListener(view -> {
-            onBackPressed();
-        });
+        binding.viewTransferHistoryBackButton.setOnClickListener(view -> onBackPressed());
 
         createRecyclerView();
         fetchTransferHistory();
     }
 
     private void fetchTransferHistory() {
-        baseViewModel.viewTransferHistory(sharedPreferencesUtils.get("token", String.class));
+        baseViewModel.viewTransferHistory();
         baseViewModel.getListTransferHistoryMutableLiveData().observe(this, listTransferHistory -> {
             transferHistoryList.clear();
             transferHistoryList.addAll(listTransferHistory.getTransferHistoryResponseList());

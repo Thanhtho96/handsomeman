@@ -17,9 +17,9 @@ import java.util.List;
 
 public class SkillEditAdapter extends RecyclerView.Adapter<SkillEditAdapter.SkillEditViewHolder> {
 
-    private List<Skill> skillList;
-    private LayoutInflater layoutInflater;
-    private Context context;
+    private final List<Skill> skillList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
     private ItemSkillEditBinding binding;
 
     private OnItemClickListener onItemClickListener;
@@ -72,14 +72,11 @@ public class SkillEditAdapter extends RecyclerView.Adapter<SkillEditAdapter.Skil
             tvSkillName = binding.textViewItemSkillNameEdit;
             ibDeleteSkill = binding.imageButtonDeleteSkillEdit;
 
-            ibDeleteSkill.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.deleteSkill(position);
-                        }
+            ibDeleteSkill.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.deleteSkill(position);
                     }
                 }
             });

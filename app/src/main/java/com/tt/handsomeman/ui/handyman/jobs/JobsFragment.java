@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
@@ -22,8 +21,8 @@ import com.tt.handsomeman.databinding.FragmentJobsBinding;
 
 public class JobsFragment extends Fragment {
 
-    private Fragment jobsChildJobsFragment = new JobsChildJobsFragment();
-    private Fragment jobsChildWishListFragment = new JobsChildWishListFragment();
+    private final Fragment jobsChildJobsFragment = new JobsChildJobsFragment();
+    private final Fragment jobsChildWishListFragment = new JobsChildWishListFragment();
     private Fragment active = jobsChildJobsFragment;
     private EditText edtSearchByWord;
     private FragmentJobsBinding binding;
@@ -59,25 +58,17 @@ public class JobsFragment extends Fragment {
             active = jobsChildWishListFragment;
         }
 
-        rdJobs.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(jobsChildJobsFragment).commit();
-                    active = jobsChildJobsFragment;
-                }
+        rdJobs.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(jobsChildJobsFragment).commit();
+                active = jobsChildJobsFragment;
             }
         });
 
-        rdWishList.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(jobsChildWishListFragment).commit();
-                    active = jobsChildWishListFragment;
-                }
+        rdWishList.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(jobsChildWishListFragment).commit();
+                active = jobsChildWishListFragment;
             }
         });
     }

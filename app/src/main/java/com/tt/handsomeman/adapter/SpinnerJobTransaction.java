@@ -14,9 +14,9 @@ import java.util.List;
 
 public class SpinnerJobTransaction extends BaseAdapter {
 
-    private Context context;
-    private List<JobTransactionResponse> transactionResponses;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<JobTransactionResponse> transactionResponses;
+    private final LayoutInflater inflater;
     private SpinnerItemBlackTextBinding binding;
 
     public SpinnerJobTransaction(Context context,

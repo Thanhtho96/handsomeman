@@ -14,6 +14,7 @@ import com.tt.handsomeman.response.PaidPaymentNotificationResponse;
 import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.service.NotificationService;
 import com.tt.handsomeman.util.Constants;
+import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import java.util.List;
 
@@ -24,18 +25,21 @@ import io.reactivex.schedulers.Schedulers;
 
 public class NotificationViewModel extends BaseViewModel {
     private final NotificationService notificationService;
-    private MutableLiveData<List<NotificationResponse>> listNotificationMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<MadeABidNotificationResponse>> madeABidNotificationResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<StandardResponse> standardResponseMarkReadMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<StandardResponse> standardResponseAcceptBidMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<PaidPaymentNotificationResponse>> paidPaymentNotificationResponseMutableLiveData = new MutableLiveData<>();
-    private String locale = Constants.language.getValue();
+    private final MutableLiveData<List<NotificationResponse>> listNotificationMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<MadeABidNotificationResponse>> madeABidNotificationResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<StandardResponse> standardResponseMarkReadMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<StandardResponse> standardResponseAcceptBidMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<PaidPaymentNotificationResponse>> paidPaymentNotificationResponseMutableLiveData = new MutableLiveData<>();
+    private final String locale = Constants.language.getValue();
+    private final String authorization;
 
     @Inject
     NotificationViewModel(@NonNull Application application,
-                          NotificationService notificationService) {
+                          NotificationService notificationService,
+                          SharedPreferencesUtils sharedPreferencesUtils) {
         super(application);
         this.notificationService = notificationService;
+        authorization = sharedPreferencesUtils.get("token", String.class);
     }
 
     public MutableLiveData<List<NotificationResponse>> getListNotificationMutableLiveData() {
@@ -58,9 +62,8 @@ public class NotificationViewModel extends BaseViewModel {
         return paidPaymentNotificationResponseMutableLiveData;
     }
 
-    public void fetchNotificationOfAccount(String authorization,
-                                           String type) {
-        compositeDisposable.add(notificationService.getAllNotification(authorization, type)
+    public void fetchNotificationOfAccount(String type) {
+        compositeDisposable.add(notificationService.getAllNotification(this.authorization, type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
@@ -71,47 +74,35 @@ public class NotificationViewModel extends BaseViewModel {
                 ));
     }
 
-    public void markNotificationAsRead(String authorization,
-                                       Integer notificationId) {
-        compositeDisposable.add(notificationService.markNotificationRead(locale, authorization, notificationId)
+    public void markNotificationAsRead(Integer notificationId) {
+        compositeDisposable.add(notificationService.markNotificationRead(locale, this.authorization, notificationId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            standardResponseMarkReadMutableLiveData.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> standardResponseMarkReadMutableLiveData.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 
-    public void fetchMadeBidNotification(String authorization,
-                                         Integer jobBidId) {
-        compositeDisposable.add(notificationService.viewMadeBid(locale, authorization, jobBidId)
+    public void fetchMadeBidNotification(Integer jobBidId) {
+        compositeDisposable.add(notificationService.viewMadeBid(locale, this.authorization, jobBidId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            madeABidNotificationResponseMutableLiveData.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> madeABidNotificationResponseMutableLiveData.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 
-    public void fetchPaidPaymentNotification(String authorization,
-                                             Integer customerTransferId) {
-        compositeDisposable.add(notificationService.viewPaidPayment(locale, authorization, customerTransferId)
+    public void fetchPaidPaymentNotification(Integer customerTransferId) {
+        compositeDisposable.add(notificationService.viewPaidPayment(locale, this.authorization, customerTransferId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            paidPaymentNotificationResponseMutableLiveData.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> paidPaymentNotificationResponseMutableLiveData.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 
-    public void acceptBid(String authorization,
-                          AcceptBidRequest acceptBidRequest) {
-        compositeDisposable.add(notificationService.acceptBid(locale, authorization, acceptBidRequest)
+    public void acceptBid(AcceptBidRequest acceptBidRequest) {
+        compositeDisposable.add(notificationService.acceptBid(locale, this.authorization, acceptBidRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            standardResponseAcceptBidMutableLiveData.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> standardResponseAcceptBidMutableLiveData.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 }

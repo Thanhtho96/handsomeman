@@ -16,9 +16,9 @@ import java.util.List;
 
 public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.SkillViewHolder> {
 
-    private List<Skill> skillList;
-    private LayoutInflater layoutInflater;
-    private Context context;
+    private final List<Skill> skillList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
     private ItemSkillBinding binding;
 
     public SkillAdapter(List<Skill> skillList,

@@ -12,7 +12,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
@@ -28,7 +27,6 @@ import com.tt.handsomeman.databinding.ActivityCustomerMakeTransactionBinding;
 import com.tt.handsomeman.request.MadeTheTransactionRequest;
 import com.tt.handsomeman.response.JobTransactionResponse;
 import com.tt.handsomeman.response.PayoutResponse;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.response.ViewMadeTransactionResponse;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.DecimalFormat;
@@ -46,6 +44,8 @@ import javax.inject.Inject;
 
 public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
+    private final List<JobTransactionResponse> jobTransactionResponses = new ArrayList<>();
+    private final List<PayoutResponse> payoutResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -55,8 +55,6 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
     private TextView tvBonus, tvPaymentMilestoneOrder, paymentMilestonePercentage, handymanName;
     private Spinner spBankAccount, spProject;
     private ImageView imgHandymanAvatar;
-    private List<JobTransactionResponse> jobTransactionResponses = new ArrayList<>();
-    private List<PayoutResponse> payoutResponseList = new ArrayList<>();
     private SpinnerBankAccount spinnerBankAccount;
     private SpinnerJobTransaction spinnerJobTransaction;
     private ActivityCustomerMakeTransactionBinding binding;
@@ -84,21 +82,21 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
         bindView();
         generateBankAccountSpinner();
         generateJobTitleSpinner();
-        fetchData(authorization);
+        fetchData();
         listenToProjectSpinner();
         listenToBankSpinner();
         listenToEditTextChange();
-        makeTheTransfer(authorization);
+        makeTheTransfer();
     }
 
-    private void makeTheTransfer(String authorization) {
+    private void makeTheTransfer() {
         btnCheck.setOnClickListener(v -> {
             btnCheck.setEnabled(false);
             Calendar now = Calendar.getInstance();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault());
             String sendTime = formatter.format(now.getTime());
 
-            baseViewModel.makeTheTransaction(authorization, new MadeTheTransactionRequest(
+            baseViewModel.makeTheTransaction(new MadeTheTransactionRequest(
                     jobId,
                     handymanId,
                     payoutId,
@@ -106,13 +104,10 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
                     paymentMilestoneOrder,
                     sendTime,
                     bonus));
-            baseViewModel.getStandardResponseMutableLiveData().observe(this, new Observer<StandardResponse>() {
-                @Override
-                public void onChanged(StandardResponse standardResponse) {
-                    Toast.makeText(CustomerMakeTransaction.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                        onBackPressed();
-                    }
+            baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
+                Toast.makeText(CustomerMakeTransaction.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    onBackPressed();
                 }
             });
         });
@@ -228,8 +223,8 @@ public class CustomerMakeTransaction extends BaseAppCompatActivityWithViewModel<
         });
     }
 
-    private void fetchData(String authorization) {
-        baseViewModel.viewMakeTransaction(authorization);
+    private void fetchData() {
+        baseViewModel.viewMakeTransaction();
         baseViewModel.getViewTransactionLiveData().observe(this, viewMadeTransactionResponseDataBracketResponse -> {
             if (viewMadeTransactionResponseDataBracketResponse.getStatus().equals(StatusConstant.OK)) {
                 ViewMadeTransactionResponse transactionResponse = viewMadeTransactionResponseDataBracketResponse.getData();

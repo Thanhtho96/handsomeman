@@ -13,9 +13,9 @@ import com.tt.handsomeman.databinding.SpinnerItemBlackTextBinding;
 
 public class SpinnerPercentage extends BaseAdapter {
 
-    private Context context;
-    private String[] str;
-    private LayoutInflater layoutInflater;
+    private final Context context;
+    private final String[] str;
+    private final LayoutInflater layoutInflater;
     private SpinnerItemBlackTextBinding binding;
 
     public SpinnerPercentage(Context context,

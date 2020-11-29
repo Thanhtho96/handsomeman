@@ -7,7 +7,6 @@ import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
@@ -16,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tt.handsomeman.HandymanApp;
@@ -24,8 +22,6 @@ import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.FragmentMessagesBinding;
 import com.tt.handsomeman.response.Contact;
 import com.tt.handsomeman.response.ConversationResponse;
-import com.tt.handsomeman.response.DataBracketResponse;
-import com.tt.handsomeman.response.ListConversation;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.viewmodel.MessageViewModel;
@@ -36,15 +32,15 @@ import javax.inject.Inject;
 
 public class MessagesFragment extends BaseFragment<MessageViewModel, FragmentMessagesBinding> {
 
+    final MutableLiveData<List<ConversationResponse>> conversationList = new MutableLiveData<>();
+    final MutableLiveData<List<Contact>> contactList = new MutableLiveData<>();
+    private final Fragment childMessagesFragment = new MessagesChildMessagesFragment();
+    private final Fragment childContactsFragment = new MessagesChildContactsFragment();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-    MutableLiveData<List<ConversationResponse>> conversationList = new MutableLiveData<>();
-    MutableLiveData<List<Contact>> contactList = new MutableLiveData<>();
     String authorizationCode;
-    private Fragment childMessagesFragment = new MessagesChildMessagesFragment();
-    private Fragment childContactsFragment = new MessagesChildContactsFragment();
     private Fragment active = childMessagesFragment;
     private EditText edtSearchByWord;
 
@@ -73,25 +69,17 @@ public class MessagesFragment extends BaseFragment<MessageViewModel, FragmentMes
 
         setEditTextHintTextAndIcon();
 
-        rdMessage.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(childMessagesFragment).commit();
-                    active = childMessagesFragment;
-                }
+        rdMessage.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(childMessagesFragment).commit();
+                active = childMessagesFragment;
             }
         });
 
-        rdContact.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(childContactsFragment).commit();
-                    active = childContactsFragment;
-                }
+        rdContact.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(childContactsFragment).commit();
+                active = childContactsFragment;
             }
         });
 
@@ -101,13 +89,10 @@ public class MessagesFragment extends BaseFragment<MessageViewModel, FragmentMes
     private void fetchData() {
         String type = sharedPreferencesUtils.get("type", String.class);
 
-        baseViewModel.fetchAllConversationByAccountId(authorizationCode, type);
-        baseViewModel.getListConversation().observe(getViewLifecycleOwner(), new Observer<DataBracketResponse<ListConversation>>() {
-            @Override
-            public void onChanged(DataBracketResponse<ListConversation> listConversationDataBracketResponse) {
-                conversationList.setValue(listConversationDataBracketResponse.getData().getConversationList());
-                contactList.setValue(listConversationDataBracketResponse.getData().getContactList());
-            }
+        baseViewModel.fetchAllConversationByAccountId(type);
+        baseViewModel.getListConversation().observe(getViewLifecycleOwner(), listConversationDataBracketResponse -> {
+            conversationList.setValue(listConversationDataBracketResponse.getData().getConversationList());
+            contactList.setValue(listConversationDataBracketResponse.getData().getContactList());
         });
     }
 

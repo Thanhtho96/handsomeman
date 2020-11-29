@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,12 +24,12 @@ import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 
 public class MessagesChildContactsFragment extends Fragment {
 
+    private final List<Contact> contactList = new ArrayList<>();
     private ContactAdapter contactAdapter;
-    private List<Contact> contactList = new ArrayList<>();
     private FragmentMessagesChildContactsBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentMessagesChildContactsBinding.inflate(inflater, container, false);
@@ -46,13 +45,10 @@ public class MessagesChildContactsFragment extends Fragment {
 
         createContactRecyclerView(messagesFragment.getAuthorizationCode());
 
-        messagesFragment.contactList.observe(getViewLifecycleOwner(), new Observer<List<Contact>>() {
-            @Override
-            public void onChanged(List<Contact> contacts) {
-                contactList.clear();
-                contactList.addAll(contacts);
-                contactAdapter.notifyItemRangeInserted(1, contactList.size());
-            }
+        messagesFragment.contactList.observe(getViewLifecycleOwner(), contacts -> {
+            contactList.clear();
+            contactList.addAll(contacts);
+            contactAdapter.notifyItemRangeInserted(1, contactList.size());
         });
     }
 

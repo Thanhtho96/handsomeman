@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.tt.handsomeman.databinding.OnBoardingFragmentSlidePageBinding;
@@ -36,7 +37,7 @@ public class OnBoardingSlidePageFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = OnBoardingFragmentSlidePageBinding.inflate(inflater, container, false);

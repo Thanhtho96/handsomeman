@@ -11,7 +11,7 @@ import dagger.Module;
 @Module
 public class SharedPreferencesUtils {
 
-    private SharedPreferences sharedPreferences;
+    private final SharedPreferences sharedPreferences;
 
     @Inject
     public SharedPreferencesUtils(SharedPreferences sharedPreferences) {

@@ -10,8 +10,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +19,6 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -59,8 +56,37 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
     private ActivityCustomerMainScreenBinding binding;
     private LocationManager locationManager;
     private Fragment active = fragment1;
-    private Geocoder geoCoder;
+    private final BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = item -> {
+        switch (item.getItemId()) {
+            case R.id.navigation_jobs:
+                fm.beginTransaction().hide(active).show(fragment1).commit();
+                active = fragment1;
+                return true;
 
+            case R.id.navigation_messages:
+                fm.beginTransaction().hide(active).show(fragment2).commit();
+                active = fragment2;
+                return true;
+
+            case R.id.navigation_my_projects:
+                fm.beginTransaction().hide(active).show(fragment3).commit();
+                active = fragment3;
+                return true;
+
+            case R.id.navigation_notifications:
+                fm.beginTransaction().hide(active).show(fragment4).commit();
+                active = fragment4;
+                return true;
+
+            case R.id.navigation_more:
+                fm.beginTransaction().hide(active).show(fragment5).commit();
+                active = fragment5;
+                return true;
+        }
+        return false;
+    };
+    private Geocoder geoCoder;
     private final LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(final Location location) {
@@ -125,41 +151,6 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
         }
     };
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_jobs:
-                    fm.beginTransaction().hide(active).show(fragment1).commit();
-                    active = fragment1;
-                    return true;
-
-                case R.id.navigation_messages:
-                    fm.beginTransaction().hide(active).show(fragment2).commit();
-                    active = fragment2;
-                    return true;
-
-                case R.id.navigation_my_projects:
-                    fm.beginTransaction().hide(active).show(fragment3).commit();
-                    active = fragment3;
-                    return true;
-
-                case R.id.navigation_notifications:
-                    fm.beginTransaction().hide(active).show(fragment4).commit();
-                    active = fragment4;
-                    return true;
-
-                case R.id.navigation_more:
-                    fm.beginTransaction().hide(active).show(fragment5).commit();
-                    active = fragment5;
-                    return true;
-            }
-            return false;
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,14 +180,11 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
             return;
         }
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            Constants.Latitude.setValue(location.getLatitude());
-                            Constants.Longitude.setValue(location.getLongitude());
-                        }
+                .addOnSuccessListener(this, location -> {
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        Constants.Latitude.setValue(location.getLatitude());
+                        Constants.Longitude.setValue(location.getLongitude());
                     }
                 });
     }
@@ -252,14 +240,11 @@ public class CustomerMainScreen extends BaseAppCompatActivity {
             // and the user would benefit from additional context for the use of the permission.
             // Display a SnackBar with cda button to request the missing permission.
             Snackbar.make(binding.container, "Permission is needed",
-                    Snackbar.LENGTH_INDEFINITE).setAction("GRANT IT", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Request the permission
-                    ActivityCompat.requestPermissions(CustomerMainScreen.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            PERMISSION_REQUEST_LOCATION);
-                }
+                    Snackbar.LENGTH_INDEFINITE).setAction("GRANT IT", view -> {
+                // Request the permission
+                ActivityCompat.requestPermissions(CustomerMainScreen.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSION_REQUEST_LOCATION);
             }).show();
 
         } else {

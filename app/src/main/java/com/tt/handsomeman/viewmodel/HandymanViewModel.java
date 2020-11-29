@@ -28,6 +28,7 @@ import com.tt.handsomeman.response.StartScreenHandyman;
 import com.tt.handsomeman.response.TransactionDetailResponse;
 import com.tt.handsomeman.service.HandymanService;
 import com.tt.handsomeman.util.Constants;
+import com.tt.handsomeman.util.SharedPreferencesUtils;
 
 import java.util.List;
 
@@ -41,27 +42,30 @@ import okhttp3.RequestBody;
 public class HandymanViewModel extends BaseViewModel {
 
     private final HandymanService handymanService;
-    private MutableLiveData<HandymanReviewProfile> handymanReviewProfileMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<HandymanProfileResponse> handymanProfileResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<ListCategory> listCategoryMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<ListTransferHistory> listTransferHistoryMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<ListPayoutResponse> listPayoutResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<StandardResponse> standardResponseMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<MyProjectList> myProjectListMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<StartScreenHandyman> screenDataMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<List<Job>> jobMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<HandymanJobDetail> jobDetailMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<JobDetailProfile> jobDetailProfileMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<StandardResponse> standardResponseMarkReadMutableLiveData = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<TransactionDetailResponse>> jobTransactionLiveData = new MutableLiveData<>();
-    private MutableLiveData<DataBracketResponse<ReviewResponse>> reviewResponseLiveData = new MutableLiveData<>();
-    private String locale = Constants.language.getValue();
+    private final MutableLiveData<HandymanReviewProfile> handymanReviewProfileMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<HandymanProfileResponse> handymanProfileResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<ListCategory> listCategoryMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<ListTransferHistory> listTransferHistoryMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<ListPayoutResponse> listPayoutResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<StandardResponse> standardResponseMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<MyProjectList> myProjectListMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<StartScreenHandyman> screenDataMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<Job>> jobMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<HandymanJobDetail> jobDetailMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<JobDetailProfile> jobDetailProfileMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<StandardResponse> standardResponseMarkReadMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<TransactionDetailResponse>> jobTransactionLiveData = new MutableLiveData<>();
+    private final MutableLiveData<DataBracketResponse<ReviewResponse>> reviewResponseLiveData = new MutableLiveData<>();
+    private final String locale = Constants.language.getValue();
+    private final String authorization;
 
     @Inject
     HandymanViewModel(@NonNull Application application,
-                      HandymanService handymanService) {
+                      HandymanService handymanService,
+                      SharedPreferencesUtils sharedPreferencesUtils) {
         super(application);
         this.handymanService = handymanService;
+        this.authorization = sharedPreferencesUtils.get("token", String.class);
     }
 
     public MutableLiveData<HandymanReviewProfile> getHandymanReviewProfileLiveData() {
@@ -120,8 +124,8 @@ public class HandymanViewModel extends BaseViewModel {
         return reviewResponseLiveData;
     }
 
-    public void fetchHandymanInfo(String authorization) {
-        compositeDisposable.add(handymanService.getHandymanInfo(locale, authorization)
+    public void fetchHandymanInfo() {
+        compositeDisposable.add(handymanService.getHandymanInfo(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
@@ -132,8 +136,8 @@ public class HandymanViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void fetchHandymanReview(String authorization) {
-        compositeDisposable.add(handymanService.getHandymanReview(locale, authorization)
+    public void fetchHandymanReview() {
+        compositeDisposable.add(handymanService.getHandymanReview(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((response) -> {
@@ -143,8 +147,8 @@ public class HandymanViewModel extends BaseViewModel {
                 }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void fetchHandymanProfile(String authorization) {
-        compositeDisposable.add(handymanService.getHandymanProfile(locale, authorization)
+    public void fetchHandymanProfile() {
+        compositeDisposable.add(handymanService.getHandymanProfile(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
@@ -155,18 +159,15 @@ public class HandymanViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void editHandymanProfile(String authorization,
-                                    HandymanEditRequest handymanEditRequest) {
-        compositeDisposable.add(handymanService.editHandymanProfile(locale, authorization, handymanEditRequest)
+    public void editHandymanProfile(HandymanEditRequest handymanEditRequest) {
+        compositeDisposable.add(handymanService.editHandymanProfile(locale, this.authorization, handymanEditRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataBracketResponseResponse -> {
-                    standardResponseMutableLiveData.setValue(dataBracketResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(dataBracketResponseResponse -> standardResponseMutableLiveData.setValue(dataBracketResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void fetchListCategory(String authorization) {
-        compositeDisposable.add(handymanService.getListCategory(locale, authorization)
+    public void fetchListCategory() {
+        compositeDisposable.add(handymanService.getListCategory(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
@@ -177,8 +178,8 @@ public class HandymanViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void viewTransferHistory(String authorization) {
-        compositeDisposable.add(handymanService.viewTransferHistory(locale, authorization)
+    public void viewTransferHistory() {
+        compositeDisposable.add(handymanService.viewTransferHistory(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
@@ -189,8 +190,8 @@ public class HandymanViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void getListPayoutOfHandyman(String authorization) {
-        compositeDisposable.add(handymanService.getListPayoutOfHandyman(locale, authorization)
+    public void getListPayoutOfHandyman() {
+        compositeDisposable.add(handymanService.getListPayoutOfHandyman(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((dataBracketResponseResponse) -> {
@@ -201,18 +202,15 @@ public class HandymanViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void transferToBankAccount(String authorization,
-                                      HandymanTransferRequest handymanTransferRequest) {
-        compositeDisposable.add(handymanService.transferToBank(locale, authorization, handymanTransferRequest)
+    public void transferToBankAccount(HandymanTransferRequest handymanTransferRequest) {
+        compositeDisposable.add(handymanService.transferToBank(locale, this.authorization, handymanTransferRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataBracketResponseResponse -> {
-                    standardResponseMutableLiveData.setValue(dataBracketResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(dataBracketResponseResponse -> standardResponseMutableLiveData.setValue(dataBracketResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void fetchJobsOfHandyman(String authorization) {
-        compositeDisposable.add(handymanService.getJobsOfHandyman(locale, authorization)
+    public void fetchJobsOfHandyman() {
+        compositeDisposable.add(handymanService.getJobsOfHandyman(locale, this.authorization)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((myProjectListResponse) -> {
@@ -223,10 +221,9 @@ public class HandymanViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchDataStartScreen(String authorization,
-                                     NearbyJobRequest nearbyJobRequest) {
+    public void fetchDataStartScreen(NearbyJobRequest nearbyJobRequest) {
         compositeDisposable
-                .add(handymanService.getStartScreen(locale, authorization, nearbyJobRequest)
+                .add(handymanService.getStartScreen(locale, this.authorization, nearbyJobRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((startScreenResponseResponse) -> {
@@ -237,9 +234,9 @@ public class HandymanViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchJobsWishList(String authorization) {
+    public void fetchJobsWishList() {
         compositeDisposable
-                .add(handymanService.getJobWishList(locale, authorization)
+                .add(handymanService.getJobWishList(locale, this.authorization)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobWishList) -> {
@@ -251,10 +248,9 @@ public class HandymanViewModel extends BaseViewModel {
     }
 
 
-    public void fetchYourLocationData(String authorization,
-                                      NearbyJobRequest nearbyJobRequest) {
+    public void fetchYourLocationData(NearbyJobRequest nearbyJobRequest) {
         compositeDisposable
-                .add(handymanService.getJobNearBy(locale, authorization, nearbyJobRequest)
+                .add(handymanService.getJobNearBy(locale, this.authorization, nearbyJobRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobResponse) -> {
@@ -265,11 +261,10 @@ public class HandymanViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchJobsByCategory(String authorization,
-                                    Integer categoryId,
+    public void fetchJobsByCategory(Integer categoryId,
                                     NearbyJobRequest nearbyJobRequest) {
         compositeDisposable
-                .add(handymanService.getJobByCategory(locale, authorization, categoryId, nearbyJobRequest)
+                .add(handymanService.getJobByCategory(locale, this.authorization, categoryId, nearbyJobRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobResponse) -> {
@@ -280,10 +275,9 @@ public class HandymanViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchJobsByFilter(String authorization,
-                                  JobFilterRequest jobFilterRequest) {
+    public void fetchJobsByFilter(JobFilterRequest jobFilterRequest) {
         compositeDisposable
-                .add(handymanService.getJobByFilter(locale, authorization, jobFilterRequest)
+                .add(handymanService.getJobByFilter(locale, this.authorization, jobFilterRequest)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((jobResponse) -> {
@@ -294,9 +288,8 @@ public class HandymanViewModel extends BaseViewModel {
                                 throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchHandymanJobDetail(String authorization,
-                                       Integer jobId) {
-        compositeDisposable.add(handymanService.getHandymanJobDetail(locale, authorization, jobId)
+    public void fetchHandymanJobDetail(Integer jobId) {
+        compositeDisposable.add(handymanService.getHandymanJobDetail(locale, this.authorization, jobId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((jobResponse) -> {
@@ -307,9 +300,8 @@ public class HandymanViewModel extends BaseViewModel {
                         throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_LONG).show()));
     }
 
-    public void fetchJobDetailProfile(String authorization,
-                                      Integer customerId) {
-        compositeDisposable.add(handymanService.getJobDetailProfile(locale, authorization, customerId)
+    public void fetchJobDetailProfile(Integer customerId) {
+        compositeDisposable.add(handymanService.getJobDetailProfile(locale, this.authorization, customerId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((profileResponse) -> {
@@ -321,71 +313,53 @@ public class HandymanViewModel extends BaseViewModel {
     }
 
 
-    public void addJobBid(String authorization,
-                          RequestBody bid,
+    public void addJobBid(RequestBody bid,
                           RequestBody description,
                           List<MultipartBody.Part> files,
                           RequestBody jobId,
                           RequestBody serviceFee,
                           RequestBody bidTime,
                           List<RequestBody> md5List) {
-        compositeDisposable.add(handymanService.addJobBid(locale, authorization, bid, description, files, jobId, serviceFee, bidTime, md5List)
+        compositeDisposable.add(handymanService.addJobBid(locale, this.authorization, bid, description, files, jobId, serviceFee, bidTime, md5List)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((response) -> {
-                    standardResponseMutableLiveData.setValue(response.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe((response) -> standardResponseMutableLiveData.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void fetchJobTransactionDetail(String authorization,
-                                          Integer jobId) {
-        compositeDisposable.add(handymanService.viewPaymentTransaction(locale, authorization, jobId)
+    public void fetchJobTransactionDetail(Integer jobId) {
+        compositeDisposable.add(handymanService.viewPaymentTransaction(locale, this.authorization, jobId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataBracketResponseResponse -> {
-                    jobTransactionLiveData.setValue(dataBracketResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(dataBracketResponseResponse -> jobTransactionLiveData.setValue(dataBracketResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void markNotificationAsRead(String authorization,
-                                       Integer notificationId) {
-        compositeDisposable.add(handymanService.markNotificationRead(authorization, notificationId)
+    public void markNotificationAsRead(Integer notificationId) {
+        compositeDisposable.add(handymanService.markNotificationRead(this.authorization, notificationId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                            standardResponseMarkReadMutableLiveData.setValue(response.body());
-                        }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
+                .subscribe(response -> standardResponseMarkReadMutableLiveData.setValue(response.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()
                 ));
     }
 
-    public void loadReviewWithCustomer(String authorization,
-                                       int customerId) {
-        compositeDisposable.add(handymanService.loadReviewWithCustomer(authorization, customerId)
+    public void loadReviewWithCustomer(int customerId) {
+        compositeDisposable.add(handymanService.loadReviewWithCustomer(this.authorization, customerId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataBracketResponseResponse -> {
-                    reviewResponseLiveData.setValue(dataBracketResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(dataBracketResponseResponse -> reviewResponseLiveData.setValue(dataBracketResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void reviewCustomer(String authorization,
-                               ReviewRequest reviewRequest) {
-        compositeDisposable.add(handymanService.reviewCustomer(locale, authorization, reviewRequest)
+    public void reviewCustomer(ReviewRequest reviewRequest) {
+        compositeDisposable.add(handymanService.reviewCustomer(locale, this.authorization, reviewRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(standardResponseResponse -> {
-                    standardResponseMutableLiveData.setValue(standardResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(standardResponseResponse -> standardResponseMutableLiveData.setValue(standardResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 
-    public void updateAvatar(String authorizationCode,
-                             MultipartBody.Part body,
+    public void updateAvatar(MultipartBody.Part body,
                              RequestBody updateDate) {
-        compositeDisposable.add(handymanService.updateAvatar(locale, authorizationCode, body, updateDate)
+        compositeDisposable.add(handymanService.updateAvatar(locale, this.authorization, body, updateDate)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(standardResponseResponse -> {
-                    standardResponseMutableLiveData.setValue(standardResponseResponse.body());
-                }, throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
+                .subscribe(standardResponseResponse -> standardResponseMutableLiveData.setValue(standardResponseResponse.body()), throwable -> Toast.makeText(getApplication(), throwable.getMessage(), Toast.LENGTH_SHORT).show()));
     }
 }

@@ -29,12 +29,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private static final int SENDER = 1;
     private static final int RECEIVER = 2;
+    private final List<MessageResponse> messageResponseList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
+    private final String authorizationCode;
     private int RANDOM = 3;
-
-    private List<MessageResponse> messageResponseList;
-    private LayoutInflater layoutInflater;
-    private Context context;
-    private String authorizationCode;
     private ItemMessageSenderBinding senderBinding;
     private ItemMessageReceiverBinding receiverBinding;
 

@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityLoginBinding;
@@ -64,12 +66,7 @@ public class Login extends BaseAppCompatActivity {
 
         HandymanApp.getComponent().inject(this);
 
-        binding.loginBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.loginBackButton.setOnClickListener(view -> onBackPressed());
 
         edtChangedListener();
 
@@ -81,110 +78,99 @@ public class Login extends BaseAppCompatActivity {
     }
 
     private void viewPassword() {
-        cbVisiblePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cbVisiblePassword.isChecked()) {
-                    edtPassword.setTransformationMethod(null);
-                } else {
-                    edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
-                edtPassword.setSelection(edtPassword.length());
+        cbVisiblePassword.setOnClickListener(view -> {
+            if (cbVisiblePassword.isChecked()) {
+                edtPassword.setTransformationMethod(null);
+            } else {
+                edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+            edtPassword.setSelection(edtPassword.length());
         });
     }
 
     private void doForgotPassword() {
-        btForgot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(Login.this, ForgotPassword.class));
-            }
-        });
+        btForgot.setOnClickListener(view -> startActivity(new Intent(Login.this, ForgotPassword.class)));
     }
 
     private void doLogin() {
-        btLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                pgLogin.setVisibility(View.VISIBLE);
-                btLogin.setEnabled(false);
-                String type = sharedPreferencesUtils.get("type", String.class);
-                String mail = edtMail.getText().toString().trim();
-                String password = edtPassword.getText().toString().trim();
+        btLogin.setOnClickListener(view -> {
+            pgLogin.setVisibility(View.VISIBLE);
+            btLogin.setEnabled(false);
+            String type = sharedPreferencesUtils.get("type", String.class);
+            String mail = edtMail.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim();
 
-                userService.doLogin(new UserLogin(mail, password), type).enqueue(new Callback<DataBracketResponse<TokenState>>() {
-                    @Override
-                    public void onResponse(Call<DataBracketResponse<TokenState>> call,
-                                           Response<DataBracketResponse<TokenState>> response) {
-                        if (response.body().getStatus().equals(StatusConstant.OK) && response.body().getStatusCode().equals(StatusCodeConstant.OK)) {
-                            String token = response.body().getData().getToken();
-                            Integer state = response.body().getData().getState();
-                            String userId = response.body().getData().getUserId();
+            userService.doLogin(new UserLogin(mail, password), type).enqueue(new Callback<DataBracketResponse<TokenState>>() {
+                @Override
+                public void onResponse(@NonNull Call<DataBracketResponse<TokenState>> call,
+                                       @NonNull Response<DataBracketResponse<TokenState>> response) {
+                    if (response.body().getStatus().equals(StatusConstant.OK) && response.body().getStatusCode().equals(StatusCodeConstant.OK)) {
+                        String token = response.body().getData().getToken();
+                        Integer state = response.body().getData().getState();
+                        String userId = response.body().getData().getUserId();
 
-                            pgLogin.setVisibility(View.INVISIBLE);
+                        pgLogin.setVisibility(View.INVISIBLE);
 
-                            sharedPreferencesUtils.put("token", token);
-                            sharedPreferencesUtils.put("state", state);
-                            sharedPreferencesUtils.put("userId", userId);
+                        sharedPreferencesUtils.put("token", token);
+                        sharedPreferencesUtils.put("state", state);
+                        sharedPreferencesUtils.put("userId", userId);
 
-                            switch (RoleName.valueOf(type)) {
-                                case ROLE_HANDYMAN:
-                                    if (state.equals(Constants.NOT_ACTIVE_ACCOUNT)) {
-                                        startActivity(new Intent(Login.this, SignUpAddPayout.class));
-                                        if (Register.register != null) {
-                                            Register.register.finish();
-                                            Register.register = null;
-                                        }
-                                        if (Start.start != null) {
-                                            Start.start.finish();
-                                            Start.start = null;
-                                        }
-                                        finish();
-                                    } else if (state.equals(Constants.STATE_REGISTER_ADDED_PAYOUT)) {
-                                        startActivity(new Intent(Login.this, HandyManMainScreen.class));
-                                        if (Register.register != null) {
-                                            Register.register.finish();
-                                            Register.register = null;
-                                        }
-                                        if (Start.start != null) {
-                                            Start.start.finish();
-                                            Start.start = null;
-                                        }
-                                        finish();
+                        switch (RoleName.valueOf(type)) {
+                            case ROLE_HANDYMAN:
+                                if (state.equals(Constants.NOT_ACTIVE_ACCOUNT)) {
+                                    startActivity(new Intent(Login.this, SignUpAddPayout.class));
+                                    if (Register.register != null) {
+                                        Register.register.finish();
+                                        Register.register = null;
                                     }
-                                    break;
-                                case ROLE_CUSTOMER:
-                                    if (state.equals(Constants.NOT_ACTIVE_ACCOUNT) || state.equals(Constants.STATE_REGISTER_ADDED_PAYOUT)) {
-                                        startActivity(new Intent(Login.this, CustomerMainScreen.class));
-                                        if (Register.register != null) {
-                                            Register.register.finish();
-                                            Register.register = null;
-                                        }
-                                        if (Start.start != null) {
-                                            Start.start.finish();
-                                            Start.start = null;
-                                        }
-                                        finish();
+                                    if (Start.start != null) {
+                                        Start.start.finish();
+                                        Start.start = null;
                                     }
-                                    break;
-                            }
-                        } else {
-                            pgLogin.setVisibility(View.INVISIBLE);
-                            btLogin.setEnabled(true);
-                            Toast.makeText(Login.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                                    finish();
+                                } else if (state.equals(Constants.STATE_REGISTER_ADDED_PAYOUT)) {
+                                    startActivity(new Intent(Login.this, HandyManMainScreen.class));
+                                    if (Register.register != null) {
+                                        Register.register.finish();
+                                        Register.register = null;
+                                    }
+                                    if (Start.start != null) {
+                                        Start.start.finish();
+                                        Start.start = null;
+                                    }
+                                    finish();
+                                }
+                                break;
+                            case ROLE_CUSTOMER:
+                                if (state.equals(Constants.NOT_ACTIVE_ACCOUNT) || state.equals(Constants.STATE_REGISTER_ADDED_PAYOUT)) {
+                                    startActivity(new Intent(Login.this, CustomerMainScreen.class));
+                                    if (Register.register != null) {
+                                        Register.register.finish();
+                                        Register.register = null;
+                                    }
+                                    if (Start.start != null) {
+                                        Start.start.finish();
+                                        Start.start = null;
+                                    }
+                                    finish();
+                                }
+                                break;
                         }
-                    }
-
-                    @Override
-                    public void onFailure(Call<DataBracketResponse<TokenState>> call,
-                                          Throwable t) {
+                    } else {
                         pgLogin.setVisibility(View.INVISIBLE);
                         btLogin.setEnabled(true);
-                        Toast.makeText(Login.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(Login.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     }
-                });
-            }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<DataBracketResponse<TokenState>> call,
+                                      @NonNull Throwable t) {
+                    pgLogin.setVisibility(View.INVISIBLE);
+                    btLogin.setEnabled(true);
+                    Toast.makeText(Login.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
 

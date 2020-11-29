@@ -26,10 +26,10 @@ import java.util.List;
 
 public class CustomerTransferHistoryAdapter extends RecyclerView.Adapter<CustomerTransferHistoryAdapter.ViewHolder> {
 
-    private List<CustomerTransferHistoryResponse> historyResponseList;
-    private Context context;
-    private LayoutInflater inflater;
-    private String authorizationCode;
+    private final List<CustomerTransferHistoryResponse> historyResponseList;
+    private final Context context;
+    private final LayoutInflater inflater;
+    private final String authorizationCode;
     private ItemCustomerTransferHistoryBinding binding;
 
     public CustomerTransferHistoryAdapter(List<CustomerTransferHistoryResponse> historyResponseList,

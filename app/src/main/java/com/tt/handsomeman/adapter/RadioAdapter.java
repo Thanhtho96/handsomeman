@@ -15,10 +15,10 @@ import com.tt.handsomeman.databinding.ItemSkillCategoryNameBinding;
 import java.util.List;
 
 public abstract class RadioAdapter<T> extends RecyclerView.Adapter<RadioAdapter.RadioViewHolder> {
-    List<T> mItems;
+    final List<T> mItems;
+    final Context mContext;
+    private final LayoutInflater inflater;
     int mSelectedItem = -1;
-    Context mContext;
-    private LayoutInflater inflater;
     private ItemSkillCategoryNameBinding binding;
 
     RadioAdapter(Context context,

@@ -18,9 +18,9 @@ import java.util.List;
 
 public class PaymentMilestoneAdapter extends RecyclerView.Adapter<PaymentMilestoneAdapter.ViewHolder> {
 
-    private Context context;
-    private List<PaymentPaid> paymentPaidList;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<PaymentPaid> paymentPaidList;
+    private final LayoutInflater inflater;
     private ItemPaymentMilestoneBinding binding;
 
     public PaymentMilestoneAdapter(Context context,

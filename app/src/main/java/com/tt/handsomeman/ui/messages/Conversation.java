@@ -7,13 +7,12 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.lifecycle.Observer;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,10 +23,7 @@ import com.tt.handsomeman.adapter.MessageAdapter;
 import com.tt.handsomeman.databinding.ActivityConversationBinding;
 import com.tt.handsomeman.request.PageableRequest;
 import com.tt.handsomeman.request.SendMessageRequest;
-import com.tt.handsomeman.response.DataBracketResponse;
-import com.tt.handsomeman.response.ListMessage;
 import com.tt.handsomeman.response.MessageResponse;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.FCMService;
 import com.tt.handsomeman.util.Constants;
@@ -53,12 +49,12 @@ import jp.wasabeef.recyclerview.animators.FadeInUpAnimator;
 public class Conversation extends BaseAppCompatActivityWithViewModel<MessageViewModel> {
 
     public static Integer receiveDefaultId;
+    private final List<MessageResponse> messageResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private MessageAdapter messageAdapter;
-    private List<MessageResponse> messageResponseList = new ArrayList<>();
     private TextView tvReceiverName;
     private ImageButton ibSendMessage;
     private EditText edtMessageBody;
@@ -84,12 +80,7 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
         edtMessageBody = binding.editTextMessageConversation;
         ibSendMessage.setEnabled(false);
 
-        binding.conversationBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        binding.conversationBackButton.setOnClickListener(v -> onBackPressed());
 
         sendId = Integer.parseInt(sharedPreferencesUtils.get("userId", String.class));
 
@@ -100,9 +91,9 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
 
         createRecyclerViewMessage();
         listenEditChange();
-        fetchData(authorizationCode, receiveId, new PageableRequest(0, 10));
+        fetchData(receiveId, new PageableRequest(0, 10));
         addRecyclerViewListener();
-        sendMessage(authorizationCode, receiveId);
+        sendMessage(receiveId);
         listenToFireBaseService(receiveId);
 
         LocalBroadcastManager.getInstance(this).registerReceiver((receiver),
@@ -153,11 +144,10 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
         };
     }
 
-    private void sendMessage(String authorizationCode,
-                             int receiveId) {
+    private void sendMessage(int receiveId) {
         ibSendMessage.setOnClickListener(view -> {
             String bodyMessage = edtMessageBody.getText().toString().trim();
-            sendMessage(authorizationCode, receiveId, bodyMessage);
+            sendMessage(receiveId, bodyMessage);
             edtMessageBody.setText(null);
         });
     }
@@ -188,26 +178,22 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
         });
     }
 
-    private void sendMessage(String authorizationCode,
-                             int receiveId,
+    private void sendMessage(int receiveId,
                              String bodyMessage) {
         Calendar now = Calendar.getInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault());
         String sendTime = formatter.format(now.getTime());
 
-        baseViewModel.sendMessageToConversation(authorizationCode, new SendMessageRequest(receiveId, bodyMessage, sendTime));
-        baseViewModel.getStandardResponseMutableLiveData().observe(this, new Observer<StandardResponse>() {
-            @Override
-            public void onChanged(StandardResponse standardResponse) {
-                Toast.makeText(Conversation.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                    MessageResponse messageResponse = new MessageResponse(Constants.BASE_URL + Constants.VIEW_AVATAR + sendId,
-                            sendId, bodyMessage, now.getTime(), (byte) 1, sharedPreferencesUtils.get("updateDate", Long.class));
-                    if (!messageResponseList.contains(messageResponse)) {
-                        messageResponseList.add(0, messageResponse);
-                        messageAdapter.notifyItemInserted(0);
-                        rcvMessage.scrollToPosition(0);
-                    }
+        baseViewModel.sendMessageToConversation(new SendMessageRequest(receiveId, bodyMessage, sendTime));
+        baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
+            Toast.makeText(Conversation.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+            if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                MessageResponse messageResponse = new MessageResponse(Constants.BASE_URL + Constants.VIEW_AVATAR + sendId,
+                        sendId, bodyMessage, now.getTime(), (byte) 1, sharedPreferencesUtils.get("updateDate", Long.class));
+                if (!messageResponseList.contains(messageResponse)) {
+                    messageResponseList.add(0, messageResponse);
+                    messageAdapter.notifyItemInserted(0);
+                    rcvMessage.scrollToPosition(0);
                 }
             }
         });
@@ -216,7 +202,7 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
     private void addRecyclerViewListener() {
         rcvMessage.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView,
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView,
                                              int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 isAtBottom = !recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE;
@@ -225,42 +211,38 @@ public class Conversation extends BaseAppCompatActivityWithViewModel<MessageView
                 if (isAtTop && isNext && !isLoading) {
                     if (page == 0) {
                         page++;
-                        fetchData(authorizationCode, receiveId, new PageableRequest(page, 10));
+                        fetchData(receiveId, new PageableRequest(page, 10));
                     } else
-                        fetchData(authorizationCode, receiveId, new PageableRequest(page++, 10));
+                        fetchData(receiveId, new PageableRequest(page++, 10));
                 }
             }
         });
     }
 
-    private void fetchData(String authorizationCode,
-                           int accountId,
+    private void fetchData(int accountId,
                            PageableRequest pageableRequest) {
         messageAdapter.addLoading();
         isLoading = true;
-        baseViewModel.fetchMessagesWithAccount(authorizationCode, accountId, pageableRequest);
-        baseViewModel.getListMessageResponse().observe(this, new Observer<DataBracketResponse<ListMessage>>() {
-            @Override
-            public void onChanged(DataBracketResponse<ListMessage> listMessageDataBracketResponse) {
-                messageAdapter.removeLoading();
-                if (listMessageDataBracketResponse.getStatus().equals(StatusConstant.OK) && listMessageDataBracketResponse.getStatusCode().equals(StatusCodeConstant.OK)) {
-                    int size = messageResponseList.size();
-                    List<MessageResponse> messageResponses = listMessageDataBracketResponse.getData().getMessageResponseList();
-                    for (MessageResponse messageResponse : messageResponses) {
-                        if (!messageResponseList.contains(messageResponse)) {
-                            messageResponseList.add(messageResponse);
-                        }
+        baseViewModel.fetchMessagesWithAccount(accountId, pageableRequest);
+        baseViewModel.getListMessageResponse().observe(this, listMessageDataBracketResponse -> {
+            messageAdapter.removeLoading();
+            if (listMessageDataBracketResponse.getStatus().equals(StatusConstant.OK) && listMessageDataBracketResponse.getStatusCode().equals(StatusCodeConstant.OK)) {
+                int size = messageResponseList.size();
+                List<MessageResponse> messageResponses = listMessageDataBracketResponse.getData().getMessageResponseList();
+                for (MessageResponse messageResponse : messageResponses) {
+                    if (!messageResponseList.contains(messageResponse)) {
+                        messageResponseList.add(messageResponse);
                     }
-                    messageAdapter.notifyItemRangeInserted(size, messageResponseList.size() - size);
-                    if (page == 0) {
-                        rcvMessage.scrollToPosition(0);
-                    }
-                    isNext = true;
-                } else {
-                    isNext = false;
                 }
-                isLoading = false;
+                messageAdapter.notifyItemRangeInserted(size, messageResponseList.size() - size);
+                if (page == 0) {
+                    rcvMessage.scrollToPosition(0);
+                }
+                isNext = true;
+            } else {
+                isNext = false;
             }
+            isLoading = false;
         });
     }
 

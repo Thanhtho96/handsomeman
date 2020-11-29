@@ -15,9 +15,9 @@ import java.util.List;
 
 public class SpinnerBankAccount extends BaseAdapter {
 
-    private Context context;
-    private List<PayoutResponse> payoutResponseList;
-    private LayoutInflater layoutInflater;
+    private final Context context;
+    private final List<PayoutResponse> payoutResponseList;
+    private final LayoutInflater layoutInflater;
     private SpinnerItemBlackTextBinding binding;
 
     public SpinnerBankAccount(Context context,

@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,12 +25,12 @@ import java.util.List;
 
 public class MyProjectsChildInPastFragment extends Fragment {
 
-    private List<Job> inPastList = new ArrayList<>();
+    private final List<Job> inPastList = new ArrayList<>();
     private JobFilterAdapter jobAdapter;
     private FragmentMyProjectsChildInPastBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentMyProjectsChildInPastBinding.inflate(inflater, container, false);
@@ -44,26 +43,20 @@ public class MyProjectsChildInPastFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         createJobRecycleView();
 
-        ((MyProjectsFragment) getParentFragment()).inPastList.observe(getViewLifecycleOwner(), new Observer<List<Job>>() {
-            @Override
-            public void onChanged(List<Job> jobs) {
-                inPastList.clear();
-                inPastList.addAll(jobs);
-                jobAdapter.notifyDataSetChanged();
-            }
+        ((MyProjectsFragment) getParentFragment()).inPastList.observe(getViewLifecycleOwner(), jobs -> {
+            inPastList.clear();
+            inPastList.addAll(jobs);
+            jobAdapter.notifyDataSetChanged();
         });
     }
 
     private void createJobRecycleView() {
         RecyclerView rcvJob = binding.recycleViewJobsInPast;
         jobAdapter = new JobFilterAdapter(getContext(), inPastList);
-        jobAdapter.setOnItemClickListener(new JobFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(getContext(), JobDetail.class);
-                intent.putExtra("jobId", inPastList.get(position).getId());
-                startActivity(intent);
-            }
+        jobAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(getContext(), JobDetail.class);
+            intent.putExtra("jobId", inPastList.get(position).getId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvJob.setLayoutManager(layoutManagerJob);

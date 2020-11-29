@@ -30,15 +30,15 @@ import javax.inject.Inject;
 
 public class JobsChildWishListFragment extends BaseFragment<HandymanViewModel, FragmentJobsChildWishListBinding> {
 
+    private final List<Job> jobArrayList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private JobFilterAdapter jobAdapter;
-    private List<Job> jobArrayList = new ArrayList<>();
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -57,8 +57,7 @@ public class JobsChildWishListFragment extends BaseFragment<HandymanViewModel, F
     }
 
     private void fetchData() {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchJobsWishList(authorizationCode);
+        baseViewModel.fetchJobsWishList();
 
         baseViewModel.getJobLiveData().observe(getViewLifecycleOwner(), data -> {
             jobArrayList.clear();
@@ -70,13 +69,10 @@ public class JobsChildWishListFragment extends BaseFragment<HandymanViewModel, F
     private void createJobRecycleView(@NonNull View view) {
         RecyclerView rcvJob = viewBinding.recycleViewJobsWishList;
         jobAdapter = new JobFilterAdapter(getContext(), jobArrayList);
-        jobAdapter.setOnItemClickListener(new JobFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(getContext(), JobDetail.class);
-                intent.putExtra("jobId", jobArrayList.get(position).getId());
-                startActivity(intent);
-            }
+        jobAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(getContext(), JobDetail.class);
+            intent.putExtra("jobId", jobArrayList.get(position).getId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvJob.setLayoutManager(layoutManagerJob);

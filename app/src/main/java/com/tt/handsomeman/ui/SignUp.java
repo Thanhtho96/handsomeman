@@ -12,13 +12,12 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.databinding.ActivitySignUpBinding;
-import com.tt.handsomeman.model.SignUpFormState;
 import com.tt.handsomeman.request.UserRegistration;
 import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.service.UserService;
@@ -61,12 +60,7 @@ public class SignUp extends BaseAppCompatActivity {
 
         HandymanApp.getComponent().inject(this);
 
-        binding.signUpBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.signUpBackButton.setOnClickListener(view -> onBackPressed());
 
         observeSignUpState(edtPassword, edtRePassword, edtName, edtMail, btnSignUp);
 
@@ -85,41 +79,38 @@ public class SignUp extends BaseAppCompatActivity {
                           ProgressBar pgSignUp) {
         String type = sharedPreferencesUtils.get("type", String.class);
 
-        btnSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pgSignUp.setVisibility(View.VISIBLE);
-                btnSignUp.setEnabled(false);
-                String name = edtName.getText().toString().trim();
-                String mail = edtMail.getText().toString().trim();
-                String password = edtPassword.getText().toString().trim();
-                String rePassword = edtRePassword.getText().toString().trim();
+        btnSignUp.setOnClickListener(view -> {
+            pgSignUp.setVisibility(View.VISIBLE);
+            btnSignUp.setEnabled(false);
+            String name = edtName.getText().toString().trim();
+            String mail = edtMail.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim();
+            String rePassword = edtRePassword.getText().toString().trim();
 
-                userService.doSignUp(type, new UserRegistration(name, mail, password, rePassword)).enqueue(new Callback<StandardResponse>() {
-                    @Override
-                    public void onResponse(Call<StandardResponse> call,
-                                           Response<StandardResponse> response) {
-                        if (response.body().getStatus().equals(StatusConstant.OK) && response.body().getStatusCode().equals(StatusCodeConstant.CREATED)) {
-                            pgSignUp.setVisibility(View.INVISIBLE);
-                            Toast.makeText(SignUp.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(SignUp.this, Login.class));
-                            finish();
-                        } else {
-                            pgSignUp.setVisibility(View.INVISIBLE);
-                            btnSignUp.setEnabled(true);
-                            Toast.makeText(SignUp.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<StandardResponse> call,
-                                          Throwable t) {
+            userService.doSignUp(type, new UserRegistration(name, mail, password, rePassword)).enqueue(new Callback<StandardResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<StandardResponse> call,
+                                       @NonNull Response<StandardResponse> response) {
+                    if (response.body().getStatus().equals(StatusConstant.OK) && response.body().getStatusCode().equals(StatusCodeConstant.CREATED)) {
+                        pgSignUp.setVisibility(View.INVISIBLE);
+                        Toast.makeText(SignUp.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(SignUp.this, Login.class));
+                        finish();
+                    } else {
                         pgSignUp.setVisibility(View.INVISIBLE);
                         btnSignUp.setEnabled(true);
-                        Toast.makeText(SignUp.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(SignUp.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     }
-                });
-            }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<StandardResponse> call,
+                                      @NonNull Throwable t) {
+                    pgSignUp.setVisibility(View.INVISIBLE);
+                    btnSignUp.setEnabled(true);
+                    Toast.makeText(SignUp.this, t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
 
@@ -127,28 +118,22 @@ public class SignUp extends BaseAppCompatActivity {
                                 CheckBox cbRePassword,
                                 EditText edtPassword,
                                 EditText edtRePassword) {
-        cbPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cbPassword.isChecked()) {
-                    edtPassword.setTransformationMethod(null);
-                } else {
-                    edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
-                edtPassword.setSelection(edtPassword.length());
+        cbPassword.setOnClickListener(view -> {
+            if (cbPassword.isChecked()) {
+                edtPassword.setTransformationMethod(null);
+            } else {
+                edtPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+            edtPassword.setSelection(edtPassword.length());
         });
 
-        cbRePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cbRePassword.isChecked()) {
-                    edtRePassword.setTransformationMethod(null);
-                } else {
-                    edtRePassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
-                edtRePassword.setSelection(edtRePassword.length());
+        cbRePassword.setOnClickListener(view -> {
+            if (cbRePassword.isChecked()) {
+                edtRePassword.setTransformationMethod(null);
+            } else {
+                edtRePassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+            edtRePassword.setSelection(edtRePassword.length());
         });
     }
 
@@ -191,25 +176,22 @@ public class SignUp extends BaseAppCompatActivity {
                                     EditText edtName,
                                     EditText edtMail,
                                     Button btnSignUp) {
-        signUpViewModel.getSignUpFormState().observe(this, new Observer<SignUpFormState>() {
-            @Override
-            public void onChanged(SignUpFormState signUpFormState) {
-                if (signUpFormState == null) {
-                    return;
-                }
-                btnSignUp.setEnabled(signUpFormState.isDataValid());
-                if (signUpFormState.getNameError() != null) {
-                    edtName.setError(getString(signUpFormState.getNameError()));
-                }
-                if (signUpFormState.getMailError() != null) {
-                    edtMail.setError(getString(signUpFormState.getMailError()));
-                }
-                if (signUpFormState.getPasswordError() != null) {
-                    edtPassword.setError(getString(signUpFormState.getPasswordError()));
-                }
-                if (signUpFormState.getRePasswordError() != null) {
-                    edtRePassword.setError(getString(signUpFormState.getRePasswordError()));
-                }
+        signUpViewModel.getSignUpFormState().observe(this, signUpFormState -> {
+            if (signUpFormState == null) {
+                return;
+            }
+            btnSignUp.setEnabled(signUpFormState.isDataValid());
+            if (signUpFormState.getNameError() != null) {
+                edtName.setError(getString(signUpFormState.getNameError()));
+            }
+            if (signUpFormState.getMailError() != null) {
+                edtMail.setError(getString(signUpFormState.getMailError()));
+            }
+            if (signUpFormState.getPasswordError() != null) {
+                edtPassword.setError(getString(signUpFormState.getPasswordError()));
+            }
+            if (signUpFormState.getRePasswordError() != null) {
+                edtRePassword.setError(getString(signUpFormState.getRePasswordError()));
             }
         });
     }

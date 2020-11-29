@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,8 +28,6 @@ import com.tt.handsomeman.adapter.SkillAdapter;
 import com.tt.handsomeman.databinding.FragmentMyProfileAboutBinding;
 import com.tt.handsomeman.model.Handyman;
 import com.tt.handsomeman.model.Skill;
-import com.tt.handsomeman.response.HandymanProfileResponse;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.AvatarOptionDialogFragment;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.ui.MyProfile;
@@ -55,7 +52,7 @@ import okhttp3.RequestBody;
 
 public class MyProfileAboutFragment extends BaseFragment<HandymanViewModel, FragmentMyProfileAboutBinding> {
     private static final Integer REQUEST_MY_PROFILE_RESULT_CODE = 77;
-
+    private final List<Skill> skillList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -64,13 +61,12 @@ public class MyProfileAboutFragment extends BaseFragment<HandymanViewModel, Frag
     private TextView yourName, education, about, allProjects, successedProject;
     private SkillAdapter skillAdapter;
     private RecyclerView rcvSkill;
-    private List<Skill> skillList = new ArrayList<>();
     private boolean isMyProfileEdit = false;
     private String authorizationCode, avatarLink = "";
     private long updateDate = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -88,9 +84,7 @@ public class MyProfileAboutFragment extends BaseFragment<HandymanViewModel, Frag
         createSkillRecyclerView();
         fetchHandymanProfile(authorizationCode);
 
-        imAvatar.setOnClickListener(v -> {
-            AvatarOptionDialogFragment.newInstance().show(getChildFragmentManager(), "avatar_option");
-        });
+        imAvatar.setOnClickListener(v -> AvatarOptionDialogFragment.newInstance().show(getChildFragmentManager(), "avatar_option"));
     }
 
     private void bindView() {
@@ -113,37 +107,34 @@ public class MyProfileAboutFragment extends BaseFragment<HandymanViewModel, Frag
     }
 
     private void fetchHandymanProfile(String authorizationCode) {
-        baseViewModel.fetchHandymanProfile(authorizationCode);
-        baseViewModel.getHandymanProfileResponseMutableLiveData().observe(getViewLifecycleOwner(), new Observer<HandymanProfileResponse>() {
-            @Override
-            public void onChanged(HandymanProfileResponse handymanProfileResponse) {
-                Handyman handyman = handymanProfileResponse.getHandyman();
+        baseViewModel.fetchHandymanProfile();
+        baseViewModel.getHandymanProfileResponseMutableLiveData().observe(getViewLifecycleOwner(), handymanProfileResponse -> {
+            Handyman handyman = handymanProfileResponse.getHandyman();
 
-                yourName.setText(handyman.getName());
-                education.setText(handyman.getEducation());
-                about.setText(handyman.getDetail());
-                allProjects.setText(String.valueOf(handymanProfileResponse.getAllProject()));
-                successedProject.setText(String.valueOf(handymanProfileResponse.getSuccessedProject()));
+            yourName.setText(handyman.getName());
+            education.setText(handyman.getEducation());
+            about.setText(handyman.getDetail());
+            allProjects.setText(String.valueOf(handymanProfileResponse.getAllProject()));
+            successedProject.setText(String.valueOf(handymanProfileResponse.getSuccessedProject()));
 
-                avatarLink = handymanProfileResponse.getAvatar();
-                updateDate = handymanProfileResponse.getUpdateDate();
+            avatarLink = handymanProfileResponse.getAvatar();
+            updateDate = handymanProfileResponse.getUpdateDate();
 
-                GlideUrl glideUrl = new GlideUrl((handymanProfileResponse.getAvatar()),
-                        new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
+            GlideUrl glideUrl = new GlideUrl((handymanProfileResponse.getAvatar()),
+                    new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
 
-                Glide.with(MyProfileAboutFragment.this)
-                        .load(glideUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .circleCrop()
-                        .placeholder(R.drawable.custom_progressbar)
-                        .error(R.drawable.logo)
-                        .signature(new MediaStoreSignature("", handymanProfileResponse.getUpdateDate(), 0))
-                        .into(imAvatar);
+            Glide.with(MyProfileAboutFragment.this)
+                    .load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .placeholder(R.drawable.custom_progressbar)
+                    .error(R.drawable.logo)
+                    .signature(new MediaStoreSignature("", handymanProfileResponse.getUpdateDate(), 0))
+                    .into(imAvatar);
 
-                skillList.clear();
-                skillList.addAll(handymanProfileResponse.getSkillList());
-                skillAdapter.notifyDataSetChanged();
-            }
+            skillList.clear();
+            skillList.addAll(handymanProfileResponse.getSkillList());
+            skillAdapter.notifyDataSetChanged();
         });
     }
 
@@ -161,18 +152,15 @@ public class MyProfileAboutFragment extends BaseFragment<HandymanViewModel, Frag
             RequestBody requestFile = RequestBody.create(file, MediaType.parse(mimeType));
             body = MultipartBody.Part.createFormData("avatar", file.getName(), requestFile);
 
-            baseViewModel.updateAvatar(authorizationCode, body, updateDate);
-            baseViewModel.getStandardResponseMutableLiveData().observe(this, new Observer<StandardResponse>() {
-                @Override
-                public void onChanged(StandardResponse standardResponse) {
-                    Toast.makeText(getContext(), standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                        isMyProfileEdit = true;
-                        MyProfile myProfile = (MyProfile) getActivity();
-                        myProfile.setMyProfileEditResult(isMyProfileEdit);
+            baseViewModel.updateAvatar(body, updateDate);
+            baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
+                Toast.makeText(getContext(), standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    isMyProfileEdit = true;
+                    MyProfile myProfile = (MyProfile) getActivity();
+                    myProfile.setMyProfileEditResult(isMyProfileEdit);
 
-                        fetchHandymanProfile(authorizationCode);
-                    }
+                    fetchHandymanProfile(authorizationCode);
                 }
             });
         }

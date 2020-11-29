@@ -19,9 +19,9 @@ import java.util.List;
 
 public class PayoutAdapter extends RecyclerView.Adapter<PayoutAdapter.PayoutViewHolder> {
 
-    private List<Payout> payoutList;
-    private LayoutInflater layoutInflater;
-    private Context context;
+    private final List<Payout> payoutList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
     private ItemPayoutBinding binding;
     private OnItemClickListener mListener;
 
@@ -72,26 +72,20 @@ public class PayoutAdapter extends RecyclerView.Adapter<PayoutAdapter.PayoutView
             btnPayout = binding.imageButtonItemPayout;
             tvPayoutLastNumbers = binding.payoutLastNumbers;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
 
-            btnPayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            btnPayout.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });

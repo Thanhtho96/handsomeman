@@ -27,12 +27,12 @@ public class ContactAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public static final int HEADER = 0;
     public static final int ITEM = 1;
 
-    private List<Contact> contactList;
-    private Context context;
-    private LayoutInflater layoutInflater;
+    private final List<Contact> contactList;
+    private final Context context;
+    private final LayoutInflater layoutInflater;
+    private final String authorizationCode;
     private ItemContactBinding contactBinding;
     private ItemContactHeaderBinding headerBinding;
-    private String authorizationCode;
 
     public ContactAdapter(List<Contact> contactList,
                           Context context,

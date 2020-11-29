@@ -11,7 +11,7 @@ import com.tt.handsomeman.model.SignUpFormState;
 
 public class SignUpViewModel extends ViewModel {
 
-    private MutableLiveData<SignUpFormState> signUpFormState = new MutableLiveData<>();
+    private final MutableLiveData<SignUpFormState> signUpFormState = new MutableLiveData<>();
 
     public LiveData<SignUpFormState> getSignUpFormState() {
         return signUpFormState;

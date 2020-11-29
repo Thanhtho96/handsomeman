@@ -10,7 +10,7 @@ import com.tt.handsomeman.R;
 import com.tt.handsomeman.model.SignUpAddPayoutFormState;
 
 public class SignUpAddPayoutViewModel extends ViewModel {
-    private MutableLiveData<SignUpAddPayoutFormState> liveData = new MutableLiveData<>();
+    private final MutableLiveData<SignUpAddPayoutFormState> liveData = new MutableLiveData<>();
 
     public LiveData<SignUpAddPayoutFormState> getUpAddPayoutFormState() {
         return liveData;

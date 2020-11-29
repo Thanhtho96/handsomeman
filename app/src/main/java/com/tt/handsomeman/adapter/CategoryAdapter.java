@@ -17,9 +17,9 @@ import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    private List<Category> categoryList;
-    private LayoutInflater layoutInflater;
-    private Context context;
+    private final List<Category> categoryList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
     private ItemCategoryBinding binding;
 
     private OnItemClickListener mListener;
@@ -72,26 +72,20 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             tvCategoryName = binding.textViewJobName;
             btnCategoryDetail = binding.imageButtonCategoryDetail;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
 
-            btnCategoryDetail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            btnCategoryDetail.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });

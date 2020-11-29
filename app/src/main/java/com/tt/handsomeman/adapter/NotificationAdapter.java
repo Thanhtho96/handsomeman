@@ -32,10 +32,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int PAID_PAYMENT = 2;
     private static final int ACCEPT_BID = 3;
 
-    private Context context;
-    private List<NotificationResponse> notificationList;
-    private LayoutInflater layoutInflater;
-    private String authorizationCode;
+    private final Context context;
+    private final List<NotificationResponse> notificationList;
+    private final LayoutInflater layoutInflater;
+    private final String authorizationCode;
     private OnItemClickListener listener;
     private ItemNotificationBinding binding;
 
@@ -206,14 +206,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             tvSendTime = binding.pushTimeNotification;
             tvNotificationBody = binding.bodyNotification;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
@@ -233,14 +230,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             tvSendTime = binding.pushTimeNotification;
             tvNotificationBody = binding.bodyNotification;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
@@ -260,14 +254,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             tvSendTime = binding.pushTimeNotification;
             tvNotificationBody = binding.bodyNotification;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });

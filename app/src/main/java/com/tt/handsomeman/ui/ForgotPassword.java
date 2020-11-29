@@ -5,18 +5,15 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityForgotPasswordBinding;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.util.StatusConstant;
 import com.tt.handsomeman.viewmodel.UserViewModel;
 
@@ -40,22 +37,14 @@ public class ForgotPassword extends BaseAppCompatActivityWithViewModel<UserViewM
         final EditText edtForgotPassword = binding.editTextForgotPasswordYourMail;
         final Button btnForgotPassword = binding.buttonSendForgotPassword;
 
-        binding.forgotPasswordBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.forgotPasswordBackButton.setOnClickListener(view -> onBackPressed());
 
         btnForgotPassword.setOnClickListener(v -> {
             baseViewModel.forgotPassword(edtForgotPassword.getText().toString().trim());
-            baseViewModel.getStandardResponseMutableLiveData().observe(this, new Observer<StandardResponse>() {
-                @Override
-                public void onChanged(StandardResponse standardResponse) {
-                    Toast.makeText(ForgotPassword.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                        onBackPressed();
-                    }
+            baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
+                Toast.makeText(ForgotPassword.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    onBackPressed();
                 }
             });
         });

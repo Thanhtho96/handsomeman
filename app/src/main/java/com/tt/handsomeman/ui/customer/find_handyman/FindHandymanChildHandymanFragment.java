@@ -10,7 +10,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +39,8 @@ import javax.inject.Inject;
 
 public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerViewModel, FragmentFindHandymanChildHandymanBinding> {
 
+    private final List<HandymanResponse> handymanResponseList = new ArrayList<>();
+    private final List<Category> categoryArrayList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -48,8 +49,6 @@ public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerView
     private LinearLayout showMoreYourLocation;
     private FindHandymanAdapter findHandymanAdapter;
     private CategoryAdapter categoryAdapter;
-    private List<HandymanResponse> handymanResponseList = new ArrayList<>();
-    private List<Category> categoryArrayList = new ArrayList<>();
     private String authorizationCode;
 
     @Override
@@ -75,33 +74,20 @@ public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerView
         createCategoryRecycleView();
         showMoreByYourLocation();
 
-        Constants.Longitude.observe(getViewLifecycleOwner(), new Observer<Double>() {
-            @Override
-            public void onChanged(Double aDouble) {
-                fetchData(Constants.Latitude.getValue(), aDouble);
-            }
-        });
+        Constants.Longitude.observe(getViewLifecycleOwner(), aDouble -> fetchData(Constants.Latitude.getValue(), aDouble));
     }
 
     private void showMoreByYourLocation() {
-        showMoreYourLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getContext(), HandymanNearYourLocation.class));
-            }
-        });
+        showMoreYourLocation.setOnClickListener(view -> startActivity(new Intent(getContext(), HandymanNearYourLocation.class)));
     }
 
     private void createJobRecycleView() {
         RecyclerView rcvFindHandyman = viewBinding.recycleViewFindHandyman;
         findHandymanAdapter = new FindHandymanAdapter(getContext(), handymanResponseList, authorizationCode);
-        findHandymanAdapter.setOnItemClickListener(new FindHandymanAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(getContext(), HandymanDetail.class);
-                intent.putExtra("handymanId", handymanResponseList.get(position).getHandymanId());
-                startActivity(intent);
-            }
+        findHandymanAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(getContext(), HandymanDetail.class);
+            intent.putExtra("handymanId", handymanResponseList.get(position).getHandymanId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvFindHandyman.setLayoutManager(layoutManagerJob);
@@ -113,16 +99,13 @@ public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerView
     private void createCategoryRecycleView() {
         RecyclerView rcvCategory = viewBinding.recycleViewCategories;
         categoryAdapter = new CategoryAdapter(getContext(), categoryArrayList);
-        categoryAdapter.setOnItemClickListener(new CategoryAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String categoryName = categoryArrayList.get(position).getName();
+        categoryAdapter.setOnItemClickListener(position -> {
+            String categoryName = categoryArrayList.get(position).getName();
 
-                Intent intent = new Intent(getContext(), FindHandymanCategory.class);
-                intent.putExtra("categoryName", categoryName);
-                intent.putExtra("categoryId", categoryArrayList.get(position).getCategory_id());
-                startActivity(intent);
-            }
+            Intent intent = new Intent(getContext(), FindHandymanCategory.class);
+            intent.putExtra("categoryName", categoryName);
+            intent.putExtra("categoryId", categoryArrayList.get(position).getCategory_id());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerCategory = new LinearLayoutManager(getContext());
         rcvCategory.setLayoutManager(layoutManagerCategory);
@@ -138,9 +121,9 @@ public class FindHandymanChildHandymanFragment extends BaseFragment<CustomerView
         String dateRequest = formatter.format(now.getTime());
         double radius = 10d;
 
-        baseViewModel.fetchDataStartScreen(authorizationCode, new NearbyHandymanRequest(lat, lng, radius, dateRequest));
+        baseViewModel.fetchDataStartScreen(new NearbyHandymanRequest(lat, lng, radius, dateRequest));
 
-        baseViewModel.getStartScreenCustomerMutableLiveData().observe(this, data -> {
+        baseViewModel.getStartScreenCustomerMutableLiveData().observe(getViewLifecycleOwner(), data -> {
             pgFindHandyman.setVisibility(View.GONE);
             handymanResponseList.clear();
             handymanResponseList.addAll(data.getHandymanResponsesList());

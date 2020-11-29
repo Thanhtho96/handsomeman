@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,12 +28,12 @@ public class CustomerMyProjectsChildInProgressFragment extends Fragment {
 
     private static final Integer ADD_NEW_JOB_CODE = 747;
 
-    private List<Job> inProgressList = new ArrayList<>();
+    private final List<Job> inProgressList = new ArrayList<>();
     private JobFilterAdapter jobAdapter;
     private FragmentCustomerMyProjectChildInProgressBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentCustomerMyProjectChildInProgressBinding.inflate(inflater, container, false);
@@ -47,13 +46,10 @@ public class CustomerMyProjectsChildInProgressFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         createJobRecycleView();
 
-        ((MyProjectsFragment) getParentFragment()).inProgressList.observe(getViewLifecycleOwner(), new Observer<List<Job>>() {
-            @Override
-            public void onChanged(List<Job> jobs) {
-                inProgressList.clear();
-                inProgressList.addAll(jobs);
-                jobAdapter.notifyDataSetChanged();
-            }
+        ((MyProjectsFragment) getParentFragment()).inProgressList.observe(getViewLifecycleOwner(), jobs -> {
+            inProgressList.clear();
+            inProgressList.addAll(jobs);
+            jobAdapter.notifyDataSetChanged();
         });
 
         binding.buttonAddNewJob.setOnClickListener(v -> startActivityForResult(new Intent(getContext(), AddNewJob.class), ADD_NEW_JOB_CODE));
@@ -62,13 +58,10 @@ public class CustomerMyProjectsChildInProgressFragment extends Fragment {
     private void createJobRecycleView() {
         RecyclerView rcvJob = binding.recycleViewJobsInProgress;
         jobAdapter = new JobFilterAdapter(getContext(), inProgressList);
-        jobAdapter.setOnItemClickListener(new JobFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(getContext(), MyJobDetail.class);
-                intent.putExtra("jobId", inProgressList.get(position).getId());
-                startActivity(intent);
-            }
+        jobAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(getContext(), MyJobDetail.class);
+            intent.putExtra("jobId", inProgressList.get(position).getId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvJob.setLayoutManager(layoutManagerJob);

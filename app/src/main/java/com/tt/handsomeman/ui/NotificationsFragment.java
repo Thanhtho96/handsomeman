@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,12 +35,11 @@ import javax.inject.Inject;
 public class NotificationsFragment extends BaseFragment<NotificationViewModel, FragmentNotificationsBinding> {
 
     private static final int NOTIFICATION_REQUEST = 47;
-
+    private final List<NotificationResponse> responseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-    private List<NotificationResponse> responseList = new ArrayList<>();
     private NotificationAdapter notificationAdapter;
     private String authorization;
 
@@ -66,53 +64,47 @@ public class NotificationsFragment extends BaseFragment<NotificationViewModel, F
 
     private void fetchData() {
         String type = sharedPreferencesUtils.get("type", String.class);
-        baseViewModel.fetchNotificationOfAccount(authorization, type);
-        baseViewModel.getListNotificationMutableLiveData().observe(getViewLifecycleOwner(), new Observer<List<NotificationResponse>>() {
-            @Override
-            public void onChanged(List<NotificationResponse> notifications) {
-                responseList.clear();
-                responseList.addAll(notifications);
-                notificationAdapter.notifyDataSetChanged();
-            }
+        baseViewModel.fetchNotificationOfAccount(type);
+        baseViewModel.getListNotificationMutableLiveData().observe(getViewLifecycleOwner(), notifications -> {
+            responseList.clear();
+            responseList.addAll(notifications);
+            notificationAdapter.notifyDataSetChanged();
         });
     }
 
     private void createJobRecycleView() {
         RecyclerView rcvNotification = viewBinding.recyclerViewNotification;
         notificationAdapter = new NotificationAdapter(getContext(), responseList, authorization);
-        notificationAdapter.setOnItemClickListener(new NotificationAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                NotificationResponse notificationResponse = responseList.get(position);
-                switch (NotificationType.valueOf(notificationResponse.getNotificationType())) {
-                    case MADE_A_BID:
-                        Intent intent = new Intent(getContext(), ViewMadeBid.class);
-                        intent.putExtra("handymanId", notificationResponse.getSenderId());
-                        intent.putExtra("notificationId", notificationResponse.getId());
-                        intent.putExtra("jobTitle", notificationResponse.getNotificationDescription());
-                        intent.putExtra("jobBidId", notificationResponse.getContentId());
-                        intent.putExtra("personBid", notificationResponse.getSenderName());
-                        intent.putExtra("isRead", notificationResponse.getRead());
-                        intent.putExtra("notificationPos", position);
-                        startActivityForResult(intent, NOTIFICATION_REQUEST);
-                        break;
-                    case ACCEPT_BID:
-                        Intent intent1 = new Intent(getContext(), JobDetail.class);
-                        intent1.putExtra("notificationId", notificationResponse.getId());
-                        intent1.putExtra("jobId", notificationResponse.getContentId());
-                        intent1.putExtra("isRead", notificationResponse.getRead());
-                        intent1.putExtra("notificationPos", position);
-                        startActivityForResult(intent1, NOTIFICATION_REQUEST);
-                        break;
-                    case PAID_PAYMENT:
-                        Intent intent2 = new Intent(getContext(), ViewTransaction.class);
-                        intent2.putExtra("notificationId", notificationResponse.getId());
-                        intent2.putExtra("customerTransferId", notificationResponse.getContentId());
-                        intent2.putExtra("isRead", notificationResponse.getRead());
-                        intent2.putExtra("notificationPos", position);
-                        startActivityForResult(intent2, NOTIFICATION_REQUEST);
-                        break;
-                }
+        notificationAdapter.setOnItemClickListener(position -> {
+            NotificationResponse notificationResponse = responseList.get(position);
+            switch (NotificationType.valueOf(notificationResponse.getNotificationType())) {
+                case MADE_A_BID:
+                    Intent intent = new Intent(getContext(), ViewMadeBid.class);
+                    intent.putExtra("handymanId", notificationResponse.getSenderId());
+                    intent.putExtra("notificationId", notificationResponse.getId());
+                    intent.putExtra("jobTitle", notificationResponse.getNotificationDescription());
+                    intent.putExtra("jobBidId", notificationResponse.getContentId());
+                    intent.putExtra("personBid", notificationResponse.getSenderName());
+                    intent.putExtra("isRead", notificationResponse.getRead());
+                    intent.putExtra("notificationPos", position);
+                    startActivityForResult(intent, NOTIFICATION_REQUEST);
+                    break;
+                case ACCEPT_BID:
+                    Intent intent1 = new Intent(getContext(), JobDetail.class);
+                    intent1.putExtra("notificationId", notificationResponse.getId());
+                    intent1.putExtra("jobId", notificationResponse.getContentId());
+                    intent1.putExtra("isRead", notificationResponse.getRead());
+                    intent1.putExtra("notificationPos", position);
+                    startActivityForResult(intent1, NOTIFICATION_REQUEST);
+                    break;
+                case PAID_PAYMENT:
+                    Intent intent2 = new Intent(getContext(), ViewTransaction.class);
+                    intent2.putExtra("notificationId", notificationResponse.getId());
+                    intent2.putExtra("customerTransferId", notificationResponse.getContentId());
+                    intent2.putExtra("isRead", notificationResponse.getRead());
+                    intent2.putExtra("notificationPos", position);
+                    startActivityForResult(intent2, NOTIFICATION_REQUEST);
+                    break;
             }
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());

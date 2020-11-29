@@ -34,16 +34,15 @@ import javax.inject.Inject;
 
 public class TransferToBank extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
+    private final List<PayoutResponse> payoutResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-
     private TextView tvWalletBalance;
     private ImageButton ibTransfer;
     private EditText edtTransferAmount;
     private Spinner spBankAccount;
-    private List<PayoutResponse> payoutResponseList = new ArrayList<>();
     private SpinnerBankAccount spinnerBankAccountAdapter;
     private PayoutResponse payoutResponse;
     private double balance;
@@ -73,7 +72,6 @@ public class TransferToBank extends BaseAppCompatActivityWithViewModel<HandymanV
     private void transferToBank() {
         if (balance > 0) {
             ibTransfer.setEnabled(false);
-            String authorization = sharedPreferencesUtils.get("token", String.class);
 
             Calendar now = Calendar.getInstance();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault());
@@ -83,7 +81,7 @@ public class TransferToBank extends BaseAppCompatActivityWithViewModel<HandymanV
             int payoutId = payoutResponse.getPayoutId();
 
             HandymanTransferRequest transferRequest = new HandymanTransferRequest(payoutId, myBalanceToTransfer, dateTransfer);
-            baseViewModel.transferToBankAccount(authorization, transferRequest);
+            baseViewModel.transferToBankAccount(transferRequest);
             baseViewModel.getStandardResponseMutableLiveData().observe(TransferToBank.this, standardResponse -> {
                 Toast.makeText(TransferToBank.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
                 if (standardResponse.getStatus().equals(StatusConstant.OK)) {
@@ -99,8 +97,7 @@ public class TransferToBank extends BaseAppCompatActivityWithViewModel<HandymanV
     }
 
     private void fetchHandymanInfo() {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.getListPayoutOfHandyman(authorizationCode);
+        baseViewModel.getListPayoutOfHandyman();
         baseViewModel.getListPayoutResponseMutableLiveData().observe(this, listPayoutResponse -> {
             balance = listPayoutResponse.getBalance();
             tvWalletBalance.setText(getString(R.string.money_currency_string, DecimalFormat.format(balance)));

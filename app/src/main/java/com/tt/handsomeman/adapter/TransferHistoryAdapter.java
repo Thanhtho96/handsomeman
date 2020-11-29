@@ -21,9 +21,9 @@ import java.util.List;
 
 public class TransferHistoryAdapter extends RecyclerView.Adapter<TransferHistoryAdapter.TransferHistoryViewHolder> {
 
-    private List<TransferHistoryResponse> transferHistoryList;
-    private LayoutInflater layoutInflater;
-    private Context context;
+    private final List<TransferHistoryResponse> transferHistoryList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
     private ItemTransferHistoryBinding binding;
 
     public TransferHistoryAdapter(List<TransferHistoryResponse> transferHistoryList,

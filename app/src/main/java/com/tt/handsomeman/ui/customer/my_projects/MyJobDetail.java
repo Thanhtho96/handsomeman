@@ -21,7 +21,6 @@ import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.signature.MediaStoreSignature;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -81,9 +80,7 @@ public class MyJobDetail extends BaseAppCompatActivityWithViewModel<CustomerView
     }
 
     private void goBack() {
-        binding.backButton.setOnClickListener(v -> {
-            onBackPressed();
-        });
+        binding.backButton.setOnClickListener(v -> onBackPressed());
     }
 
     private void bindView() {
@@ -110,7 +107,7 @@ public class MyJobDetail extends BaseAppCompatActivityWithViewModel<CustomerView
 
     private void fetchData(Integer jobId) {
         String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchCustomerJobDetail(authorizationCode, jobId);
+        baseViewModel.fetchCustomerJobDetail(jobId);
 
         baseViewModel.getCustomerJobDetailMutableLiveData().observe(this, customerJobDetail -> {
             Job job = customerJobDetail.getJob();
@@ -166,16 +163,13 @@ public class MyJobDetail extends BaseAppCompatActivityWithViewModel<CustomerView
             Double lat = job.getLat();
             Double lng = job.getLng();
 
-            mapFragment.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    mMap = googleMap;
+            mapFragment.getMapAsync(googleMap -> {
+                mMap = googleMap;
 
-                    LatLng jobLocation = new LatLng(lat, lng);
-                    mMap.addMarker(new MarkerOptions().position(jobLocation).title(job.getLocation()));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
-                    mMap.getUiSettings().setScrollGesturesEnabled(false);
-                }
+                LatLng jobLocation = new LatLng(lat, lng);
+                mMap.addMarker(new MarkerOptions().position(jobLocation).title(job.getLocation()));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
+                mMap.getUiSettings().setScrollGesturesEnabled(false);
             });
 
             if (customerJobDetail.isAccepted()) {

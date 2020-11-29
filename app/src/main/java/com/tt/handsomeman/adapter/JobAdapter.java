@@ -18,9 +18,9 @@ import java.util.List;
 
 public class JobAdapter extends RecyclerView.Adapter<JobAdapter.JobViewHolder> {
 
-    private List<Job> jobList;
-    private LayoutInflater layoutInflater;
-    private Context context;
+    private final List<Job> jobList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
     private ItemJobBinding binding;
 
     private OnItemClickListener mListener;
@@ -83,26 +83,20 @@ public class JobAdapter extends RecyclerView.Adapter<JobAdapter.JobViewHolder> {
 
             btnJobDetail = itemView.findViewById(R.id.imageButtonJobDetail);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
 
-            btnJobDetail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            btnJobDetail.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });

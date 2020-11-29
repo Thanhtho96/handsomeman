@@ -28,12 +28,12 @@ import java.util.List;
 
 public class ConversationAdapter extends RecyclerSwipeAdapter<ConversationAdapter.ConversationViewHolder> {
 
-    private List<ConversationResponse> conversationResponsesList;
-    private LayoutInflater layoutInflater;
-    private Context context;
+    private final List<ConversationResponse> conversationResponsesList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
+    private final String authorizationCode;
     private SwipeLayout deleteSwipeLayout;
     private ItemConversationBinding binding;
-    private String authorizationCode;
     private OnItemClickListener mListener;
 
     public ConversationAdapter(List<ConversationResponse> conversationResponsesList,
@@ -135,31 +135,25 @@ public class ConversationAdapter extends RecyclerSwipeAdapter<ConversationAdapte
             avatar = binding.accountAvatarConversation;
             swipeLayout.setClickToClose(true);
 
-            layoutConversation.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    closeSwipeLayout();
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            layoutConversation.setOnClickListener(v -> {
+                closeSwipeLayout();
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
 
-            layoutDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemDelete(position);
-                            deleteSwipeLayout = swipeLayout;
-                        }
+            layoutDelete.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemDelete(position);
+                        deleteSwipeLayout = swipeLayout;
                     }
-
                 }
+
             });
         }
     }

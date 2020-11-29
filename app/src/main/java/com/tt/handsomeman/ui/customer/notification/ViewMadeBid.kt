@@ -87,7 +87,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
     private fun markAsRead(notificationId: Int,
                            token: String) {
         if (!isRead) {
-            baseViewModel!!.markNotificationAsRead(token, notificationId)
+            baseViewModel!!.markNotificationAsRead(notificationId)
             baseViewModel!!.standardResponseMarkReadMutableLiveData.observe(this, Observer { standardResponse ->
                 if (standardResponse.status == StatusConstant.OK) {
                     isRead = true
@@ -103,7 +103,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
             val now = Calendar.getInstance()
             val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault())
             val sendTime = formatter.format(now.time)
-            baseViewModel!!.acceptBid(token, AcceptBidRequest(jobId, handymanId, sendTime))
+            baseViewModel!!.acceptBid(AcceptBidRequest(jobId, handymanId, sendTime))
             baseViewModel!!.standardResponseAcceptBidMutableLiveData.observe(this, Observer { standardResponse ->
                 Toast.makeText(this@ViewMadeBid, standardResponse.message, Toast.LENGTH_SHORT).show()
                 if ((standardResponse.status == StatusConstant.OK)) {
@@ -120,7 +120,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
     private fun getNotificationData(notificationId: Int,
                                     jobBidId: Int,
                                     token: String) {
-        baseViewModel!!.fetchMadeBidNotification(token, jobBidId)
+        baseViewModel!!.fetchMadeBidNotification(jobBidId)
         baseViewModel!!.madeABidNotificationResponseMutableLiveData.observe(this, Observer { madeABidNotificationResponseDataBracketResponse ->
             if (madeABidNotificationResponseDataBracketResponse.status == StatusConstant.OK) {
                 val madeABidNotificationResponse = madeABidNotificationResponseDataBracketResponse.data
@@ -175,10 +175,7 @@ class ViewMadeBid : BaseAppCompatActivityWithViewModel<NotificationViewModel?>()
                         response = client.newCall(request).execute()
                     }
                 }
-                map.put(
-                        getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/${bidFileResponse.fileName}",
-                        response?.body?.contentLength()!!
-                )
+                map[getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/${bidFileResponse.fileName}"] = response?.body?.contentLength()!!
                 // if don't find file available contentLength will return -1
                 if (response?.body?.contentLength()!! > 0) {
                     val file_size: Long? = response?.body?.contentLength()

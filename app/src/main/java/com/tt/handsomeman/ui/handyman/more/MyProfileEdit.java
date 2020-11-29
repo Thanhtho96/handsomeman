@@ -5,13 +5,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,8 +28,6 @@ import com.tt.handsomeman.model.Handyman;
 import com.tt.handsomeman.model.Skill;
 import com.tt.handsomeman.request.HandymanEditRequest;
 import com.tt.handsomeman.request.SkillEditRequest;
-import com.tt.handsomeman.response.HandymanProfileResponse;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -46,7 +42,7 @@ import javax.inject.Inject;
 
 public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
     private static final Integer REQUEST_MY_PROFILE_EDIT_RESULT_CODE = 777;
-
+    private final ArrayList<Skill> skillEditList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -55,7 +51,6 @@ public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanVi
     private ImageButton ibEdit, ibAddSkillMyProfileEdit;
     private SkillEditAdapter skillEditAdapter;
     private RecyclerView rcvSkillEdit;
-    private ArrayList<Skill> skillEditList = new ArrayList<>();
     private boolean isEdit = false;
     private boolean isLoadDone = false;
     private ActivityMyProfileEditBinding binding;
@@ -77,16 +72,13 @@ public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanVi
 
         goBack();
 
-        ibAddSkillMyProfileEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isLoadDone) {
-                    Intent intent = new Intent(MyProfileEdit.this, AddNewSkill.class);
-                    intent.putExtra("listSkill", skillEditList);
-                    startActivityForResult(intent, REQUEST_MY_PROFILE_EDIT_RESULT_CODE);
-                } else {
-                    Toast.makeText(MyProfileEdit.this, getString(R.string.please_wait), Toast.LENGTH_SHORT).show();
-                }
+        ibAddSkillMyProfileEdit.setOnClickListener(v -> {
+            if (isLoadDone) {
+                Intent intent = new Intent(MyProfileEdit.this, AddNewSkill.class);
+                intent.putExtra("listSkill", skillEditList);
+                startActivityForResult(intent, REQUEST_MY_PROFILE_EDIT_RESULT_CODE);
+            } else {
+                Toast.makeText(MyProfileEdit.this, getString(R.string.please_wait), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -97,12 +89,7 @@ public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanVi
     }
 
     private void goBack() {
-        binding.myProfileEditBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        binding.myProfileEditBackButton.setOnClickListener(v -> onBackPressed());
     }
 
     private void editTextYourNameListener(EditText yourNameEdit) {
@@ -139,18 +126,10 @@ public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanVi
 
     private void createRecyclerView() {
         skillEditAdapter = new SkillEditAdapter(skillEditList, this);
-        skillEditAdapter.setOnItemClickListener(new SkillEditAdapter.OnItemClickListener() {
-            @Override
-            public void deleteSkill(int position) {
-                new YesOrNoDialog(MyProfileEdit.this, R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.sure_to_delete_skill), R.drawable.dele, new YesOrNoDialog.OnItemClickListener() {
-                    @Override
-                    public void onItemClickYes() {
-                        skillEditList.remove(position);
-                        skillEditAdapter.notifyItemRemoved(position);
-                    }
-                }).show();
-            }
-        });
+        skillEditAdapter.setOnItemClickListener(position -> new YesOrNoDialog(MyProfileEdit.this, R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.sure_to_delete_skill), R.drawable.dele, () -> {
+            skillEditList.remove(position);
+            skillEditAdapter.notifyItemRemoved(position);
+        }).show());
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvSkillEdit.setLayoutManager(layoutManagerJob);
         rcvSkillEdit.setItemAnimator(new DefaultItemAnimator());
@@ -159,71 +138,61 @@ public class MyProfileEdit extends BaseAppCompatActivityWithViewModel<HandymanVi
     }
 
     private void doEdit() {
-        ibEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String yourNameEditValue = yourNameEdit.getText().toString();
-                String educationEditValue = educationEdit.getText().toString();
-                String aboutEditValue = aboutEdit.getText().toString();
-                String authorizationCode = sharedPreferencesUtils.get("token", String.class);
+        ibEdit.setOnClickListener(v -> {
+            String yourNameEditValue = yourNameEdit.getText().toString();
+            String educationEditValue = educationEdit.getText().toString();
+            String aboutEditValue = aboutEdit.getText().toString();
 
-                List<SkillEditRequest> skillEditRequestList = new ArrayList<>();
+            List<SkillEditRequest> skillEditRequestList = new ArrayList<>();
 
-                for (Skill skill : skillEditList) {
-                    SkillEditRequest skillEditRequest = new SkillEditRequest(skill.getCategory_id(), skill.getName());
-                    skillEditRequestList.add(skillEditRequest);
-                }
-
-                HandymanEditRequest handymanEditRequest = new HandymanEditRequest(yourNameEditValue, educationEditValue, aboutEditValue, skillEditRequestList);
-
-                baseViewModel.editHandymanProfile(authorizationCode, handymanEditRequest);
-                baseViewModel.getStandardResponseMutableLiveData().observe(MyProfileEdit.this, new Observer<StandardResponse>() {
-                    @Override
-                    public void onChanged(StandardResponse standardResponse) {
-                        Toast.makeText(MyProfileEdit.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                        if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                            isEdit = true;
-                            Intent intent = new Intent();
-                            intent.putExtra("isMyProfileEdit", isEdit);
-                            setResult(RESULT_OK, intent);
-                            finish();
-                        }
-                    }
-                });
+            for (Skill skill : skillEditList) {
+                SkillEditRequest skillEditRequest = new SkillEditRequest(skill.getCategory_id(), skill.getName());
+                skillEditRequestList.add(skillEditRequest);
             }
+
+            HandymanEditRequest handymanEditRequest = new HandymanEditRequest(yourNameEditValue, educationEditValue, aboutEditValue, skillEditRequestList);
+
+            baseViewModel.editHandymanProfile(handymanEditRequest);
+            baseViewModel.getStandardResponseMutableLiveData().observe(MyProfileEdit.this, standardResponse -> {
+                Toast.makeText(MyProfileEdit.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    isEdit = true;
+                    Intent intent = new Intent();
+                    intent.putExtra("isMyProfileEdit", isEdit);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            });
         });
     }
 
     private void fetchHandymanProfile() {
         String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchHandymanProfile(authorizationCode);
-        baseViewModel.getHandymanProfileResponseMutableLiveData().observe(this, new Observer<HandymanProfileResponse>() {
-            @Override
-            public void onChanged(HandymanProfileResponse handymanProfileResponse) {
-                Handyman handyman = handymanProfileResponse.getHandyman();
+        baseViewModel.fetchHandymanProfile();
+        baseViewModel.getHandymanProfileResponseMutableLiveData().observe(this, handymanProfileResponse -> {
+            Handyman handyman = handymanProfileResponse.getHandyman();
 
-                yourNameEdit.setText(handyman.getName());
-                educationEdit.setText(handyman.getEducation());
-                aboutEdit.setText(handyman.getDetail());
+            yourNameEdit.setText(handyman.getName());
+            educationEdit.setText(handyman.getEducation());
+            aboutEdit.setText(handyman.getDetail());
 
-                GlideUrl glideUrl = new GlideUrl((handymanProfileResponse.getAvatar()),
-                        new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
+            GlideUrl glideUrl = new GlideUrl((handymanProfileResponse.getAvatar()),
+                    new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
 
-                Glide.with(MyProfileEdit.this)
-                        .load(glideUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .circleCrop()
-                        .placeholder(R.drawable.custom_progressbar)
-                        .error(R.drawable.logo)
-                        .signature(new MediaStoreSignature("", handymanProfileResponse.getUpdateDate(), 0))
-                        .into(binding.accountAvatar);
+            Glide.with(MyProfileEdit.this)
+                    .load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .placeholder(R.drawable.custom_progressbar)
+                    .error(R.drawable.logo)
+                    .signature(new MediaStoreSignature("", handymanProfileResponse.getUpdateDate(), 0))
+                    .into(binding.accountAvatar);
 
-                skillEditList.clear();
-                skillEditList.addAll(handymanProfileResponse.getSkillList());
-                skillEditAdapter.notifyDataSetChanged();
+            skillEditList.clear();
+            skillEditList.addAll(handymanProfileResponse.getSkillList());
+            skillEditAdapter.notifyDataSetChanged();
 
-                isLoadDone = true;
-            }
+            isLoadDone = true;
         });
     }
 

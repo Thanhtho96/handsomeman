@@ -1,6 +1,6 @@
 package com.tt.handsomeman.response;
 
-public class DataBracketResponse<T extends Object> extends StandardResponse {
+public class DataBracketResponse<T> extends StandardResponse {
     private T data;
 
     public T getData() {

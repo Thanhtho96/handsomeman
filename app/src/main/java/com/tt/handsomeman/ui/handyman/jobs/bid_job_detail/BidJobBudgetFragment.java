@@ -53,7 +53,7 @@ public class BidJobBudgetFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentBidJobDetailBudgetBinding.inflate(inflater, container, false);

@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.CustomerReviewAdapter;
 import com.tt.handsomeman.databinding.FragmentCustomerProfileReviewBinding;
-import com.tt.handsomeman.response.CustomerReviewProfile;
 import com.tt.handsomeman.response.CustomerReviewResponse;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
@@ -33,6 +31,7 @@ import javax.inject.Inject;
 
 public class CustomerProfileReviewFragment extends BaseFragment<CustomerViewModel, FragmentCustomerProfileReviewBinding> {
 
+    private final List<CustomerReviewResponse> customerReviewResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -40,7 +39,6 @@ public class CustomerProfileReviewFragment extends BaseFragment<CustomerViewMode
     private TextView countReviewers;
     private RatingBar rtCountPoint;
     private CustomerReviewAdapter customerReviewAdapter;
-    private List<CustomerReviewResponse> customerReviewResponseList = new ArrayList<>();
     private String authorizationCode;
 
     @Override
@@ -66,17 +64,14 @@ public class CustomerProfileReviewFragment extends BaseFragment<CustomerViewMode
     }
 
     private void fetchData() {
-        baseViewModel.fetchCustomerReview(authorizationCode);
-        baseViewModel.getCustomerReviewProfileMutableLiveData().observe(getViewLifecycleOwner(), new Observer<CustomerReviewProfile>() {
-            @Override
-            public void onChanged(CustomerReviewProfile customerReviewProfile) {
-                countReviewers.setText(getResources().getQuantityString(R.plurals.numberOfReview, customerReviewProfile.getCountReviewers(), customerReviewProfile.getCountReviewers()));
-                rtCountPoint.setRating(customerReviewProfile.getAverageReviewPoint());
+        baseViewModel.fetchCustomerReview();
+        baseViewModel.getCustomerReviewProfileMutableLiveData().observe(getViewLifecycleOwner(), customerReviewProfile -> {
+            countReviewers.setText(getResources().getQuantityString(R.plurals.numberOfReview, customerReviewProfile.getCountReviewers(), customerReviewProfile.getCountReviewers()));
+            rtCountPoint.setRating(customerReviewProfile.getAverageReviewPoint());
 
-                customerReviewResponseList.clear();
-                customerReviewResponseList.addAll(customerReviewProfile.getCustomerReviewResponses());
-                customerReviewAdapter.notifyDataSetChanged();
-            }
+            customerReviewResponseList.clear();
+            customerReviewResponseList.addAll(customerReviewProfile.getCustomerReviewResponses());
+            customerReviewAdapter.notifyDataSetChanged();
         });
     }
 

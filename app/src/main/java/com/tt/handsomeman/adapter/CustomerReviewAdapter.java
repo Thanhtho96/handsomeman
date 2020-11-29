@@ -24,10 +24,10 @@ import java.util.List;
 
 public class CustomerReviewAdapter extends RecyclerView.Adapter<CustomerReviewAdapter.CustomerReviewViewHolder> {
 
-    private List<CustomerReviewResponse> customerReviewResponses;
-    private LayoutInflater layoutInflater;
-    private Context context;
-    private String authorizationCode;
+    private final List<CustomerReviewResponse> customerReviewResponses;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
+    private final String authorizationCode;
     private ItemReviewBinding binding;
 
     public CustomerReviewAdapter(Context context,

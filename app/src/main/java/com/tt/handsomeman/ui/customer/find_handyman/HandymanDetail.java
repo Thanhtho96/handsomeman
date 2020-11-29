@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,7 +26,6 @@ import com.tt.handsomeman.adapter.SkillAdapter;
 import com.tt.handsomeman.databinding.ActivityHandymanDetailBinding;
 import com.tt.handsomeman.model.Skill;
 import com.tt.handsomeman.request.HandymanDetailRequest;
-import com.tt.handsomeman.response.HandymanDetailResponse;
 import com.tt.handsomeman.response.HandymanReviewResponse;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.customer.CustomerReview;
@@ -46,7 +44,8 @@ public class HandymanDetail extends BaseAppCompatActivityWithViewModel<CustomerV
 
     private static final Integer REVIEW_REQUEST = 777;
     private static boolean reviewed;
-
+    private final List<Skill> skillList = new ArrayList<>();
+    private final List<HandymanReviewResponse> handymanReviewResponses = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -57,9 +56,7 @@ public class HandymanDetail extends BaseAppCompatActivityWithViewModel<CustomerV
     private Button btnInviteToProject, btnReview;
     private SkillAdapter skillAdapter;
     private RecyclerView rcvSkill, rcvReview;
-    private List<Skill> skillList = new ArrayList<>();
     private HandymanReviewAdapter handymanReviewAdapter;
-    private List<HandymanReviewResponse> handymanReviewResponses = new ArrayList<>();
     private int handymanId;
     private ActivityHandymanDetailBinding binding;
     private String authorizationCode;
@@ -137,40 +134,37 @@ public class HandymanDetail extends BaseAppCompatActivityWithViewModel<CustomerV
 
 
         baseViewModel.fetchHandymanDetail(authorizationCode, new HandymanDetailRequest(lat, lng, handymanId));
-        baseViewModel.getHandymanDetailResponseMutableLiveData().observe(this, new Observer<HandymanDetailResponse>() {
-            @Override
-            public void onChanged(HandymanDetailResponse handymanDetailResponse) {
-                int distance = Integer.parseInt(DecimalFormat.formatGetDistance(handymanDetailResponse.getDistance() * 1000));
-                tvDistance.setText(HandymanApp.getInstance().getResources().getQuantityString(R.plurals.handymanDistance, distance, distance));
+        baseViewModel.getHandymanDetailResponseMutableLiveData().observe(this, handymanDetailResponse -> {
+            int distance = Integer.parseInt(DecimalFormat.formatGetDistance(handymanDetailResponse.getDistance() * 1000));
+            tvDistance.setText(HandymanApp.getInstance().getResources().getQuantityString(R.plurals.handymanDistance, distance, distance));
 
-                accountName.setText(handymanDetailResponse.getHandymanName());
-                education.setText(handymanDetailResponse.getEducation());
-                about.setText(handymanDetailResponse.getDetail());
-                allProjects.setText(String.valueOf(handymanDetailResponse.getAllProject()));
-                successedProject.setText(String.valueOf(handymanDetailResponse.getSuccessedProject()));
-                countReviews.setText(getResources().getQuantityString(R.plurals.numberOfReview, handymanDetailResponse.getCountReviewers(), handymanDetailResponse.getCountReviewers()));
-                rtCountPoint.setRating(handymanDetailResponse.getAverageReviewPoint());
+            accountName.setText(handymanDetailResponse.getHandymanName());
+            education.setText(handymanDetailResponse.getEducation());
+            about.setText(handymanDetailResponse.getDetail());
+            allProjects.setText(String.valueOf(handymanDetailResponse.getAllProject()));
+            successedProject.setText(String.valueOf(handymanDetailResponse.getSuccessedProject()));
+            countReviews.setText(getResources().getQuantityString(R.plurals.numberOfReview, handymanDetailResponse.getCountReviewers(), handymanDetailResponse.getCountReviewers()));
+            rtCountPoint.setRating(handymanDetailResponse.getAverageReviewPoint());
 
-                GlideUrl glideUrl = new GlideUrl((handymanDetailResponse.getAvatar()),
-                        new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
+            GlideUrl glideUrl = new GlideUrl((handymanDetailResponse.getAvatar()),
+                    new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
 
-                Glide.with(HandymanDetail.this)
-                        .load(glideUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .circleCrop()
-                        .placeholder(R.drawable.custom_progressbar)
-                        .error(R.drawable.logo)
-                        .signature(new MediaStoreSignature("", handymanDetailResponse.getUpdateDate(), 0))
-                        .into(binding.accountAvatar);
+            Glide.with(HandymanDetail.this)
+                    .load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .placeholder(R.drawable.custom_progressbar)
+                    .error(R.drawable.logo)
+                    .signature(new MediaStoreSignature("", handymanDetailResponse.getUpdateDate(), 0))
+                    .into(binding.accountAvatar);
 
-                handymanReviewResponses.clear();
-                handymanReviewResponses.addAll(handymanDetailResponse.getHandymanReviewResponseList());
-                handymanReviewAdapter.notifyDataSetChanged();
+            handymanReviewResponses.clear();
+            handymanReviewResponses.addAll(handymanDetailResponse.getHandymanReviewResponseList());
+            handymanReviewAdapter.notifyDataSetChanged();
 
-                skillList.clear();
-                skillList.addAll(handymanDetailResponse.getSkillList());
-                skillAdapter.notifyDataSetChanged();
-            }
+            skillList.clear();
+            skillList.addAll(handymanDetailResponse.getSkillList());
+            skillAdapter.notifyDataSetChanged();
         });
     }
 

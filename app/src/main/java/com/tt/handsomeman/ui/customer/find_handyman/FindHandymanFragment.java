@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
@@ -22,14 +21,14 @@ import com.tt.handsomeman.databinding.FragmentFindHandymanBinding;
 
 public class FindHandymanFragment extends Fragment {
 
-    private Fragment childHandymanFragment = new FindHandymanChildHandymanFragment();
-    private Fragment childWishlistFragment = new FindHandymanChildWishlistFragment();
+    private final Fragment childHandymanFragment = new FindHandymanChildHandymanFragment();
+    private final Fragment childWishlistFragment = new FindHandymanChildWishlistFragment();
     private Fragment active = childHandymanFragment;
     private EditText edtSearchByWord;
     private FragmentFindHandymanBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentFindHandymanBinding.inflate(inflater, container, false);
@@ -59,25 +58,17 @@ public class FindHandymanFragment extends Fragment {
             active = childWishlistFragment;
         }
 
-        rdHandyman.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(childHandymanFragment).commit();
-                    active = childHandymanFragment;
-                }
+        rdHandyman.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(childHandymanFragment).commit();
+                active = childHandymanFragment;
             }
         });
 
-        rdWishList.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(childWishlistFragment).commit();
-                    active = childWishlistFragment;
-                }
+        rdWishList.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(childWishlistFragment).commit();
+                active = childWishlistFragment;
             }
         });
     }

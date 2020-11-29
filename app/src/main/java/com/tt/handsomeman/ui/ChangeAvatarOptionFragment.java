@@ -66,13 +66,9 @@ public class ChangeAvatarOptionFragment extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
         binding.back.setOnClickListener(v -> dismiss());
 
-        binding.takePhoto.setOnClickListener(v -> {
-            dispatchTakePictureIntent();
-        });
+        binding.takePhoto.setOnClickListener(v -> dispatchTakePictureIntent());
 
-        binding.chooseImage.setOnClickListener(v -> {
-            startFileChooser();
-        });
+        binding.chooseImage.setOnClickListener(v -> startFileChooser());
     }
 
     private void dispatchTakePictureIntent() {
@@ -160,18 +156,10 @@ public class ChangeAvatarOptionFragment extends BottomSheetDialogFragment {
     private void copy(File source,
                       File destination) throws IOException {
 
-        FileChannel in = new FileInputStream(source).getChannel();
-        FileChannel out = new FileOutputStream(destination).getChannel();
-
-        try {
+        try (FileChannel in = new FileInputStream(source).getChannel(); FileChannel out = new FileOutputStream(destination).getChannel()) {
             in.transferTo(0, in.size(), out);
         } catch (Exception e) {
             // post to log
-        } finally {
-            if (in != null)
-                in.close();
-            if (out != null)
-                out.close();
         }
     }
 
@@ -262,14 +250,11 @@ public class ChangeAvatarOptionFragment extends BottomSheetDialogFragment {
             // and the user would benefit from additional context for the use of the permission.
             // Display a SnackBar with cda button to request the missing permission.
             Snackbar.make(binding.container, getString(R.string.need_permission),
-                    Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.grant_permisstion), new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Request the permission
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PERMISSION_REQUEST_READ_STORAGE);
-                }
+                    Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.grant_permisstion), view -> {
+                // Request the permission
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_READ_STORAGE);
             }).show();
 
         } else {

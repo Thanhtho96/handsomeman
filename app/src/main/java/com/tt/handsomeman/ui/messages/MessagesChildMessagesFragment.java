@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,15 +34,9 @@ import jp.wasabeef.recyclerview.animators.FadeInLeftAnimator;
 
 public class MessagesChildMessagesFragment extends BaseFragment<MessageViewModel, FragmentMessagesChildMessagesBinding> {
 
-    @Inject
-    ViewModelProvider.Factory viewModelFactory;
-    @Inject
-    SharedPreferencesUtils sharedPreferencesUtils;
-    private ConversationAdapter conversationAdapter;
-    private List<ConversationResponse> conversationResponseList = new ArrayList<>();
-    private MutableLiveData<Boolean> isScroll = new MutableLiveData<>();
-
-    private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+    private final List<ConversationResponse> conversationResponseList = new ArrayList<>();
+    private final MutableLiveData<Boolean> isScroll = new MutableLiveData<>();
+    private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(@NonNull RecyclerView recyclerView,
                                          int newState) {
@@ -58,9 +51,14 @@ public class MessagesChildMessagesFragment extends BaseFragment<MessageViewModel
             }
         }
     };
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+    @Inject
+    SharedPreferencesUtils sharedPreferencesUtils;
+    private ConversationAdapter conversationAdapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -78,22 +76,16 @@ public class MessagesChildMessagesFragment extends BaseFragment<MessageViewModel
 
         createMessageRecycleView(messagesFragment.getAuthorizationCode());
 
-        isScroll.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                if (aBoolean) {
-                    conversationAdapter.closeSwipeLayout();
-                }
+        isScroll.observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean) {
+                conversationAdapter.closeSwipeLayout();
             }
         });
 
-        messagesFragment.conversationList.observe(getViewLifecycleOwner(), new Observer<List<ConversationResponse>>() {
-            @Override
-            public void onChanged(List<ConversationResponse> conversationResponses) {
-                conversationResponseList.clear();
-                conversationResponseList.addAll(conversationResponses);
-                conversationAdapter.notifyItemRangeInserted(1, conversationResponseList.size());
-            }
+        messagesFragment.conversationList.observe(getViewLifecycleOwner(), conversationResponses -> {
+            conversationResponseList.clear();
+            conversationResponseList.addAll(conversationResponses);
+            conversationAdapter.notifyItemRangeInserted(1, conversationResponseList.size());
         });
     }
 
@@ -112,15 +104,11 @@ public class MessagesChildMessagesFragment extends BaseFragment<MessageViewModel
 
             @Override
             public void onItemDelete(int position) {
-                String authorizationCode = sharedPreferencesUtils.get("token", String.class);
                 ConversationResponse conversationResponse = conversationResponseList.get(position);
-                new YesOrNoDialog(getActivity(), R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.sure_to_delete_message), R.drawable.dele, new YesOrNoDialog.OnItemClickListener() {
-                    @Override
-                    public void onItemClickYes() {
-                        baseViewModel.deleteConversationById(authorizationCode, conversationResponse.getConversationId());
-                        baseViewModel.getMessageResponse().observe(getViewLifecycleOwner(), s -> Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show());
-                        conversationAdapter.deleteConversation(position);
-                    }
+                new YesOrNoDialog(getActivity(), R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.sure_to_delete_message), R.drawable.dele, () -> {
+                    baseViewModel.deleteConversationById(conversationResponse.getConversationId());
+                    baseViewModel.getMessageResponse().observe(getViewLifecycleOwner(), s -> Toast.makeText(getContext(), s, Toast.LENGTH_SHORT).show());
+                    conversationAdapter.deleteConversation(position);
                 }).show();
             }
         });

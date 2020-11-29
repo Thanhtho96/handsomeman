@@ -10,7 +10,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +39,8 @@ import javax.inject.Inject;
 
 public class JobsChildJobsFragment extends BaseFragment<HandymanViewModel, FragmentJobsChildJobsBinding> {
 
+    private final List<Job> jobArrayList = new ArrayList<>();
+    private final List<Category> categoryArrayList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -47,8 +48,6 @@ public class JobsChildJobsFragment extends BaseFragment<HandymanViewModel, Fragm
     private ProgressBar pgJob, pgCategory;
     private JobAdapter jobAdapter;
     private CategoryAdapter categoryAdapter;
-    private List<Job> jobArrayList = new ArrayList<>();
-    private List<Category> categoryArrayList = new ArrayList<>();
     private LinearLayout showMoreYourLocation;
 
     @Override
@@ -75,33 +74,20 @@ public class JobsChildJobsFragment extends BaseFragment<HandymanViewModel, Fragm
 
         showMoreByYourLocation();
 
-        Constants.Longitude.observe(getViewLifecycleOwner(), new Observer<Double>() {
-            @Override
-            public void onChanged(Double aDouble) {
-                fetchData(Constants.Latitude.getValue(), aDouble);
-            }
-        });
+        Constants.Longitude.observe(getViewLifecycleOwner(), aDouble -> fetchData(Constants.Latitude.getValue(), aDouble));
     }
 
     private void showMoreByYourLocation() {
-        showMoreYourLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getContext(), YourLocation.class));
-            }
-        });
+        showMoreYourLocation.setOnClickListener(view -> startActivity(new Intent(getContext(), YourLocation.class)));
     }
 
     private void createJobRecycleView() {
         RecyclerView rcvJob = viewBinding.recycleViewJobs;
         jobAdapter = new JobAdapter(getContext(), jobArrayList);
-        jobAdapter.setOnItemClickListener(new JobAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(getContext(), JobDetail.class);
-                intent.putExtra("jobId", jobArrayList.get(position).getId());
-                startActivity(intent);
-            }
+        jobAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(getContext(), JobDetail.class);
+            intent.putExtra("jobId", jobArrayList.get(position).getId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(getContext());
         rcvJob.setLayoutManager(layoutManagerJob);
@@ -113,16 +99,13 @@ public class JobsChildJobsFragment extends BaseFragment<HandymanViewModel, Fragm
     private void createCategoryRecycleView() {
         RecyclerView rcvCategory = viewBinding.recycleViewCategories;
         categoryAdapter = new CategoryAdapter(getContext(), categoryArrayList);
-        categoryAdapter.setOnItemClickListener(new CategoryAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                String categoryName = categoryArrayList.get(position).getName();
+        categoryAdapter.setOnItemClickListener(position -> {
+            String categoryName = categoryArrayList.get(position).getName();
 
-                Intent intent = new Intent(getContext(), GroupByCategory.class);
-                intent.putExtra("categoryName", categoryName);
-                intent.putExtra("categoryId", categoryArrayList.get(position).getCategory_id());
-                startActivity(intent);
-            }
+            Intent intent = new Intent(getContext(), GroupByCategory.class);
+            intent.putExtra("categoryName", categoryName);
+            intent.putExtra("categoryId", categoryArrayList.get(position).getCategory_id());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerCategory = new LinearLayoutManager(getContext());
         rcvCategory.setLayoutManager(layoutManagerCategory);
@@ -133,15 +116,14 @@ public class JobsChildJobsFragment extends BaseFragment<HandymanViewModel, Fragm
 
     private void fetchData(Double lat,
                            Double lng) {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
         Calendar now = Calendar.getInstance();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault());
         String dateRequest = formatter.format(now.getTime());
         double radius = 10d;
 
-        baseViewModel.fetchDataStartScreen(authorizationCode, new NearbyJobRequest(lat, lng, radius, dateRequest));
+        baseViewModel.fetchDataStartScreen(new NearbyJobRequest(lat, lng, radius, dateRequest));
 
-        baseViewModel.getStartScreenData().observe(this, data -> {
+        baseViewModel.getStartScreenData().observe(getViewLifecycleOwner(), data -> {
             pgJob.setVisibility(View.GONE);
             jobArrayList.clear();
             jobArrayList.addAll(data.getJobList());

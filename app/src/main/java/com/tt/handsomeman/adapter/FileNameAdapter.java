@@ -26,9 +26,9 @@ import java.net.URLConnection;
 import java.util.List;
 
 public class FileNameAdapter extends RecyclerView.Adapter<FileNameAdapter.ViewHolder> {
-    private Context context;
-    private List<BidFileResponse> bidFileResponses;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<BidFileResponse> bidFileResponses;
+    private final LayoutInflater inflater;
     private ItemFileNameBinding binding;
     private OnItemClickListener listener;
 
@@ -105,16 +105,13 @@ public class FileNameAdapter extends RecyclerView.Adapter<FileNameAdapter.ViewHo
             pgDownload = binding.progressHorizontal;
             btnOpen = binding.buttonOpen;
 
-            btnDownload.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            btnDownload.setVisibility(View.GONE);
-                            pgDownload.setVisibility(View.VISIBLE);
-                            listener.onItemClickDownload(position);
-                        }
+            btnDownload.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        btnDownload.setVisibility(View.GONE);
+                        pgDownload.setVisibility(View.VISIBLE);
+                        listener.onItemClickDownload(position);
                     }
                 }
             });

@@ -37,7 +37,7 @@ public abstract class BaseRecycleViewAdapter extends RecyclerView.Adapter<BaseRe
 
     protected abstract View.OnClickListener getOnItemClickListener(int position);
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
         private final ViewDataBinding binding;
 
         public MyViewHolder(ViewDataBinding binding) {

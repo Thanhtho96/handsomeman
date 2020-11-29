@@ -16,9 +16,9 @@ import java.util.List;
 
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder> {
 
-    private Context context;
-    private List<PlaceResponse> placeResponseList;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<PlaceResponse> placeResponseList;
+    private final LayoutInflater inflater;
     private ItemPlaceBinding binding;
     private OnItemClickListener listener;
 
@@ -70,14 +70,11 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             primaryPlaceName = binding.primaryPlaceName;
             secondaryPlaceName = binding.secondaryPlaceName;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });

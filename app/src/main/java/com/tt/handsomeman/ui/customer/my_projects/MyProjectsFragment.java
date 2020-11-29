@@ -7,7 +7,6 @@ import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
@@ -16,14 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.FragmentMyProjectsBinding;
 import com.tt.handsomeman.model.Job;
-import com.tt.handsomeman.response.MyProjectList;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.viewmodel.CustomerViewModel;
@@ -34,14 +31,14 @@ import javax.inject.Inject;
 
 public class MyProjectsFragment extends BaseFragment<CustomerViewModel, FragmentMyProjectsBinding> {
 
+    final MutableLiveData<List<Job>> inProgressList = new MutableLiveData<>();
+    final MutableLiveData<List<Job>> inPastList = new MutableLiveData<>();
+    private final Fragment childInProgressFragment = new CustomerMyProjectsChildInProgressFragment();
+    private final Fragment childInPastFragment = new MyProjectsChildInPastFragment();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-    MutableLiveData<List<Job>> inProgressList = new MutableLiveData<>();
-    MutableLiveData<List<Job>> inPastList = new MutableLiveData<>();
-    private Fragment childInProgressFragment = new CustomerMyProjectsChildInProgressFragment();
-    private Fragment childInPastFragment = new MyProjectsChildInPastFragment();
     private Fragment active = childInProgressFragment;
     private EditText edtSearchByWord;
 
@@ -68,25 +65,17 @@ public class MyProjectsFragment extends BaseFragment<CustomerViewModel, Fragment
 
         setEditTextHintTextAndIcon();
 
-        rdInProgress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(childInProgressFragment).commit();
-                    active = childInProgressFragment;
-                }
+        rdInProgress.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(childInProgressFragment).commit();
+                active = childInProgressFragment;
             }
         });
 
-        rdInPast.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    fm.beginTransaction().hide(active).show(childInPastFragment).commit();
-                    active = childInPastFragment;
-                }
+        rdInPast.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                fm.beginTransaction().hide(active).show(childInPastFragment).commit();
+                active = childInPastFragment;
             }
         });
 
@@ -94,15 +83,11 @@ public class MyProjectsFragment extends BaseFragment<CustomerViewModel, Fragment
     }
 
     void fetchData() {
-        String authorization = sharedPreferencesUtils.get("token", String.class);
 
-        baseViewModel.fetchJobsOfCustomer(authorization);
-        baseViewModel.getMyProjectListMutableLiveData().observe(getViewLifecycleOwner(), new Observer<MyProjectList>() {
-            @Override
-            public void onChanged(MyProjectList myProjectList) {
-                inProgressList.setValue(myProjectList.getInProgressList());
-                inPastList.setValue(myProjectList.getInPastList());
-            }
+        baseViewModel.fetchJobsOfCustomer();
+        baseViewModel.getMyProjectListMutableLiveData().observe(getViewLifecycleOwner(), myProjectList -> {
+            inProgressList.setValue(myProjectList.getInProgressList());
+            inPastList.setValue(myProjectList.getInPastList());
         });
     }
 

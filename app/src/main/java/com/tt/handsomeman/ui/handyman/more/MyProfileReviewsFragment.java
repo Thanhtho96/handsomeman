@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.HandymanReviewAdapter;
 import com.tt.handsomeman.databinding.FragmentMyProfileReviewsBinding;
-import com.tt.handsomeman.response.HandymanReviewProfile;
 import com.tt.handsomeman.response.HandymanReviewResponse;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
@@ -33,6 +31,7 @@ import javax.inject.Inject;
 
 public class MyProfileReviewsFragment extends BaseFragment<HandymanViewModel, FragmentMyProfileReviewsBinding> {
 
+    private final List<HandymanReviewResponse> handymanReviewResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -40,11 +39,10 @@ public class MyProfileReviewsFragment extends BaseFragment<HandymanViewModel, Fr
     private TextView countReviewers;
     private RatingBar rtCountPoint;
     private HandymanReviewAdapter handymanReviewAdapter;
-    private List<HandymanReviewResponse> handymanReviewResponseList = new ArrayList<>();
     private String authorizationCode;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -76,17 +74,14 @@ public class MyProfileReviewsFragment extends BaseFragment<HandymanViewModel, Fr
     }
 
     private void fetchData() {
-        baseViewModel.fetchHandymanReview(authorizationCode);
-        baseViewModel.getHandymanReviewProfileLiveData().observe(getViewLifecycleOwner(), new Observer<HandymanReviewProfile>() {
-            @Override
-            public void onChanged(HandymanReviewProfile handymanReviewProfile) {
-                countReviewers.setText(getResources().getQuantityString(R.plurals.numberOfReview, handymanReviewProfile.getCountReviewers(), handymanReviewProfile.getCountReviewers()));
-                rtCountPoint.setRating(handymanReviewProfile.getAverageReviewPoint());
+        baseViewModel.fetchHandymanReview();
+        baseViewModel.getHandymanReviewProfileLiveData().observe(getViewLifecycleOwner(), handymanReviewProfile -> {
+            countReviewers.setText(getResources().getQuantityString(R.plurals.numberOfReview, handymanReviewProfile.getCountReviewers(), handymanReviewProfile.getCountReviewers()));
+            rtCountPoint.setRating(handymanReviewProfile.getAverageReviewPoint());
 
-                handymanReviewResponseList.clear();
-                handymanReviewResponseList.addAll(handymanReviewProfile.getHandymanReviewResponseList());
-                handymanReviewAdapter.notifyDataSetChanged();
-            }
+            handymanReviewResponseList.clear();
+            handymanReviewResponseList.addAll(handymanReviewProfile.getHandymanReviewResponseList());
+            handymanReviewAdapter.notifyDataSetChanged();
         });
     }
 }

@@ -8,7 +8,7 @@ import com.tt.handsomeman.model.AddJobFirstFormState;
 
 public class AddJobFirstFormViewModel extends ViewModel {
 
-    private MutableLiveData<AddJobFirstFormState> formStateMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<AddJobFirstFormState> formStateMutableLiveData = new MutableLiveData<>();
 
     public MutableLiveData<AddJobFirstFormState> getFormStateMutableLiveData() {
         return formStateMutableLiveData;

@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,13 +29,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class YourLocation extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
+    private final List<Job> jobArrayList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-
     private JobFilterAdapter jobAdapter;
-    private List<Job> jobArrayList = new ArrayList<>();
     private ProgressBar pgJob;
     private ImageButton btnFilter;
     private ActivityYourLocationBinding binding;
@@ -59,42 +57,24 @@ public class YourLocation extends BaseAppCompatActivityWithViewModel<HandymanVie
 
         createJobRecycleView();
 
-        Constants.Longitude.observe(this, new Observer<Double>() {
-            @Override
-            public void onChanged(Double aDouble) {
-                fetchData(Constants.Latitude.getValue(), aDouble);
-            }
-        });
+        Constants.Longitude.observe(this, aDouble -> fetchData(Constants.Latitude.getValue(), aDouble));
     }
 
     private void navigateToFilter() {
-        btnFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(YourLocation.this, JobFilter.class));
-            }
-        });
+        btnFilter.setOnClickListener(view -> startActivity(new Intent(YourLocation.this, JobFilter.class)));
     }
 
     private void backPreviousActivity() {
-        binding.yourLocationBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.yourLocationBackButton.setOnClickListener(view -> onBackPressed());
     }
 
     private void createJobRecycleView() {
         RecyclerView rcvJob = binding.recycleViewJobsYourLocation;
         jobAdapter = new JobFilterAdapter(this, jobArrayList);
-        jobAdapter.setOnItemClickListener(new JobFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(YourLocation.this, JobDetail.class);
-                intent.putExtra("jobId", jobArrayList.get(position).getId());
-                startActivity(intent);
-            }
+        jobAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(YourLocation.this, JobDetail.class);
+            intent.putExtra("jobId", jobArrayList.get(position).getId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvJob.setLayoutManager(layoutManagerJob);
@@ -106,11 +86,10 @@ public class YourLocation extends BaseAppCompatActivityWithViewModel<HandymanVie
 
     private void fetchData(Double lat,
                            Double lng) {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
 
         double radius = 10d;
 
-        baseViewModel.fetchYourLocationData(authorizationCode, new NearbyJobRequest(lat, lng, radius));
+        baseViewModel.fetchYourLocationData(new NearbyJobRequest(lat, lng, radius));
 
         baseViewModel.getJobLiveData().observe(this, data -> {
             pgJob.setVisibility(View.GONE);

@@ -2,7 +2,6 @@ package com.tt.handsomeman.ui.customer.more;
 
 import android.os.Bundle;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,8 +12,6 @@ import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.CustomerTransferHistoryAdapter;
 import com.tt.handsomeman.databinding.ActivityCustomerTransferHistoryBinding;
 import com.tt.handsomeman.response.CustomerTransferHistoryResponse;
-import com.tt.handsomeman.response.DataBracketResponse;
-import com.tt.handsomeman.response.ListCustomerTransfer;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -27,12 +24,12 @@ import javax.inject.Inject;
 
 public class CustomerTransferHistory extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
+    private final List<CustomerTransferHistoryResponse> historyResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private CustomerTransferHistoryAdapter customerTransferHistoryAdapter;
-    private List<CustomerTransferHistoryResponse> historyResponseList = new ArrayList<>();
     private ActivityCustomerTransferHistoryBinding binding;
     private RecyclerView rcvTransferHistory;
     private String authorizationCode;
@@ -68,14 +65,11 @@ public class CustomerTransferHistory extends BaseAppCompatActivityWithViewModel<
     }
 
     private void fetchData() {
-        baseViewModel.fetchTransferHistory(authorizationCode);
-        baseViewModel.getListTransferHistoryLiveData().observe(this, new Observer<DataBracketResponse<ListCustomerTransfer>>() {
-            @Override
-            public void onChanged(DataBracketResponse<ListCustomerTransfer> listCustomerTransferDataBracketResponse) {
-                historyResponseList.clear();
-                historyResponseList.addAll(listCustomerTransferDataBracketResponse.getData().getCustomerTransferHistoryList());
-                customerTransferHistoryAdapter.notifyDataSetChanged();
-            }
+        baseViewModel.fetchTransferHistory();
+        baseViewModel.getListTransferHistoryLiveData().observe(this, listCustomerTransferDataBracketResponse -> {
+            historyResponseList.clear();
+            historyResponseList.addAll(listCustomerTransferDataBracketResponse.getData().getCustomerTransferHistoryList());
+            customerTransferHistoryAdapter.notifyDataSetChanged();
         });
     }
 }

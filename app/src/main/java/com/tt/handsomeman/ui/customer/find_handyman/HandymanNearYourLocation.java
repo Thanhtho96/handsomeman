@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +32,7 @@ import javax.inject.Inject;
 
 public class HandymanNearYourLocation extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
 
+    private final List<HandymanResponse> handymanResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -40,7 +40,6 @@ public class HandymanNearYourLocation extends BaseAppCompatActivityWithViewModel
     private ActivityHandymanNearYourLocationBinding binding;
     private ProgressBar pgHandyman;
     private FindHandymanFilterAdapter findHandymanfilterAdapter;
-    private List<HandymanResponse> handymanResponseList = new ArrayList<>();
     private String authorizationCode;
 
     @Override
@@ -57,12 +56,7 @@ public class HandymanNearYourLocation extends BaseAppCompatActivityWithViewModel
         backPreviousActivity();
         createJobRecycleView();
 
-        Constants.Latitude.observe(this, new Observer<Double>() {
-            @Override
-            public void onChanged(Double aDouble) {
-                fetchData(aDouble, Constants.Longitude.getValue());
-            }
-        });
+        Constants.Latitude.observe(this, aDouble -> fetchData(aDouble, Constants.Longitude.getValue()));
     }
 
     private void fetchData(Double lat,
@@ -72,7 +66,7 @@ public class HandymanNearYourLocation extends BaseAppCompatActivityWithViewModel
         String dateRequest = formatter.format(now.getTime());
         double radius = 10d;
 
-        baseViewModel.fetHandymanNearby(authorizationCode, new NearbyHandymanRequest(lat, lng, radius, dateRequest));
+        baseViewModel.fetHandymanNearby(new NearbyHandymanRequest(lat, lng, radius, dateRequest));
 
         baseViewModel.getNearbyHandymanResponseMutableLiveData().observe(this, data -> {
             pgHandyman.setVisibility(View.GONE);
@@ -85,13 +79,10 @@ public class HandymanNearYourLocation extends BaseAppCompatActivityWithViewModel
     private void createJobRecycleView() {
         RecyclerView rcvHandyman = binding.recycleViewHandymanYourLocation;
         findHandymanfilterAdapter = new FindHandymanFilterAdapter(this, handymanResponseList, authorizationCode);
-        findHandymanfilterAdapter.setOnItemClickListener(new FindHandymanFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(HandymanNearYourLocation.this, HandymanDetail.class);
-                intent.putExtra("handymanId", handymanResponseList.get(position).getHandymanId());
-                startActivity(intent);
-            }
+        findHandymanfilterAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(HandymanNearYourLocation.this, HandymanDetail.class);
+            intent.putExtra("handymanId", handymanResponseList.get(position).getHandymanId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvHandyman.setLayoutManager(layoutManagerJob);
@@ -101,11 +92,6 @@ public class HandymanNearYourLocation extends BaseAppCompatActivityWithViewModel
     }
 
     private void backPreviousActivity() {
-        binding.yourLocationBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.yourLocationBackButton.setOnClickListener(view -> onBackPressed());
     }
 }

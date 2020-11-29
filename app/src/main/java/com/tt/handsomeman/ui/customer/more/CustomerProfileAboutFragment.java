@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
@@ -24,8 +23,6 @@ import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.FragmentCustomerProfileAboutBinding;
 import com.tt.handsomeman.model.Customer;
-import com.tt.handsomeman.response.CustomerProfileResponse;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.AvatarOptionDialogFragment;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.ui.MyProfile;
@@ -60,7 +57,7 @@ public class CustomerProfileAboutFragment extends BaseFragment<CustomerViewModel
     private long updateDate = 0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -80,38 +77,33 @@ public class CustomerProfileAboutFragment extends BaseFragment<CustomerViewModel
 
         fetchCustomerProfile();
 
-        imgAvatar.setOnClickListener(v -> {
-            AvatarOptionDialogFragment.newInstance().show(getChildFragmentManager(), "avatar_option");
-        });
+        imgAvatar.setOnClickListener(v -> AvatarOptionDialogFragment.newInstance().show(getChildFragmentManager(), "avatar_option"));
     }
 
     private void fetchCustomerProfile() {
         authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchCustomerProfile(authorizationCode);
-        baseViewModel.getCustomerProfileResponseMutableLiveData().observe(getViewLifecycleOwner(), new Observer<CustomerProfileResponse>() {
-            @Override
-            public void onChanged(CustomerProfileResponse customerProfileResponse) {
-                Customer customer = customerProfileResponse.getCustomer();
+        baseViewModel.fetchCustomerProfile();
+        baseViewModel.getCustomerProfileResponseMutableLiveData().observe(getViewLifecycleOwner(), customerProfileResponse -> {
+            Customer customer = customerProfileResponse.getCustomer();
 
-                avatarLink = customerProfileResponse.getAvatar();
-                updateDate = customerProfileResponse.getUpdateDate();
+            avatarLink = customerProfileResponse.getAvatar();
+            updateDate = customerProfileResponse.getUpdateDate();
 
-                GlideUrl glideUrl = new GlideUrl((customerProfileResponse.getAvatar()),
-                        new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
+            GlideUrl glideUrl = new GlideUrl((customerProfileResponse.getAvatar()),
+                    new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
 
-                Glide.with(CustomerProfileAboutFragment.this)
-                        .load(glideUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .circleCrop()
-                        .placeholder(R.drawable.custom_progressbar)
-                        .error(R.drawable.logo)
-                        .signature(new MediaStoreSignature("", customerProfileResponse.getUpdateDate(), 0))
-                        .into(imgAvatar);
+            Glide.with(CustomerProfileAboutFragment.this)
+                    .load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .placeholder(R.drawable.custom_progressbar)
+                    .error(R.drawable.logo)
+                    .signature(new MediaStoreSignature("", customerProfileResponse.getUpdateDate(), 0))
+                    .into(imgAvatar);
 
-                yourName.setText(customer.getName());
-                allProjects.setText(String.valueOf(customerProfileResponse.getAllProject()));
-                successedProject.setText(String.valueOf(customerProfileResponse.getSuccessedProject()));
-            }
+            yourName.setText(customer.getName());
+            allProjects.setText(String.valueOf(customerProfileResponse.getAllProject()));
+            successedProject.setText(String.valueOf(customerProfileResponse.getSuccessedProject()));
         });
     }
 
@@ -129,18 +121,15 @@ public class CustomerProfileAboutFragment extends BaseFragment<CustomerViewModel
             RequestBody requestFile = RequestBody.create(file, MediaType.parse(mimeType));
             body = MultipartBody.Part.createFormData("avatar", file.getName(), requestFile);
 
-            baseViewModel.updateAvatar(authorizationCode, body, updateDate);
-            baseViewModel.getStandardResponseMutableLiveData().observe(this, new Observer<StandardResponse>() {
-                @Override
-                public void onChanged(StandardResponse standardResponse) {
-                    Toast.makeText(getContext(), standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                        isMyProfileEdit = true;
-                        MyProfile myProfile = (MyProfile) getActivity();
-                        myProfile.setMyProfileEditResult(isMyProfileEdit);
+            baseViewModel.updateAvatar(body, updateDate);
+            baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
+                Toast.makeText(getContext(), standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    isMyProfileEdit = true;
+                    MyProfile myProfile = (MyProfile) getActivity();
+                    myProfile.setMyProfileEditResult(isMyProfileEdit);
 
-                        fetchCustomerProfile();
-                    }
+                    fetchCustomerProfile();
                 }
             });
         }

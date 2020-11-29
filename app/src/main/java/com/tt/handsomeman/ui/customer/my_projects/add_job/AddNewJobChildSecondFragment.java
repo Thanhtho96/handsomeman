@@ -58,6 +58,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class AddNewJobChildSecondFragment extends Fragment {
 
+    private final List<PlaceResponse> placeResponseList = new ArrayList<>();
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private Spinner spDeadline;
@@ -67,7 +68,6 @@ public class AddNewJobChildSecondFragment extends Fragment {
     private GoogleMap mMap;
     private PlaceAdapter placeAdapter;
     private RecyclerView rcvPlace;
-    private List<PlaceResponse> placeResponseList = new ArrayList<>();
     private String[] deadlineOption;
     private Calendar myCalendar = Calendar.getInstance();
     private SimpleDateFormat sdf;

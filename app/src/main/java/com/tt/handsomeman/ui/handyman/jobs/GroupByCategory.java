@@ -31,12 +31,12 @@ import javax.inject.Inject;
 
 public class GroupByCategory extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
+    private final List<Job> jobArrayList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private JobFilterAdapter jobAdapter;
-    private List<Job> jobArrayList = new ArrayList<>();
     private ProgressBar pgJob;
     private TextView categoryName;
     private ImageButton btnFilter;
@@ -68,35 +68,24 @@ public class GroupByCategory extends BaseAppCompatActivityWithViewModel<Handyman
     }
 
     private void navigateToFilter() {
-        btnFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(GroupByCategory.this, JobFilter.class);
-                intent.putExtra("categoryId", getIntent().getIntExtra("categoryId", 0));
-                startActivity(intent);
-            }
+        btnFilter.setOnClickListener(view -> {
+            Intent intent = new Intent(GroupByCategory.this, JobFilter.class);
+            intent.putExtra("categoryId", getIntent().getIntExtra("categoryId", 0));
+            startActivity(intent);
         });
     }
 
     private void backPreviousActivity() {
-        binding.categoryBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.categoryBackButton.setOnClickListener(view -> onBackPressed());
     }
 
     private void createJobRecycleView() {
         RecyclerView rcvJob = binding.recycleViewJobsByCategory;
         jobAdapter = new JobFilterAdapter(this, jobArrayList);
-        jobAdapter.setOnItemClickListener(new JobFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(GroupByCategory.this, JobDetail.class);
-                intent.putExtra("jobId", jobArrayList.get(position).getId());
-                startActivity(intent);
-            }
+        jobAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(GroupByCategory.this, JobDetail.class);
+            intent.putExtra("jobId", jobArrayList.get(position).getId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvJob.setLayoutManager(layoutManagerJob);
@@ -107,9 +96,8 @@ public class GroupByCategory extends BaseAppCompatActivityWithViewModel<Handyman
 
 
     private void fetchData(Integer categoryId) {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
 
-        baseViewModel.fetchJobsByCategory(authorizationCode, categoryId, new NearbyJobRequest(Constants.Latitude.getValue(), Constants.Longitude.getValue(), 10));
+        baseViewModel.fetchJobsByCategory(categoryId, new NearbyJobRequest(Constants.Latitude.getValue(), Constants.Longitude.getValue(), 10));
 
         baseViewModel.getJobLiveData().observe(this, data -> {
             pgJob.setVisibility(View.GONE);

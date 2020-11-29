@@ -3,7 +3,6 @@ package com.tt.handsomeman.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 
@@ -69,56 +68,33 @@ public class MyProfile extends BaseAppCompatActivity {
         fm.beginTransaction().add(R.id.myProfileFragmentParent, reviewsFragment).hide(reviewsFragment).commit();
         fm.beginTransaction().add(R.id.myProfileFragmentParent, aboutFragment).commit();
 
-        rdAbout.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    ibEdit.setVisibility(View.VISIBLE);
-                    fm.beginTransaction().hide(active).show(aboutFragment).commit();
-                    active = aboutFragment;
-                }
+        rdAbout.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                ibEdit.setVisibility(View.VISIBLE);
+                fm.beginTransaction().hide(active).show(aboutFragment).commit();
+                active = aboutFragment;
             }
         });
 
-        rdReviews.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if (isChecked) {
-                    ibEdit.setVisibility(View.GONE);
-                    fm.beginTransaction().hide(active).show(reviewsFragment).commit();
-                    active = reviewsFragment;
-                }
+        rdReviews.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                ibEdit.setVisibility(View.GONE);
+                fm.beginTransaction().hide(active).show(reviewsFragment).commit();
+                active = reviewsFragment;
             }
         });
     }
 
     private void goBack() {
-        binding.myProfileBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        binding.myProfileBackButton.setOnClickListener(v -> onBackPressed());
     }
 
     private void editHandymanProfile() {
-        ibEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                aboutFragment.startActivityForResult(new Intent(MyProfile.this, MyProfileEdit.class), REQUEST_MY_PROFILE_RESULT_CODE);
-            }
-        });
+        ibEdit.setOnClickListener(v -> aboutFragment.startActivityForResult(new Intent(MyProfile.this, MyProfileEdit.class), REQUEST_MY_PROFILE_RESULT_CODE));
     }
 
     private void editCustomerProfile() {
-        ibEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                aboutFragment.startActivityForResult(new Intent(MyProfile.this, CustomerProfileEdit.class), REQUEST_MY_PROFILE_RESULT_CODE);
-            }
-        });
+        ibEdit.setOnClickListener(v -> aboutFragment.startActivityForResult(new Intent(MyProfile.this, CustomerProfileEdit.class), REQUEST_MY_PROFILE_RESULT_CODE));
     }
 
     public void setMyProfileEditResult(boolean isEdit) {

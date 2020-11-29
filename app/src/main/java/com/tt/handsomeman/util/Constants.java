@@ -79,9 +79,9 @@ public class Constants {
     public static final Integer NOT_ACTIVE_ACCOUNT = 1;
     public static final Integer STATE_REGISTER_ADDED_PAYOUT = 3;
 
-    public static MutableLiveData<Double> Latitude = new MutableLiveData<>();
-    public static MutableLiveData<Double> Longitude = new MutableLiveData<>();
-    public static MutableLiveData<String> language = new MutableLiveData<>();
+    public static final MutableLiveData<Double> Latitude = new MutableLiveData<>();
+    public static final MutableLiveData<Double> Longitude = new MutableLiveData<>();
+    public static final MutableLiveData<String> language = new MutableLiveData<>();
     public static MutableLiveData<PlacesClient> placesClientMutableLiveData = new MutableLiveData<>();
     public static MutableLiveData<AutocompleteSessionToken> autocompleteSessionTokenMutableLiveData = new MutableLiveData<>();
 

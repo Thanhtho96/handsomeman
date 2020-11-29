@@ -7,7 +7,7 @@ import com.tt.handsomeman.R;
 import com.tt.handsomeman.model.ChangePasswordFormState;
 
 public class ChangePasswordViewModel extends ViewModel {
-    private MutableLiveData<ChangePasswordFormState> changePasswordFormStateMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<ChangePasswordFormState> changePasswordFormStateMutableLiveData = new MutableLiveData<>();
 
     public MutableLiveData<ChangePasswordFormState> getChangePasswordFormStateMutableLiveData() {
         return changePasswordFormStateMutableLiveData;

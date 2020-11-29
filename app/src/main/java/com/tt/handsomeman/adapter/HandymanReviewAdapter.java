@@ -24,10 +24,10 @@ import java.util.List;
 
 public class HandymanReviewAdapter extends RecyclerView.Adapter<HandymanReviewAdapter.HandymanReviewViewHolder> {
 
-    private List<HandymanReviewResponse> handymanReviewResponseList;
-    private LayoutInflater layoutInflater;
-    private Context context;
-    private String authorizationCode;
+    private final List<HandymanReviewResponse> handymanReviewResponseList;
+    private final LayoutInflater layoutInflater;
+    private final Context context;
+    private final String authorizationCode;
     private ItemReviewBinding binding;
 
     public HandymanReviewAdapter(List<HandymanReviewResponse> handymanReviewResponseList,

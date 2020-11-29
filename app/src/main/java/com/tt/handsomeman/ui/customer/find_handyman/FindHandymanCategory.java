@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +32,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 public class FindHandymanCategory extends BaseAppCompatActivityWithViewModel<CustomerViewModel> {
+    private final List<HandymanResponse> handymanResponseList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -41,7 +41,6 @@ public class FindHandymanCategory extends BaseAppCompatActivityWithViewModel<Cus
     private TextView tvCategoryName;
     private ProgressBar pgHandyman;
     private FindHandymanFilterAdapter findHandymanFilterAdapter;
-    private List<HandymanResponse> handymanResponseList = new ArrayList<>();
     private String authorizationCode;
 
     @Override
@@ -62,12 +61,7 @@ public class FindHandymanCategory extends BaseAppCompatActivityWithViewModel<Cus
         Integer categoryId = getIntent().getIntExtra("categoryId", 0);
         String categoryNameIntent = getIntent().getStringExtra("categoryName");
         tvCategoryName.setText(categoryNameIntent);
-        Constants.Longitude.observe(this, new Observer<Double>() {
-            @Override
-            public void onChanged(Double aDouble) {
-                fetchData(Constants.Latitude.getValue(), aDouble, categoryId);
-            }
-        });
+        Constants.Longitude.observe(this, aDouble -> fetchData(Constants.Latitude.getValue(), aDouble, categoryId));
     }
 
     private void fetchData(Double lat,
@@ -78,7 +72,7 @@ public class FindHandymanCategory extends BaseAppCompatActivityWithViewModel<Cus
         String dateRequest = formatter.format(now.getTime());
         double radius = 10d;
 
-        baseViewModel.fetHandymanByCategory(authorizationCode, categoryId, new NearbyHandymanRequest(lat, lng, radius, dateRequest));
+        baseViewModel.fetHandymanByCategory(categoryId, new NearbyHandymanRequest(lat, lng, radius, dateRequest));
 
         baseViewModel.getNearbyHandymanResponseMutableLiveData().observe(this, data -> {
             pgHandyman.setVisibility(View.GONE);
@@ -91,13 +85,10 @@ public class FindHandymanCategory extends BaseAppCompatActivityWithViewModel<Cus
     private void createHandymanRecycleView() {
         RecyclerView rcvHandyman = binding.recycleViewHandymanByCategory;
         findHandymanFilterAdapter = new FindHandymanFilterAdapter(this, handymanResponseList, authorizationCode);
-        findHandymanFilterAdapter.setOnItemClickListener(new FindHandymanFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(FindHandymanCategory.this, HandymanDetail.class);
-                intent.putExtra("handymanId", handymanResponseList.get(position).getHandymanId());
-                startActivity(intent);
-            }
+        findHandymanFilterAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(FindHandymanCategory.this, HandymanDetail.class);
+            intent.putExtra("handymanId", handymanResponseList.get(position).getHandymanId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvHandyman.setLayoutManager(layoutManagerJob);
@@ -107,11 +98,6 @@ public class FindHandymanCategory extends BaseAppCompatActivityWithViewModel<Cus
     }
 
     private void backPreviousActivity() {
-        binding.categoryBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.categoryBackButton.setOnClickListener(view -> onBackPressed());
     }
 }

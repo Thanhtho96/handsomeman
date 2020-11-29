@@ -15,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -25,7 +24,6 @@ import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityBidJobDetailBinding;
 import com.tt.handsomeman.model.FileRequest;
 import com.tt.handsomeman.model.HandymanJobDetail;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.BaseFragmentActivity;
 import com.tt.handsomeman.ui.handyman.HandyManMainScreen;
 import com.tt.handsomeman.util.CustomViewPager;
@@ -96,76 +94,63 @@ public class BidJobDetail extends BaseFragmentActivity<HandymanViewModel, Activi
     }
 
     private void bidJob() {
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlphaAnimation inAnimation;
+        btnSubmit.setOnClickListener(v -> {
+            AlphaAnimation inAnimation;
 
-                progressBarHolder.bringToFront();
-                inAnimation = new AlphaAnimation(0f, 1f);
-                inAnimation.setDuration(300);
-                progressBarHolder.setAnimation(inAnimation);
-                progressBarHolder.setVisibility(View.VISIBLE);
+            progressBarHolder.bringToFront();
+            inAnimation = new AlphaAnimation(0f, 1f);
+            inAnimation.setDuration(300);
+            progressBarHolder.setAnimation(inAnimation);
+            progressBarHolder.setVisibility(View.VISIBLE);
 
-                btnSubmit.setEnabled(false);
+            btnSubmit.setEnabled(false);
 
-                Calendar now = Calendar.getInstance();
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault());
-                String sendTime = formatter.format(now.getTime());
+            Calendar now = Calendar.getInstance();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ZZ", Locale.getDefault());
+            String sendTime = formatter.format(now.getTime());
 
-                String authorizationCode = sharedPreferencesUtils.get("token", String.class);
+            RequestBody bid = RequestBody.create(jobBidRequest.getBid(), MultipartBody.FORM);
+            RequestBody description = RequestBody.create(jobBidRequest.getDescription(), MultipartBody.FORM);
+            RequestBody jobId = RequestBody.create(String.valueOf(handymanJobDetail.getJob().getId()), MultipartBody.FORM);
+            RequestBody serviceFee = RequestBody.create(jobBidRequest.getServiceFee(), MultipartBody.FORM);
+            RequestBody bidTime = RequestBody.create(sendTime, MultipartBody.FORM);
 
-                RequestBody bid = RequestBody.create(jobBidRequest.getBid(), MultipartBody.FORM);
-                RequestBody description = RequestBody.create(jobBidRequest.getDescription(), MultipartBody.FORM);
-                RequestBody jobId = RequestBody.create(String.valueOf(handymanJobDetail.getJob().getId()), MultipartBody.FORM);
-                RequestBody serviceFee = RequestBody.create(jobBidRequest.getServiceFee(), MultipartBody.FORM);
-                RequestBody bidTime = RequestBody.create(sendTime, MultipartBody.FORM);
+            List<MultipartBody.Part> body = new ArrayList<>();
+            List<RequestBody> md5List = new ArrayList<>();
 
-                List<MultipartBody.Part> body = new ArrayList<>();
-                List<RequestBody> md5List = new ArrayList<>();
-
-                for (FileRequest fileRequest : jobBidRequest.getFileRequestList()) {
-                    File file = new File(fileRequest.getFileDir());
-                    if (file.exists()) {
-                        String mimeType = URLConnection.guessContentTypeFromName(file.getName());
-                        RequestBody requestFile = RequestBody.create(file, MediaType.parse(mimeType));
-                        body.add(MultipartBody.Part.createFormData("files", file.getName(), requestFile));
-                        md5List.add(RequestBody.create(fileRequest.getMd5(), MultipartBody.FORM));
-                    }
+            for (FileRequest fileRequest : jobBidRequest.getFileRequestList()) {
+                File file = new File(fileRequest.getFileDir());
+                if (file.exists()) {
+                    String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+                    RequestBody requestFile = RequestBody.create(file, MediaType.parse(mimeType));
+                    body.add(MultipartBody.Part.createFormData("files", file.getName(), requestFile));
+                    md5List.add(RequestBody.create(fileRequest.getMd5(), MultipartBody.FORM));
                 }
-
-                baseViewModel.addJobBid(authorizationCode, bid, description, body, jobId, serviceFee, bidTime, md5List);
-                baseViewModel.getStandardResponseMutableLiveData().observe(BidJobDetail.this, new Observer<StandardResponse>() {
-                    @Override
-                    public void onChanged(StandardResponse standardResponse) {
-                        Toast.makeText(BidJobDetail.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                        if (standardResponse.getStatusCode().equals(StatusCodeConstant.CREATED)) {
-                            Intent intent = new Intent(BidJobDetail.this, HandyManMainScreen.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.putExtra("radioButtonChoice", 1);
-                            startActivity(intent);
-                        }
-                        AlphaAnimation outAnimation;
-
-                        outAnimation = new AlphaAnimation(1f, 0f);
-                        outAnimation.setDuration(200);
-                        progressBarHolder.setAnimation(outAnimation);
-                        progressBarHolder.setVisibility(View.GONE);
-
-                        btnSubmit.setEnabled(true);
-                    }
-                });
             }
+
+            baseViewModel.addJobBid(bid, description, body, jobId, serviceFee, bidTime, md5List);
+            baseViewModel.getStandardResponseMutableLiveData().observe(BidJobDetail.this, standardResponse -> {
+                Toast.makeText(BidJobDetail.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatusCode().equals(StatusCodeConstant.CREATED)) {
+                    Intent intent = new Intent(BidJobDetail.this, HandyManMainScreen.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("radioButtonChoice", 1);
+                    startActivity(intent);
+                }
+                AlphaAnimation outAnimation;
+
+                outAnimation = new AlphaAnimation(1f, 0f);
+                outAnimation.setDuration(200);
+                progressBarHolder.setAnimation(outAnimation);
+                progressBarHolder.setVisibility(View.GONE);
+
+                btnSubmit.setEnabled(true);
+            });
         });
     }
 
     private void goBackward() {
-        viewBinding.bidJobDetailBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        viewBinding.bidJobDetailBackButton.setOnClickListener(v -> onBackPressed());
     }
 
     private void bindView() {

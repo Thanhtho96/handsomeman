@@ -2,7 +2,6 @@ package com.tt.handsomeman.ui.handyman.jobs;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -59,22 +58,19 @@ public class JobFilter extends BaseAppCompatActivity {
 
         generateCreateTimeSpinner();
 
-        btnCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                radius = skDistance.getProgress();
-                priceMin = (int) rgPrice.getLeftSeekBar().getProgress();
-                priceMax = (int) rgPrice.getRightSeekBar().getProgress();
-                getCreatedDate();
+        btnCheck.setOnClickListener(v -> {
+            radius = skDistance.getProgress();
+            priceMin = (int) rgPrice.getLeftSeekBar().getProgress();
+            priceMax = (int) rgPrice.getRightSeekBar().getProgress();
+            getCreatedDate();
 
-                Intent intent = new Intent(JobFilter.this, JobFilterResult.class);
-                intent.putExtra("radius", radius);
-                intent.putExtra("priceMin", priceMin);
-                intent.putExtra("priceMax", priceMax);
-                intent.putExtra("dateCreated", dateCreated);
-                intent.putExtra("categoryId", getIntent().getIntExtra("categoryId", 0));
-                startActivity(intent);
-            }
+            Intent intent = new Intent(JobFilter.this, JobFilterResult.class);
+            intent.putExtra("radius", radius);
+            intent.putExtra("priceMin", priceMin);
+            intent.putExtra("priceMax", priceMax);
+            intent.putExtra("dateCreated", dateCreated);
+            intent.putExtra("categoryId", getIntent().getIntExtra("categoryId", 0));
+            startActivity(intent);
         });
     }
 
@@ -113,12 +109,7 @@ public class JobFilter extends BaseAppCompatActivity {
     }
 
     private void backPreviousScreen() {
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        btnClose.setOnClickListener(v -> onBackPressed());
     }
 
     private void seekBarDistance() {
@@ -129,7 +120,7 @@ public class JobFilter extends BaseAppCompatActivity {
                                           boolean b) {
                 int val = (progress * (seekBar.getWidth() - 20 * seekBar.getThumbOffset())) / seekBar.getMax();
                 tvDistance.setText(progress + " km");
-                tvDistance.setX(seekBar.getX() + val + seekBar.getThumbOffset() / 2);
+                tvDistance.setX(seekBar.getX() + val + seekBar.getThumbOffset() / 2f);
             }
 
             @Override

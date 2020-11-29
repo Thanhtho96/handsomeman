@@ -41,6 +41,7 @@ import javax.inject.Inject;
 
 public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel, FragmentAddNewJobChildFirstBinding> {
 
+    private final List<Category> categoryList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -55,7 +56,6 @@ public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel,
     private String[] paymentMilestone, paymentMilestonePercentages;
     private CategorySelectionAdapter categorySelectionAdapter;
     private AddJobRequest addJobRequest;
-    private List<Category> categoryList = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -278,8 +278,7 @@ public class AddNewJobChildFirstFragment extends BaseFragment<CustomerViewModel,
     }
 
     private void getListCategory() {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchListCategory(authorizationCode);
+        baseViewModel.fetchListCategory();
         baseViewModel.getListCategoryMutableLiveData().observe(getViewLifecycleOwner(), listCategory -> {
             categoryList.clear();
             categoryList.addAll(listCategory.getCategoryList());

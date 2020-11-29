@@ -63,9 +63,7 @@ public class BidJobLetterFragment extends Fragment {
         bindView();
         createRecyclerView();
 
-        ibAttachFile.setOnClickListener(v -> {
-            startFileChooser();
-        });
+        ibAttachFile.setOnClickListener(v -> startFileChooser());
 
         edtIntroduce.addTextChangedListener(new TextWatcher() {
             @Override
@@ -96,13 +94,10 @@ public class BidJobLetterFragment extends Fragment {
             }
         });
 
-        ibCheckButtonLetter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                jobBidRequest.setDescription(edtIntroduce.getText().toString().trim());
+        ibCheckButtonLetter.setOnClickListener(v -> {
+            jobBidRequest.setDescription(edtIntroduce.getText().toString().trim());
 
-                mPager.setCurrentItem(mPager.getCurrentItem() + 1);
-            }
+            mPager.setCurrentItem(mPager.getCurrentItem() + 1);
         });
     }
 
@@ -216,14 +211,11 @@ public class BidJobLetterFragment extends Fragment {
             // and the user would benefit from additional context for the use of the permission.
             // Display a SnackBar with cda button to request the missing permission.
             Snackbar.make(binding.container, getString(R.string.need_permission),
-                    Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.grant_permisstion), new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Request the permission
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            PERMISSION_REQUEST_READ_STORAGE);
-                }
+                    Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.grant_permisstion), view -> {
+                // Request the permission
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        PERMISSION_REQUEST_READ_STORAGE);
             }).show();
 
         } else {

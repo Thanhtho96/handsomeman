@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
@@ -24,7 +23,6 @@ import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.signature.MediaStoreSignature;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -35,7 +33,6 @@ import com.tt.handsomeman.model.CustomerResponse;
 import com.tt.handsomeman.model.HandymanJobDetail;
 import com.tt.handsomeman.model.Job;
 import com.tt.handsomeman.model.PaymentMilestone;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.handyman.ViewJobTransaction;
 import com.tt.handsomeman.ui.handyman.jobs.bid_job_detail.BidJobDetail;
@@ -59,7 +56,7 @@ public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewMo
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private ConstraintLayout container;
-    private ImageView imClientAvatar, imIsWish;
+    private ImageView imIsWish;
     private RatingBar rtReview;
     private TextView tvJobTitle, tvJobId, tvJobCreateTime, tvJobDetail,
             tvBudgetRange, tvJobDeadline, tvJobLocation,
@@ -112,7 +109,6 @@ public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewMo
         tvReviewCount = binding.reviewCountJobDetail;
         tvShowClientProfile = binding.showClientProfileJobDetail;
         tlMileStone = binding.paymentMileStoneTableLayoutJobDetail;
-        imClientAvatar = binding.clientAvatarJobDetail;
         imIsWish = binding.isWishListImage;
         btnPlaceABid = binding.buttonPlaceBidJobDetail;
         btnViewTransaction = binding.viewTransaction;
@@ -160,7 +156,7 @@ public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewMo
 
     private void fetchData(Integer jobId) {
         String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchHandymanJobDetail(authorizationCode, jobId);
+        baseViewModel.fetchHandymanJobDetail(jobId);
 
         baseViewModel.getJobDetailLiveData().observe(this, jobDetail -> {
             JobDetail.handymanJobDetail = jobDetail;
@@ -238,16 +234,13 @@ public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewMo
 
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    mMap = googleMap;
+            mapFragment.getMapAsync(googleMap -> {
+                mMap = googleMap;
 
-                    LatLng jobLocation = new LatLng(lat, lng);
-                    mMap.addMarker(new MarkerOptions().position(jobLocation).title(job.getLocation()));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
-                    mMap.getUiSettings().setScrollGesturesEnabled(false);
-                }
+                LatLng jobLocation = new LatLng(lat, lng);
+                mMap.addMarker(new MarkerOptions().position(jobLocation).title(job.getLocation()));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jobLocation, 15));
+                mMap.getUiSettings().setScrollGesturesEnabled(false);
             });
 
             if (jobDetail.isBid()) {
@@ -258,13 +251,9 @@ public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewMo
                 container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                 tvHired.setText(getString(R.string.yes));
                 btnViewTransaction.setVisibility(View.VISIBLE);
-                btnViewTransaction.setOnClickListener(v -> {
-                    viewJobTransaction(jobId);
-                });
+                btnViewTransaction.setOnClickListener(v -> viewJobTransaction(jobId));
                 ibSendMessage.setVisibility(View.VISIBLE);
-                ibSendMessage.setOnClickListener(v -> {
-                    sendMessage(jobDetail.getCustomer().getCustomerName(), jobDetail.getJob().getCustomerId());
-                });
+                ibSendMessage.setOnClickListener(v -> sendMessage(jobDetail.getCustomer().getCustomerName(), jobDetail.getJob().getCustomerId()));
             } else if (jobDetail.isBid()) {
                 tvHired.setText(getString(R.string.no));
             } else {
@@ -275,7 +264,7 @@ public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewMo
             }
 
             if (!isRead) {
-                markAsRead(notificationId, authorizationCode);
+                markAsRead(notificationId);
             }
             succeed = jobDetail.isSucceed();
         });
@@ -295,17 +284,13 @@ public class JobDetail extends BaseAppCompatActivityWithViewModel<HandymanViewMo
         startActivity(intent);
     }
 
-    private void markAsRead(Integer notificationId,
-                            String token) {
+    private void markAsRead(Integer notificationId) {
         if (!isRead) {
-            baseViewModel.markNotificationAsRead(token, notificationId);
-            baseViewModel.getStandardResponseMarkReadMutableLiveData().observe(this, new Observer<StandardResponse>() {
-                @Override
-                public void onChanged(StandardResponse standardResponse) {
-                    if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                        isRead = true;
-                        JobDetail.this.isReadForFirstTime = true;
-                    }
+            baseViewModel.markNotificationAsRead(notificationId);
+            baseViewModel.getStandardResponseMarkReadMutableLiveData().observe(this, standardResponse -> {
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    isRead = true;
+                    JobDetail.this.isReadForFirstTime = true;
                 }
             });
         }

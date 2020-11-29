@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,33 +59,15 @@ public class Register extends BaseAppCompatActivity {
                 break;
         }
 
-        binding.registerBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                register = null;
-                onBackPressed();
-            }
+        binding.registerBackButton.setOnClickListener(view -> {
+            register = null;
+            onBackPressed();
         });
 
-        binding.loginFBLinear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(Register.this, "Login Facebook", Toast.LENGTH_LONG).show();
-            }
-        });
+        binding.loginFBLinear.setOnClickListener(view -> Toast.makeText(Register.this, "Login Facebook", Toast.LENGTH_LONG).show());
 
-        binding.buttonRegisterLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(Register.this, Login.class));
-            }
-        });
+        binding.buttonRegisterLogin.setOnClickListener(view -> startActivity(new Intent(Register.this, Login.class)));
 
-        binding.buttonRegisterSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(Register.this, SignUp.class));
-            }
-        });
+        binding.buttonRegisterSignUp.setOnClickListener(view -> startActivity(new Intent(Register.this, SignUp.class)));
     }
 }

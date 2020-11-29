@@ -17,9 +17,9 @@ import java.util.List;
 
 public class FileDisplayAdapter extends RecyclerView.Adapter<FileDisplayAdapter.ViewHolder> {
 
-    private Context context;
-    private List<FileRequest> fileRequestNameList;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<FileRequest> fileRequestNameList;
+    private final LayoutInflater inflater;
     private ItemFileAddBinding binding;
 
     public FileDisplayAdapter(Context context,

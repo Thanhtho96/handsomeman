@@ -12,8 +12,8 @@ import com.tt.handsomeman.databinding.DialogNotificationBinding;
 
 public class NotificationDialog extends Dialog implements View.OnClickListener {
 
-    private String dialogDescription;
-    private OnItemClickListener mListener;
+    private final String dialogDescription;
+    private final OnItemClickListener mListener;
     private DialogNotificationBinding binding;
 
     public NotificationDialog(Activity activity,

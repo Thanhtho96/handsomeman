@@ -11,9 +11,9 @@ import com.tt.handsomeman.databinding.SpinnerItemStandardBinding;
 
 public class SpinnerString extends BaseAdapter {
 
-    private Context context;
-    private String[] str;
-    private LayoutInflater layoutInflater;
+    private final Context context;
+    private final String[] str;
+    private final LayoutInflater layoutInflater;
     private SpinnerItemStandardBinding binding;
 
     public SpinnerString(Context context,

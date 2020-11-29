@@ -32,27 +32,16 @@ public class ViewPayout extends BaseAppCompatActivityWithViewModel<UserViewModel
         HandymanApp.getComponent().inject(this);
         baseViewModel = new ViewModelProvider(this, viewModelFactory).get(UserViewModel.class);
 
-        binding.viewPayoutBackButton.setOnClickListener(view -> {
-            onBackPressed();
-        });
+        binding.viewPayoutBackButton.setOnClickListener(view -> onBackPressed());
 
         binding.textViewLastPayoutNumber.setText(getIntent().getStringExtra("lastPayoutNumber"));
 
-        binding.imageButtonDeletePayout.setOnClickListener(view -> {
-            new YesOrNoDialog(this, R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.sure_to_delete_payout, getIntent().getStringExtra("lastPayoutNumber")), R.drawable.dele, new YesOrNoDialog.OnItemClickListener() {
-                @Override
-                public void onItemClickYes() {
-                    delete(getIntent().getIntExtra("payoutId", 0));
-                }
-            }).show();
-
-        });
+        binding.imageButtonDeletePayout.setOnClickListener(view -> new YesOrNoDialog(this, R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.sure_to_delete_payout, getIntent().getStringExtra("lastPayoutNumber")), R.drawable.dele, () -> delete(getIntent().getIntExtra("payoutId", 0))).show());
     }
 
     private void delete(int payoutId) {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
 
-        baseViewModel.removePayout(authorizationCode, payoutId);
+        baseViewModel.removePayout(payoutId);
         baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
             Toast.makeText(this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
             if (standardResponse.getStatus().equals(StatusConstant.OK)) {

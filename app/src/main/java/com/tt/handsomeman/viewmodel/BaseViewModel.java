@@ -9,7 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import io.reactivex.disposables.CompositeDisposable;
 
 public abstract class BaseViewModel extends AndroidViewModel {
-    CompositeDisposable compositeDisposable;
+    final CompositeDisposable compositeDisposable;
 
     BaseViewModel(@NonNull Application application) {
         super(application);

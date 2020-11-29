@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,7 +24,6 @@ import com.tt.handsomeman.R;
 import com.tt.handsomeman.adapter.CustomerReviewAdapter;
 import com.tt.handsomeman.databinding.ActivityCustomerProfileJobDetailBinding;
 import com.tt.handsomeman.response.CustomerReviewResponse;
-import com.tt.handsomeman.response.JobDetailProfile;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.ui.handyman.HandymanReview;
 import com.tt.handsomeman.util.CustomDividerItemDecoration;
@@ -41,14 +39,12 @@ public class CustomerProfileJobDetail extends BaseAppCompatActivityWithViewModel
 
     private static final Integer REVIEW_REQUEST = 777;
     private static boolean reviewed;
-
+    private final List<CustomerReviewResponse> customerReviewResponses = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-
     private CustomerReviewAdapter customerReviewAdapter;
-    private List<CustomerReviewResponse> customerReviewResponses = new ArrayList<>();
     private ConstraintLayout container;
     private TextView customerName, customerAllProjectCount, customerSuccessedProject, countReviews;
     private RatingBar countPoint;
@@ -97,12 +93,7 @@ public class CustomerProfileJobDetail extends BaseAppCompatActivityWithViewModel
         countReviews = binding.reviewCountCustomerProfileJobDetail;
         countPoint = binding.ratingBarCustomerJobDetail;
         btnReview = binding.review;
-        binding.customerProfileJobDetailBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        binding.customerProfileJobDetailBackButton.setOnClickListener(v -> onBackPressed());
     }
 
     private void review() {
@@ -113,40 +104,35 @@ public class CustomerProfileJobDetail extends BaseAppCompatActivityWithViewModel
     }
 
     private void fetchData(Integer customerId) {
-        baseViewModel.fetchJobDetailProfile(authorizationCode, customerId);
-        baseViewModel.getJobDetailProfileLiveData().observe(this, new Observer<JobDetailProfile>() {
-            @Override
-            public void onChanged(JobDetailProfile jobDetailProfile) {
-                customerName.setText(jobDetailProfile.getCustomerName());
-                customerAllProjectCount.setText(String.valueOf(jobDetailProfile.getAllProject()));
-                customerSuccessedProject.setText(String.valueOf(jobDetailProfile.getSuccessedProject()));
-                countReviews.setText(getResources().getQuantityString(R.plurals.numberOfReview, jobDetailProfile.getCountReviewers(), jobDetailProfile.getCountReviewers()));
-                countPoint.setRating(jobDetailProfile.getAverageReviewPoint());
+        baseViewModel.fetchJobDetailProfile(customerId);
+        baseViewModel.getJobDetailProfileLiveData().observe(this, jobDetailProfile -> {
+            customerName.setText(jobDetailProfile.getCustomerName());
+            customerAllProjectCount.setText(String.valueOf(jobDetailProfile.getAllProject()));
+            customerSuccessedProject.setText(String.valueOf(jobDetailProfile.getSuccessedProject()));
+            countReviews.setText(getResources().getQuantityString(R.plurals.numberOfReview, jobDetailProfile.getCountReviewers(), jobDetailProfile.getCountReviewers()));
+            countPoint.setRating(jobDetailProfile.getAverageReviewPoint());
 
-                GlideUrl glideUrl = new GlideUrl((jobDetailProfile.getCustomerAvatar()),
-                        new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
+            GlideUrl glideUrl = new GlideUrl((jobDetailProfile.getCustomerAvatar()),
+                    new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
 
-                Glide.with(CustomerProfileJobDetail.this)
-                        .load(glideUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .circleCrop()
-                        .placeholder(R.drawable.custom_progressbar)
-                        .error(R.drawable.logo)
-                        .signature(new MediaStoreSignature("", jobDetailProfile.getUpdateDate(), 0))
-                        .into(binding.customerAvatarCustomerProfileJobDetail);
+            Glide.with(CustomerProfileJobDetail.this)
+                    .load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .placeholder(R.drawable.custom_progressbar)
+                    .error(R.drawable.logo)
+                    .signature(new MediaStoreSignature("", jobDetailProfile.getUpdateDate(), 0))
+                    .into(binding.customerAvatarCustomerProfileJobDetail);
 
-                customerReviewResponses.clear();
-                customerReviewResponses.addAll(jobDetailProfile.getCustomerReviewResponses());
-                customerReviewAdapter.notifyDataSetChanged();
+            customerReviewResponses.clear();
+            customerReviewResponses.addAll(jobDetailProfile.getCustomerReviewResponses());
+            customerReviewAdapter.notifyDataSetChanged();
 
-                boolean succeed = getIntent().getBooleanExtra("succeed", false);
-                if (succeed) {
-                    container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    btnReview.setVisibility(View.VISIBLE);
-                    btnReview.setOnClickListener(v -> {
-                        review();
-                    });
-                }
+            boolean succeed = getIntent().getBooleanExtra("succeed", false);
+            if (succeed) {
+                container.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                btnReview.setVisibility(View.VISIBLE);
+                btnReview.setOnClickListener(v -> review());
             }
         });
     }

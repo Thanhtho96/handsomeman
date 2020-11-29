@@ -71,7 +71,7 @@ public class AddNewJob extends BaseFragmentActivity<CustomerViewModel, ActivityA
             String token = sharedPreferencesUtils.get("token", String.class);
             addJobRequest.setCreateTime(simpleDateFormat.format(now.getTime()));
 
-            baseViewModel.addNewJob(token, addJobRequest);
+            baseViewModel.addNewJob(addJobRequest);
             baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
                 Toast.makeText(AddNewJob.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
                 if (standardResponse.getStatus().equals(StatusConstant.OK)) {

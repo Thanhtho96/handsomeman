@@ -30,11 +30,11 @@ import javax.inject.Inject;
 
 public class ViewJobTransaction extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
+    private final List<PaymentPaid> paymentPaidList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
-    private List<PaymentPaid> paymentPaidList = new ArrayList<>();
     private PaymentMilestoneAdapter paymentMilestoneAdapter;
     private TextView jobTitle, totalBalance, willReceive, haveReceive, fee, bonus;
     private LinearLayout layoutBonus;
@@ -59,7 +59,7 @@ public class ViewJobTransaction extends BaseAppCompatActivityWithViewModel<Handy
     }
 
     private void fetchData(int jobId) {
-        baseViewModel.fetchJobTransactionDetail(sharedPreferencesUtils.get("token", String.class), jobId);
+        baseViewModel.fetchJobTransactionDetail(jobId);
         baseViewModel.getJobTransactionLiveData().observe(this, transactionDetailResponseDataBracketResponse -> {
             TransactionDetailResponse transactionDetailResponse = transactionDetailResponseDataBracketResponse.getData();
             jobTitle.setText(transactionDetailResponse.getJobTitle());

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -62,13 +61,12 @@ public class ChangePassword extends BaseAppCompatActivityWithViewModel<UserViewM
 
     private void doChangePassword() {
         ibChangePassword.setEnabled(false);
-        String authorization = sharedPreferencesUtils.get("token", String.class);
 
         String currentPassword = edtCurrentPassword.getText().toString().trim();
         String newPassword = edtNewPassword.getText().toString().trim();
         String rePassword = edtRePassword.getText().toString().trim();
 
-        baseViewModel.changePassword(authorization, new ChangePasswordRequest(currentPassword, newPassword, rePassword));
+        baseViewModel.changePassword(new ChangePasswordRequest(currentPassword, newPassword, rePassword));
         baseViewModel.getStandardResponseMutableLiveData().observe(this, standardResponse -> {
             Toast.makeText(this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
             if (standardResponse.getStatus().equals(StatusConstant.OK)) {
@@ -86,40 +84,31 @@ public class ChangePassword extends BaseAppCompatActivityWithViewModel<UserViewM
                                 EditText edtCurrentPassword,
                                 EditText edtNewPassword,
                                 EditText edtRePassword) {
-        cbCurrentPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cbCurrentPassword.isChecked()) {
-                    edtCurrentPassword.setTransformationMethod(null);
-                } else {
-                    edtCurrentPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
-                edtCurrentPassword.setSelection(edtCurrentPassword.length());
+        cbCurrentPassword.setOnClickListener(view -> {
+            if (cbCurrentPassword.isChecked()) {
+                edtCurrentPassword.setTransformationMethod(null);
+            } else {
+                edtCurrentPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+            edtCurrentPassword.setSelection(edtCurrentPassword.length());
         });
 
-        cbNewPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cbNewPassword.isChecked()) {
-                    edtNewPassword.setTransformationMethod(null);
-                } else {
-                    edtNewPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
-                edtNewPassword.setSelection(edtNewPassword.length());
+        cbNewPassword.setOnClickListener(view -> {
+            if (cbNewPassword.isChecked()) {
+                edtNewPassword.setTransformationMethod(null);
+            } else {
+                edtNewPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+            edtNewPassword.setSelection(edtNewPassword.length());
         });
 
-        cbRePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cbRePassword.isChecked()) {
-                    edtRePassword.setTransformationMethod(null);
-                } else {
-                    edtRePassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
-                edtRePassword.setSelection(edtRePassword.length());
+        cbRePassword.setOnClickListener(view -> {
+            if (cbRePassword.isChecked()) {
+                edtRePassword.setTransformationMethod(null);
+            } else {
+                edtRePassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+            edtRePassword.setSelection(edtRePassword.length());
         });
     }
 

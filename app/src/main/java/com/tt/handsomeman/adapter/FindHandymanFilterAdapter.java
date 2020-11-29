@@ -27,10 +27,10 @@ import java.util.List;
 
 public class FindHandymanFilterAdapter extends RecyclerView.Adapter<FindHandymanFilterAdapter.FindHandymanFilterViewHolder> {
 
-    private Context context;
-    private List<HandymanResponse> handymanResponseList;
-    private LayoutInflater inflater;
-    private String authorizationCode;
+    private final Context context;
+    private final List<HandymanResponse> handymanResponseList;
+    private final LayoutInflater inflater;
+    private final String authorizationCode;
     private OnItemClickListener mListener;
     private ItemHandymanFilterBinding binding;
 
@@ -103,26 +103,20 @@ public class FindHandymanFilterAdapter extends RecyclerView.Adapter<FindHandyman
             rtHandymanReviewPoint = binding.ratingBarReviewHandymanItem;
             ibViewHandymanDetail = binding.imageButtonHandymanDetail;
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            itemView.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });
 
-            ibViewHandymanDetail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
+            ibViewHandymanDetail.setOnClickListener(view -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
                     }
                 }
             });

@@ -36,9 +36,7 @@ public class AvatarOptionDialogFragment extends BottomSheetDialogFragment {
                               @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.changeAvatar.setOnClickListener(v -> {
-            ChangeAvatarOptionFragment.newInstance().show(getChildFragmentManager(), "change_avatar");
-        });
+        binding.changeAvatar.setOnClickListener(v -> ChangeAvatarOptionFragment.newInstance().show(getChildFragmentManager(), "change_avatar"));
 
         binding.cancel.setOnClickListener(v -> dismiss());
 

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,12 +29,12 @@ import javax.inject.Inject;
 
 public class JobFilterResult extends BaseAppCompatActivityWithViewModel<HandymanViewModel> {
 
+    private final List<Job> jobArrayList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
     SharedPreferencesUtils sharedPreferencesUtils;
     private JobFilterAdapter jobAdapter;
-    private List<Job> jobArrayList = new ArrayList<>();
     private ProgressBar pgJob;
     private ActivityFilterResultBinding binding;
 
@@ -60,33 +59,20 @@ public class JobFilterResult extends BaseAppCompatActivityWithViewModel<Handyman
         Integer priceMax = getIntent().getIntExtra("priceMax", 0);
         String dateCreated = getIntent().getStringExtra("dateCreated");
         Integer categoryId = getIntent().getIntExtra("categoryId", 0);
-        Constants.Latitude.observe(this, new Observer<Double>() {
-            @Override
-            public void onChanged(Double aDouble) {
-                fetchData(aDouble, Constants.Longitude.getValue(), radius, priceMin, priceMax, dateCreated, categoryId);
-            }
-        });
+        Constants.Latitude.observe(this, aDouble -> fetchData(aDouble, Constants.Longitude.getValue(), radius, priceMin, priceMax, dateCreated, categoryId));
     }
 
     private void backPreviousActivity() {
-        binding.filterResultBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+        binding.filterResultBackButton.setOnClickListener(view -> onBackPressed());
     }
 
     private void createJobRecycleView() {
         RecyclerView rcvJob = binding.recycleViewFilterResult;
         jobAdapter = new JobFilterAdapter(this, jobArrayList);
-        jobAdapter.setOnItemClickListener(new JobFilterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Intent intent = new Intent(JobFilterResult.this, JobDetail.class);
-                intent.putExtra("jobId", jobArrayList.get(position).getId());
-                startActivity(intent);
-            }
+        jobAdapter.setOnItemClickListener(position -> {
+            Intent intent = new Intent(JobFilterResult.this, JobDetail.class);
+            intent.putExtra("jobId", jobArrayList.get(position).getId());
+            startActivity(intent);
         });
         RecyclerView.LayoutManager layoutManagerJob = new LinearLayoutManager(this);
         rcvJob.setLayoutManager(layoutManagerJob);
@@ -103,9 +89,8 @@ public class JobFilterResult extends BaseAppCompatActivityWithViewModel<Handyman
                            Integer priceMax,
                            String createTime,
                            Integer categoryId) {
-        String authorizationCode = sharedPreferencesUtils.get("token", String.class);
 
-        baseViewModel.fetchJobsByFilter(authorizationCode, new JobFilterRequest(lat, lng, radius, priceMin, priceMax, createTime, categoryId));
+        baseViewModel.fetchJobsByFilter(new JobFilterRequest(lat, lng, radius, priceMin, priceMax, createTime, categoryId));
 
         baseViewModel.getJobLiveData().observe(this, data -> {
             pgJob.setVisibility(View.GONE);

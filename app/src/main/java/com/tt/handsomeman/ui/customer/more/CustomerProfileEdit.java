@@ -5,12 +5,10 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
@@ -22,8 +20,6 @@ import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityCustomerProfileEditBinding;
 import com.tt.handsomeman.model.Customer;
-import com.tt.handsomeman.response.CustomerProfileResponse;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
 import com.tt.handsomeman.util.StatusConstant;
@@ -60,61 +56,46 @@ public class CustomerProfileEdit extends BaseAppCompatActivityWithViewModel<Cust
     }
 
     private void doEdit() {
-        ibEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String yourNameEditValue = yourNameEdit.getText().toString();
-                String authorizationCode = sharedPreferencesUtils.get("token", String.class);
+        ibEdit.setOnClickListener(v -> {
+            String yourNameEditValue = yourNameEdit.getText().toString();
 
-                baseViewModel.editCustomerProfile(authorizationCode, yourNameEditValue);
-                baseViewModel.getStandardResponseMutableLiveData().observe(CustomerProfileEdit.this, new Observer<StandardResponse>() {
-                    @Override
-                    public void onChanged(StandardResponse standardResponse) {
-                        Toast.makeText(CustomerProfileEdit.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                        if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                            isEdit = true;
-                            Intent intent = new Intent();
-                            intent.putExtra("isMyProfileEdit", isEdit);
-                            setResult(RESULT_OK, intent);
-                            finish();
-                        }
-                    }
-                });
-            }
+            baseViewModel.editCustomerProfile(yourNameEditValue);
+            baseViewModel.getStandardResponseMutableLiveData().observe(CustomerProfileEdit.this, standardResponse -> {
+                Toast.makeText(CustomerProfileEdit.this, standardResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    isEdit = true;
+                    Intent intent = new Intent();
+                    intent.putExtra("isMyProfileEdit", isEdit);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+            });
         });
     }
 
     private void goBack() {
-        binding.myProfileEditBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        binding.myProfileEditBackButton.setOnClickListener(v -> onBackPressed());
     }
 
     private void fetchCustomerProfile() {
         String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchCustomerProfile(authorizationCode);
-        baseViewModel.getCustomerProfileResponseMutableLiveData().observe(this, new Observer<CustomerProfileResponse>() {
-            @Override
-            public void onChanged(CustomerProfileResponse customerProfileResponse) {
-                Customer customer = customerProfileResponse.getCustomer();
+        baseViewModel.fetchCustomerProfile();
+        baseViewModel.getCustomerProfileResponseMutableLiveData().observe(this, customerProfileResponse -> {
+            Customer customer = customerProfileResponse.getCustomer();
 
-                GlideUrl glideUrl = new GlideUrl((customerProfileResponse.getAvatar()),
-                        new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
+            GlideUrl glideUrl = new GlideUrl((customerProfileResponse.getAvatar()),
+                    new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
 
-                Glide.with(CustomerProfileEdit.this)
-                        .load(glideUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .circleCrop()
-                        .placeholder(R.drawable.custom_progressbar)
-                        .error(R.drawable.logo)
-                        .signature(new MediaStoreSignature("", customerProfileResponse.getUpdateDate(), 0))
-                        .into(binding.accountAvatar);
+            Glide.with(CustomerProfileEdit.this)
+                    .load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .placeholder(R.drawable.custom_progressbar)
+                    .error(R.drawable.logo)
+                    .signature(new MediaStoreSignature("", customerProfileResponse.getUpdateDate(), 0))
+                    .into(binding.accountAvatar);
 
-                yourNameEdit.setText(customer.getName());
-            }
+            yourNameEdit.setText(customer.getName());
         });
     }
 

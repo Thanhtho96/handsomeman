@@ -4,15 +4,15 @@ import androidx.annotation.Nullable;
 
 public class AddJobFirstFormState {
     @Nullable
-    private Integer budgetMinError;
+    private final Integer budgetMinError;
     @Nullable
-    private Integer budgetMaxError;
+    private final Integer budgetMaxError;
     @Nullable
-    private Integer titleError;
+    private final Integer titleError;
     @Nullable
-    private Integer detailError;
+    private final Integer detailError;
 
-    private boolean isDataValid;
+    private final boolean isDataValid;
 
     public AddJobFirstFormState(@Nullable Integer budgetMinError,
                                 @Nullable Integer budgetMaxError,

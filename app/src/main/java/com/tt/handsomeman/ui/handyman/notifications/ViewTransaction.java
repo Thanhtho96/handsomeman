@@ -6,15 +6,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.tt.handsomeman.HandymanApp;
 import com.tt.handsomeman.R;
 import com.tt.handsomeman.databinding.ActivityViewTransactionBinding;
-import com.tt.handsomeman.response.DataBracketResponse;
 import com.tt.handsomeman.response.PaidPaymentNotificationResponse;
-import com.tt.handsomeman.response.StandardResponse;
 import com.tt.handsomeman.ui.BaseAppCompatActivityWithViewModel;
 import com.tt.handsomeman.util.DecimalFormat;
 import com.tt.handsomeman.util.SharedPreferencesUtils;
@@ -52,64 +49,55 @@ public class ViewTransaction extends BaseAppCompatActivityWithViewModel<Notifica
         notificationPos = intent.getIntExtra("notificationPos", 0);
 
         int customerTransferId = intent.getIntExtra("customerTransferId", 0);
-        String authorization = sharedPreferencesUtils.get("token", String.class);
-        fetchData(authorization, customerTransferId);
+        fetchData(customerTransferId);
     }
 
-    private void fetchData(String authorization,
-                           int customerTransferId) {
-        baseViewModel.fetchPaidPaymentNotification(authorization, customerTransferId);
-        baseViewModel.getPaidPaymentNotificationResponseMutableLiveData().observe(this, new Observer<DataBracketResponse<PaidPaymentNotificationResponse>>() {
-            @Override
-            public void onChanged(DataBracketResponse<PaidPaymentNotificationResponse> paidPaymentNotificationResponseDataBracketResponse) {
-                PaidPaymentNotificationResponse paidPaymentNotificationResponse = paidPaymentNotificationResponseDataBracketResponse.getData();
+    private void fetchData(int customerTransferId) {
+        baseViewModel.fetchPaidPaymentNotification(customerTransferId);
+        baseViewModel.getPaidPaymentNotificationResponseMutableLiveData().observe(this, paidPaymentNotificationResponseDataBracketResponse -> {
+            PaidPaymentNotificationResponse paidPaymentNotificationResponse = paidPaymentNotificationResponseDataBracketResponse.getData();
 
-                int paymentMilestoneOrder = paidPaymentNotificationResponse.getPaymentMilestoneOrder();
-                String paymentOrder;
-                switch (paymentMilestoneOrder) {
-                    case 1:
-                        paymentOrder = getString(R.string.first_milestone, paymentMilestoneOrder);
-                        break;
-                    case 2:
-                        paymentOrder = getString(R.string.second_milestone, paymentMilestoneOrder);
-                        break;
-                    case 3:
-                        paymentOrder = getString(R.string.third_milestone, paymentMilestoneOrder);
-                        break;
-                    default:
-                        paymentOrder = getString(R.string.default_milestone, paymentMilestoneOrder);
-                        break;
-                }
+            int paymentMilestoneOrder = paidPaymentNotificationResponse.getPaymentMilestoneOrder();
+            String paymentOrder;
+            switch (paymentMilestoneOrder) {
+                case 1:
+                    paymentOrder = getString(R.string.first_milestone, paymentMilestoneOrder);
+                    break;
+                case 2:
+                    paymentOrder = getString(R.string.second_milestone, paymentMilestoneOrder);
+                    break;
+                case 3:
+                    paymentOrder = getString(R.string.third_milestone, paymentMilestoneOrder);
+                    break;
+                default:
+                    paymentOrder = getString(R.string.default_milestone, paymentMilestoneOrder);
+                    break;
+            }
 
-                jobTile.setText(paidPaymentNotificationResponse.getJobTitle());
-                whoPaid.setText(getString(R.string.paid_payment_notification, paidPaymentNotificationResponse.getCustomerName(), paymentOrder));
-                balanceTransfer.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getBalanceTransfer())));
-                balanceReceive.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getBalanceReceive())));
-                fee.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getFee())));
+            jobTile.setText(paidPaymentNotificationResponse.getJobTitle());
+            whoPaid.setText(getString(R.string.paid_payment_notification, paidPaymentNotificationResponse.getCustomerName(), paymentOrder));
+            balanceTransfer.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getBalanceTransfer())));
+            balanceReceive.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getBalanceReceive())));
+            fee.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getFee())));
 
-                if (paidPaymentNotificationResponse.getBonus() > 0) {
-                    layoutBonus.setVisibility(View.VISIBLE);
-                    bonus.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getBonus())));
-                }
+            if (paidPaymentNotificationResponse.getBonus() > 0) {
+                layoutBonus.setVisibility(View.VISIBLE);
+                bonus.setText(getString(R.string.money_currency_string, DecimalFormat.format(paidPaymentNotificationResponse.getBonus())));
+            }
 
-                if (!isRead) {
-                    markAsRead(notificationId, authorization);
-                }
+            if (!isRead) {
+                markAsRead(notificationId);
             }
         });
     }
 
-    private void markAsRead(Integer notificationId,
-                            String token) {
+    private void markAsRead(Integer notificationId) {
         if (!isRead) {
-            baseViewModel.markNotificationAsRead(token, notificationId);
-            baseViewModel.getStandardResponseMarkReadMutableLiveData().observe(this, new Observer<StandardResponse>() {
-                @Override
-                public void onChanged(StandardResponse standardResponse) {
-                    if (standardResponse.getStatus().equals(StatusConstant.OK)) {
-                        isRead = true;
-                        ViewTransaction.this.isReadForFirstTime = true;
-                    }
+            baseViewModel.markNotificationAsRead(notificationId);
+            baseViewModel.getStandardResponseMarkReadMutableLiveData().observe(this, standardResponse -> {
+                if (standardResponse.getStatus().equals(StatusConstant.OK)) {
+                    isRead = true;
+                    ViewTransaction.this.isReadForFirstTime = true;
                 }
             });
         }

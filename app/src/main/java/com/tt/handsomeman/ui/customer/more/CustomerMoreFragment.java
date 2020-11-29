@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,7 +31,6 @@ import com.tt.handsomeman.adapter.PayoutAdapter;
 import com.tt.handsomeman.databinding.FragmentMoreCustomerBinding;
 import com.tt.handsomeman.model.Customer;
 import com.tt.handsomeman.model.Payout;
-import com.tt.handsomeman.response.CustomerProfileResponse;
 import com.tt.handsomeman.ui.AddNewPayout;
 import com.tt.handsomeman.ui.BaseFragment;
 import com.tt.handsomeman.ui.ChangePassword;
@@ -52,7 +50,7 @@ import javax.inject.Inject;
 public class CustomerMoreFragment extends BaseFragment<CustomerViewModel, FragmentMoreCustomerBinding> {
     private static final Integer REQUEST_MORE_FRAGMENT_MY_PROFILE_EDIT_RESULT_CODE = 7;
     private static final Integer REQUEST_MORE_CHANGE_PASSWORD = 0;
-
+    private final List<Payout> payoutList = new ArrayList<>();
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     @Inject
@@ -62,10 +60,9 @@ public class CustomerMoreFragment extends BaseFragment<CustomerViewModel, Fragme
     private ImageView imgAvatar;
     private ImageButton ibAddPayout;
     private PayoutAdapter payoutAdapter;
-    private List<Payout> payoutList = new ArrayList<>();
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         HandymanApp.getComponent().inject(this);
@@ -102,68 +99,53 @@ public class CustomerMoreFragment extends BaseFragment<CustomerViewModel, Fragme
             }
         });
 
-        tvViewTransferHistory.setOnClickListener(v -> {
-            startActivity(new Intent(getContext(), CustomerTransferHistory.class));
-        });
+        tvViewTransferHistory.setOnClickListener(v -> startActivity(new Intent(getContext(), CustomerTransferHistory.class)));
     }
 
     private void addPayout() {
-        ibAddPayout.setOnClickListener(v -> {
-            startActivityForResult(new Intent(getContext(), AddNewPayout.class), REQUEST_MORE_FRAGMENT_MY_PROFILE_EDIT_RESULT_CODE);
-        });
+        ibAddPayout.setOnClickListener(v -> startActivityForResult(new Intent(getContext(), AddNewPayout.class), REQUEST_MORE_FRAGMENT_MY_PROFILE_EDIT_RESULT_CODE));
     }
 
     private void viewMyProfile() {
-        viewMyProfileLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(getContext(), MyProfile.class), REQUEST_MORE_FRAGMENT_MY_PROFILE_EDIT_RESULT_CODE);
-            }
-        });
+        viewMyProfileLayout.setOnClickListener(v -> startActivityForResult(new Intent(getContext(), MyProfile.class), REQUEST_MORE_FRAGMENT_MY_PROFILE_EDIT_RESULT_CODE));
     }
 
     private void fetchCustomerInfo() {
         String authorizationCode = sharedPreferencesUtils.get("token", String.class);
-        baseViewModel.fetchCustomerInfo(authorizationCode);
-        baseViewModel.getCustomerProfileResponseMutableLiveData().observe(getViewLifecycleOwner(), new Observer<CustomerProfileResponse>() {
-            @Override
-            public void onChanged(CustomerProfileResponse customerProfileResponse) {
-                Customer customer = customerProfileResponse.getCustomer();
-                tvAccountName.setText(customer.getName());
+        baseViewModel.fetchCustomerInfo();
+        baseViewModel.getCustomerProfileResponseMutableLiveData().observe(getViewLifecycleOwner(), customerProfileResponse -> {
+            Customer customer = customerProfileResponse.getCustomer();
+            tvAccountName.setText(customer.getName());
 
-                GlideUrl glideUrl = new GlideUrl((customerProfileResponse.getAvatar()),
-                        new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
+            GlideUrl glideUrl = new GlideUrl((customerProfileResponse.getAvatar()),
+                    new LazyHeaders.Builder().addHeader("Authorization", authorizationCode).build());
 
-                Glide.with(CustomerMoreFragment.this)
-                        .load(glideUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .circleCrop()
-                        .placeholder(R.drawable.custom_progressbar)
-                        .error(R.drawable.logo)
-                        .signature(new MediaStoreSignature("", customerProfileResponse.getUpdateDate(), 0))
-                        .into(imgAvatar);
+            Glide.with(CustomerMoreFragment.this)
+                    .load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .circleCrop()
+                    .placeholder(R.drawable.custom_progressbar)
+                    .error(R.drawable.logo)
+                    .signature(new MediaStoreSignature("", customerProfileResponse.getUpdateDate(), 0))
+                    .into(imgAvatar);
 
-                payoutList.clear();
-                payoutList.addAll(customer.getAccount().getPayoutList());
-                payoutAdapter.notifyDataSetChanged();
-            }
+            payoutList.clear();
+            payoutList.addAll(customer.getAccount().getPayoutList());
+            payoutAdapter.notifyDataSetChanged();
         });
     }
 
     private void createPayoutRecyclerView() {
         RecyclerView rcvPayout = viewBinding.recyclerViewPayoutMore;
         payoutAdapter = new PayoutAdapter(payoutList, getContext());
-        payoutAdapter.setOnItemClickListener(new PayoutAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Payout payout = payoutList.get(position);
-                String lastPayoutNumber = payout.getAccountNumber().substring(payout.getAccountNumber().length() - 4);
+        payoutAdapter.setOnItemClickListener(position -> {
+            Payout payout = payoutList.get(position);
+            String lastPayoutNumber = payout.getAccountNumber().substring(payout.getAccountNumber().length() - 4);
 
-                Intent intent = new Intent(getContext(), ViewPayout.class);
-                intent.putExtra("lastPayoutNumber", lastPayoutNumber);
-                intent.putExtra("payoutId", payout.getId());
-                startActivityForResult(intent, REQUEST_MORE_FRAGMENT_MY_PROFILE_EDIT_RESULT_CODE);
-            }
+            Intent intent = new Intent(getContext(), ViewPayout.class);
+            intent.putExtra("lastPayoutNumber", lastPayoutNumber);
+            intent.putExtra("payoutId", payout.getId());
+            startActivityForResult(intent, REQUEST_MORE_FRAGMENT_MY_PROFILE_EDIT_RESULT_CODE);
         });
         RecyclerView.LayoutManager layoutManagerPayout = new LinearLayoutManager(getContext());
         rcvPayout.setLayoutManager(layoutManagerPayout);
@@ -173,27 +155,17 @@ public class CustomerMoreFragment extends BaseFragment<CustomerViewModel, Fragme
     }
 
     private void logOut() {
-        tvLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new YesOrNoDialog(getActivity(), R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.want_to_log_out), R.drawable.log_out, new YesOrNoDialog.OnItemClickListener() {
-                    @Override
-                    public void onItemClickYes() {
-                        String userId = sharedPreferencesUtils.get("userId", String.class);
-                        FirebaseMessaging.getInstance().unsubscribeFromTopic("notification-" + userId);
-                        sharedPreferencesUtils.clear();
-                        startActivity(new Intent(getContext(), Start.class));
-                        getActivity().finish();
-                    }
-                }).show();
-            }
-        });
+        tvLogout.setOnClickListener(v -> new YesOrNoDialog(getActivity(), R.style.PauseDialog, HandymanApp.getInstance().getString(R.string.want_to_log_out), R.drawable.log_out, () -> {
+            String userId = sharedPreferencesUtils.get("userId", String.class);
+            FirebaseMessaging.getInstance().unsubscribeFromTopic("notification-" + userId);
+            sharedPreferencesUtils.clear();
+            startActivity(new Intent(getContext(), Start.class));
+            getActivity().finish();
+        }).show());
     }
 
     private void changePassword() {
-        changePassword.setOnClickListener(view -> {
-            startActivityForResult(new Intent(getContext(), ChangePassword.class), REQUEST_MORE_CHANGE_PASSWORD);
-        });
+        changePassword.setOnClickListener(view -> startActivityForResult(new Intent(getContext(), ChangePassword.class), REQUEST_MORE_CHANGE_PASSWORD));
     }
 
     @Override

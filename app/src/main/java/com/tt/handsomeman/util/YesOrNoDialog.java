@@ -14,9 +14,9 @@ import com.tt.handsomeman.databinding.DialogYesOrNoBinding;
 
 public class YesOrNoDialog extends Dialog implements android.view.View.OnClickListener {
 
-    private String dialogDescription;
-    private int imgDescriptionSource;
-    private OnItemClickListener mListener;
+    private final String dialogDescription;
+    private final int imgDescriptionSource;
+    private final OnItemClickListener mListener;
     private DialogYesOrNoBinding binding;
 
     public YesOrNoDialog(Activity activity,
